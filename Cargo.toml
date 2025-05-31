@@ -1,0 +1,172 @@
+[package]
+name = "foxtrot"
+description = "A 3D reference project and tech demo for the Bevy Engine."
+license = "MIT OR Apache-2.0 OR CC0-1.0"
+authors = ["Jan Hohenheim <jan@hohenheim.ch>"]
+version = "0.1.0"
+edition = "2024"
+exclude = ["assets"]
+readme = "readme.md"
+keywords = ["bevy", "demo", "3d", "game"]
+repository = "https://github.com/janhohenheim/foxtrot"
+categories = ["game-development"]
+homepage = "https://janhohenheim.itch.io/foxtrot"
+
+[dependencies]
+bevy = { version = "0.16", features = [
+    "jpeg",
+    "tga",
+    "ktx2",
+    "png",
+    "wayland",
+    # Due to some Bevy bug, we need to enable the UI debug plugin even in non-dev builds,
+    # otherwise we only render the view model and the skybox.
+    "bevy_ui_debug",
+] }
+bevy_enhanced_input = "0.11"
+
+# physics
+avian3d = "0.3"
+avian_pickup = { version = "0.2.0" }
+
+# character controller
+bevy-tnua = "0.24"
+bevy-tnua-avian3d = "0.5"
+
+# navigation
+bevy_landmass = { version = "0.9.0" }
+oxidized_navigation = { version = "0.12.0", features = ["avian"] }
+landmass_oxidized_navigation = { version = "0.3.0-dev" }
+
+# Level editor
+bevy_trenchbroom = { version = "0.8.1", features = ["avian"] }
+
+# dialogue
+bevy_yarnspinner = "0.5"
+bevy_yarnspinner_example_dialogue_view = "0.5"
+
+bevy_hanabi = { version = "0.16.0-dev", optional = true }
+bevy_shuffle_bag = "0.2"
+
+# Keep this in sync with Bevy
+rand = "0.8.5"
+
+# Compile low-severity logs out of native builds for performance.
+log = { version = "0.4", features = [
+    "max_level_debug",
+    "release_max_level_warn",
+] }
+# Compile low-severity logs out of web builds for performance.
+tracing = { version = "0.1", features = [
+    "max_level_debug",
+    "release_max_level_warn",
+] }
+getrandom = { version = "0.3", default-features = false, features = [
+    "wasm_js",
+] }
+
+bevy_simple_subsecond_system = { version = "0.2.0", optional = true, git = "https://github.com/TheBevyFlock/bevy_simple_subsecond_system" }
+
+bitflags = "2.9.0"
+anyhow = "1.0.98"
+bevy-inspector-egui = { version = "0.31.0", optional = true }
+bevy_fix_cursor_unlock_web = "0.1.2"
+regex = "1.11.1"
+bevy_framepace = "0.19.1"
+[features]
+default = [
+    # Default to a native dev build.
+    "dev_native",
+]
+native = ["dep:bevy_hanabi", "bevy/experimental_pbr_pcss"]
+dev = [
+    # Improve compile times for dev builds by linking Bevy as a dynamic library.
+    "bevy/dynamic_linking",
+    "bevy/bevy_dev_tools",
+    "bevy/bevy_ui_debug",
+    # Improve error messages coming from Bevy
+    "bevy/track_location",
+    "dep:bevy-inspector-egui",
+    "avian3d/diagnostic_ui",
+]
+dev_native = [
+    "dev",
+    "native",
+    "hot_patch",
+    "bevy_remote",
+    # Enable asset hot reloading for native dev builds.
+    "bevy/file_watcher",
+    # Enable embedded asset hot reloading for native dev builds.
+    "bevy/embedded_watcher",
+    "oxidized_navigation/debug_draw",
+]
+hot_patch = ["dep:bevy_simple_subsecond_system"]
+bevy_remote = ["bevy/bevy_remote"]
+
+[package.metadata.bevy_cli]
+default-features = false
+
+[package.metadata.bevy_cli.native]
+features = ["native"]
+
+[package.metadata.bevy_cli.native.dev]
+features = ["dev_native"]
+
+[package.metadata.bevy_cli.web]
+rustflags = ["--cfg", "getrandom_backend=\"wasm_js\""]
+
+[package.metadata.bevy_cli.web.dev]
+features = ["dev"]
+
+[package.metadata.bevy_cli.web.release]
+# Optimize with size in mind (also try "z", sometimes it is better).
+# Slightly slows compile times, great improvements to file size and runtime performance.
+opt-level = "s"
+# Strip all debugging information from the binary to slightly reduce file size.
+strip = "debuginfo"
+panic = "abort"
+lto = true
+
+[lints.clippy]
+# Bevy supplies arguments to systems via dependency injection, so it's natural for systems to
+# request more than 7 arguments, which would undesirably trigger this lint.
+too_many_arguments = "allow"
+# Queries may access many components, which would undesirably trigger this lint.
+type_complexity = "allow"
+# Make sure macros use their standard braces, such as `[]` for `bevy_ecs::children!`.
+nonstandard_macro_braces = "warn"
+
+
+# Compile with Performance Optimizations:
+# https://bevyengine.org/learn/quick-start/getting-started/setup/#compile-with-performance-optimizations
+
+# Enable a small amount of optimization in the dev profile.
+[profile.dev]
+opt-level = 1
+
+# Enable a large amount of optimization in the dev profile for dependencies.
+[profile.dev.package."*"]
+opt-level = 3
+
+# Remove expensive debug assertions due to <https://github.com/bevyengine/bevy/issues/14291>
+[profile.dev.package.wgpu-types]
+debug-assertions = false
+
+[profile.wasm-dev]
+inherits = "dev"
+opt-level = 1
+
+[profile.server-dev]
+inherits = "dev"
+
+[profile.android-dev]
+inherits = "dev"
+
+[patch.crates-io]
+# oxidized_navigation and landmass_oxidized_navigation have no 0.16 releases yet
+oxidized_navigation = { git = "https://github.com/janhohenheim/oxidized_navigation", branch = "bevy-0.16" }
+landmass_oxidized_navigation = { git = "https://github.com/janhohenheim/landmass", branch = "bevy-0.16-oxidized" }
+# bevy_hanabi has no 0.16 release yet
+bevy_hanabi = { git = "https://github.com/djeedai/bevy_hanabi", branch = "main", optional = true }
+# This rev includes massive performance improvements due to collider caching
+avian3d = { git = "https://github.com/Jondolf/avian", rev = "4f31166ee5e0cc1116756952d754386333b75cb0" }

@@ -1,0 +1,23 @@
+# Rust builds
+/target
+# This file contains environment-specific configuration like linker settings
+.cargo/config.toml
+
+# ICEs
+/rustc-ice-*.txt
+
+# TrenchBroom
+assets/**/autosave/
+assets/**/*.log
+assets/**/*.pts
+assets/**/*.texinfo.json
+assets/**/*.prt
+assets/**/*.bsp
+
+# Baked assets
+/assets_baked
+
+# Flamegraph
+flamegraph.svg
+perf.data
+perf.data.old

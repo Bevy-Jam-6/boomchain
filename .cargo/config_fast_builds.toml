@@ -1,0 +1,73 @@
+[unstable]
+codegen-backend = true
+
+[profile]
+incremental = true
+
+[profile.dev]
+codegen-backend = "cranelift"
+# If you want to attach a debugger, set this to true
+debug = "line-tables-only"
+
+# Consider compiling deps with cranelift if you want cold-compilation to be faster
+[profile.dev.package."*"]
+codegen-backend = "llvm"
+
+# cranelift is `panic = abort`, so you need to compile with llvm to get `#[should_panic]` working
+[profile.test.package."*"]
+codegen-backend = "llvm"
+
+# Disable cranelift for release profile
+[profile.release]
+codegen-backend = "llvm"
+# Needed for flamegraph: https://github.com/flamegraph-rs/flamegraph?tab=readme-ov-file#improving-output-when-running-with---release
+debug = true
+
+# cranelift cannot build wasm32-unknown-unknown out of the box
+[profile.web]
+codegen-backend = "llvm"
+
+[build]
+# Requires setting `CARGO=1` or it breaks `Bevy CLI`: https://github.com/TheBevyFlock/bevy_cli/issues/429
+rustc-wrapper = "/home/hhh/.cargo/bin/sccache"
+# Using a global target dir allows all projects to share incremental compilation results,
+# vastly speeding up cold-compilation of new projects.
+target-dir = "/home/hhh/.cargo/global-target"
+
+[target.x86_64-unknown-linux-gnu]
+linker = "clang"
+rustflags = [
+    # mold sometimes does not work with subsecond
+    "-Clink-arg=-fuse-ld=lld",
+    # Needed for flamegraph: https://github.com/flamegraph-rs/flamegraph?tab=readme-ov-file#linux
+    "-Clink-arg=-Wl,--no-rosegment",
+    # Needed for flamegraph: https://github.com/bevyengine/bevy/blob/main/docs/profiling.md#perf-flame-graph
+    "-Cforce-frame-pointers=y",
+
+    # Nightly
+    "-Zshare-generics=y",
+    "-Zthreads=8",
+]
+rustdocflags = [
+    "-Clink-arg=-fuse-ld=mold",
+    # Nightly
+    "-Zshare-generics=y",
+    "-Zthreads=8",
+]
+
+[target.wasm32-unknown-unknown]
+# We cannot really change the linker for wasm32-unknown-unknown
+rustflags = [
+    "--cfg",
+    "getrandom_backend=\"wasm_js\"",
+    # Nightly
+    "-Zshare-generics=y",
+    "-Zthreads=8",
+]
+rustdocflags = [
+    "--cfg",
+    "getrandom_backend=\"wasm_js\"",
+    # Nightly
+    "-Zshare-generics=y",
+    "-Zthreads=8",
+]
