@@ -15,7 +15,7 @@ mod util;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins(TrenchBroomPlugins(
-        TrenchBroomConfig::new("foxtrot")
+        TrenchBroomConfig::new("boomchain")
             .texture_extensions(to_string_vec(&["png", "jpg", "jpeg"]))
             .texture_exclusions(to_string_vec(&[
                 "*_disp_*",

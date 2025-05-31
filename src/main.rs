@@ -43,7 +43,7 @@ fn main() -> AppExit {
             })
             .set(WindowPlugin {
                 primary_window: Window {
-                    title: "Foxtrot".to_string(),
+                    title: "Boomchain".to_string(),
                     fit_canvas_to_parent: true,
                     ..default()
                 }

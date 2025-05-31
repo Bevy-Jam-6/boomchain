@@ -2084,6 +2084,37 @@ dependencies = [
 ]
 
 [[package]]
+name = "boomchain"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "avian3d",
+ "avian_pickup",
+ "bevy",
+ "bevy-inspector-egui",
+ "bevy-tnua",
+ "bevy-tnua-avian3d",
+ "bevy_enhanced_input",
+ "bevy_fix_cursor_unlock_web",
+ "bevy_framepace",
+ "bevy_hanabi",
+ "bevy_landmass",
+ "bevy_shuffle_bag",
+ "bevy_simple_subsecond_system",
+ "bevy_trenchbroom",
+ "bevy_yarnspinner",
+ "bevy_yarnspinner_example_dialogue_view",
+ "bitflags 2.9.1",
+ "getrandom 0.3.3",
+ "landmass_oxidized_navigation",
+ "log",
+ "oxidized_navigation",
+ "rand 0.8.5",
+ "regex",
+ "tracing",
+]
+
+[[package]]
 name = "built"
 version = "0.7.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3194,37 +3225,6 @@ name = "foreign-types-shared"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aa9a19cbb55df58761df49b23516a86d432839add4af60fc256da840f66ed35b"
-
-[[package]]
-name = "foxtrot"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "avian3d",
- "avian_pickup",
- "bevy",
- "bevy-inspector-egui",
- "bevy-tnua",
- "bevy-tnua-avian3d",
- "bevy_enhanced_input",
- "bevy_fix_cursor_unlock_web",
- "bevy_framepace",
- "bevy_hanabi",
- "bevy_landmass",
- "bevy_shuffle_bag",
- "bevy_simple_subsecond_system",
- "bevy_trenchbroom",
- "bevy_yarnspinner",
- "bevy_yarnspinner_example_dialogue_view",
- "bitflags 2.9.1",
- "getrandom 0.3.3",
- "landmass_oxidized_navigation",
- "log",
- "oxidized_navigation",
- "rand 0.8.5",
- "regex",
- "tracing",
-]
 
 [[package]]
 name = "fsevent-sys"
