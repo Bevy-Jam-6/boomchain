@@ -33,6 +33,8 @@ pub(crate) struct PlayerAssets {
     pub(crate) idle_animation: Handle<AnimationClip>,
     #[dependency]
     pub(crate) a_pose_animation: Handle<AnimationClip>,
+    #[dependency]
+    pub(crate) shooting_animation: Handle<AnimationClip>,
 }
 
 impl FromWorld for PlayerAssets {
@@ -93,6 +95,7 @@ impl FromWorld for PlayerAssets {
             .unwrap(),
             idle_animation: assets.load(Player::animation_path(9)),
             a_pose_animation: assets.load(Player::animation_path(5)),
+            shooting_animation: assets.load(Player::animation_path(4)),
         }
     }
 }
