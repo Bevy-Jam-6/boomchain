@@ -19,6 +19,7 @@ use super::animation::AnimationPlayerAncestor;
 mod ai_state;
 mod animation;
 mod assets;
+mod attack;
 pub(crate) mod navigation;
 mod sound;
 
@@ -29,6 +30,7 @@ pub(super) fn plugin(app: &mut App) {
         assets::plugin,
         sound::plugin,
         ai_state::plugin,
+        attack::plugin,
     ));
     app.register_type::<Npc>();
     app.add_observer(on_add);

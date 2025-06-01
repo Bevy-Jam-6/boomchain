@@ -9,7 +9,7 @@ use bevy_tnua::{TnuaAnimatingState, TnuaAnimatingStateDirective, prelude::*};
 
 use crate::{PostPhysicsAppSystems, gameplay::animation::AnimationPlayers, screens::Screen};
 
-use super::assets::NpcAssets;
+use super::{assets::NpcAssets, attack::Attacking};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<NpcAnimations>();
@@ -68,6 +68,7 @@ pub(crate) fn setup_npc_animations(
 pub(crate) enum NpcAnimationState {
     Standing,
     Airborne,
+    Attack,
     Walking(f32),
 }
 
@@ -77,6 +78,7 @@ fn play_animations(
         &mut TnuaAnimatingState<NpcAnimationState>,
         &TnuaController,
         &AnimationPlayers,
+        Has<Attacking>,
     )>,
     mut q_animation: Query<(
         &NpcAnimations,
@@ -84,20 +86,25 @@ fn play_animations(
         &mut AnimationTransitions,
     )>,
 ) {
-    for (mut animating_state, controller, anim_players) in &mut query {
+    for (mut animating_state, controller, anim_players, attacking) in &mut query {
         let mut iter = q_animation.iter_many_mut(anim_players.iter());
         while let Some((animations, mut anim_player, mut transitions)) = iter.fetch_next() {
             match animating_state.update_by_discriminant({
-                let Some((_, basis_state)) = controller.concrete_basis::<TnuaBuiltinWalk>() else {
-                    continue;
-                };
-                let speed = basis_state.running_velocity.length();
-                if controller.is_airborne().unwrap() {
-                    NpcAnimationState::Airborne
-                } else if speed > 0.01 {
-                    NpcAnimationState::Walking(speed)
+                if attacking {
+                    NpcAnimationState::Attack
                 } else {
-                    NpcAnimationState::Standing
+                    let Some((_, basis_state)) = controller.concrete_basis::<TnuaBuiltinWalk>()
+                    else {
+                        continue;
+                    };
+                    let speed = basis_state.running_velocity.length();
+                    if controller.is_airborne().unwrap() {
+                        NpcAnimationState::Airborne
+                    } else if speed > 0.01 {
+                        NpcAnimationState::Walking(speed)
+                    } else {
+                        NpcAnimationState::Standing
+                    }
                 }
             }) {
                 TnuaAnimatingStateDirective::Maintain { state } => {
@@ -133,6 +140,13 @@ fn play_animations(
                                 Duration::from_millis(500),
                             )
                             .repeat();
+                    }
+                    NpcAnimationState::Attack => {
+                        transitions.play(
+                            &mut anim_player,
+                            animations.attack,
+                            Duration::from_millis(100),
+                        );
                     }
                     NpcAnimationState::Walking(_speed) => {
                         transitions

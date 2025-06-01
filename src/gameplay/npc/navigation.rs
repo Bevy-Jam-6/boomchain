@@ -77,15 +77,15 @@ struct WantsToFollowPlayer;
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn update_agent_target(
-    mut agents: Query<(&mut AgentTarget3d, &ChildOf), With<WantsToFollowPlayer>>,
+    mut agents: Query<(&mut AgentTarget3d, &AgentOf), With<WantsToFollowPlayer>>,
     ai_state: Query<&AiState>,
     player_position: Single<&LastValidPlayerNavmeshPosition>,
 ) {
     let Some(player_position) = player_position.0 else {
         return;
     };
-    for (mut target, child_of) in &mut agents {
-        let Ok(ai_state) = ai_state.get(child_of.0) else {
+    for (mut target, agent_of) in &mut agents {
+        let Ok(ai_state) = ai_state.get(agent_of.0) else {
             continue;
         };
         if !matches!(ai_state, AiState::Chase) {
@@ -95,15 +95,15 @@ fn update_agent_target(
     }
 }
 
-#[derive(Component, Deref, Debug, Reflect)]
+#[derive(Component, Deref, DerefMut, Debug, Reflect)]
 #[reflect(Component)]
 #[relationship(relationship_target = Agent)]
-struct AgentOf(Entity);
+pub(crate) struct AgentOf(Entity);
 
-#[derive(Component, Deref, Debug, Reflect)]
+#[derive(Component, Deref, DerefMut, Debug, Reflect)]
 #[reflect(Component)]
 #[relationship_target(relationship = AgentOf)]
-struct Agent(Entity);
+pub(crate) struct Agent(Entity);
 
 /// Use the desired velocity as the agent's velocity.
 #[cfg_attr(feature = "hot_patch", hot)]
