@@ -11,10 +11,7 @@ use bevy::{
     core_pipeline::{Skybox, bloom::Bloom, tonemapping::Tonemapping},
     pbr::NotShadowCaster,
     prelude::*,
-    render::{
-        camera::Exposure,
-        view::{NoFrustumCulling, RenderLayers},
-    },
+    render::{camera::Exposure, view::RenderLayers},
     scene::SceneInstanceReady,
     window::CursorGrabMode,
 };
@@ -127,6 +124,7 @@ fn spawn_view_model(
                 Camera3d::default(),
                 Projection::from(PerspectiveProjection {
                     fov: fov.to_radians(),
+                    near: 0.01,
                     ..default()
                 }),
                 Camera {
@@ -227,10 +225,6 @@ fn configure_player_view_model(
             RenderLayers::from(RenderLayer::VIEW_MODEL),
             // The arm is free-floating, so shadows would look weird.
             NotShadowCaster,
-            // The arm's origin is at the origin of the camera, so there is a high risk
-            // of it being culled. We want the view model to be visible at all times,
-            // so we disable frustum culling.
-            NoFrustumCulling,
         ));
     }
 }

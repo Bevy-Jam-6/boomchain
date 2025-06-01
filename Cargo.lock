@@ -1359,6 +1359,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_mod_skinned_aabb"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "88695fe9185adb904d04b9577bf7e7a78e54be7cb2445334013912259f979b67"
+dependencies = [
+ "bevy_app",
+ "bevy_asset",
+ "bevy_color",
+ "bevy_derive",
+ "bevy_ecs",
+ "bevy_gizmos",
+ "bevy_log",
+ "bevy_math",
+ "bevy_mesh",
+ "bevy_reflect",
+ "bevy_render",
+ "bevy_transform",
+]
+
+[[package]]
 name = "bevy_pbr"
 version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2099,6 +2119,7 @@ dependencies = [
  "bevy_framepace",
  "bevy_hanabi",
  "bevy_landmass",
+ "bevy_mod_skinned_aabb",
  "bevy_shuffle_bag",
  "bevy_simple_subsecond_system",
  "bevy_trenchbroom",
