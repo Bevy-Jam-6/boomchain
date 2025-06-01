@@ -99,7 +99,10 @@ fn setup_player(
                 combine_rule: CoefficientCombine::Multiply,
             },
             ColliderDensity(100.0),
-            CollisionLayers::new(CollisionLayer::Character, LayerMask::ALL),
+            CollisionLayers::new(
+                LayerMask::from([CollisionLayer::Character, CollisionLayer::Player]),
+                LayerMask::ALL,
+            ),
             TnuaAnimatingState::<PlayerAnimationState>::default(),
             children![(
                 Name::new("Player Landmass Character"),

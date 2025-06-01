@@ -16,6 +16,8 @@ pub(crate) enum CollisionLayer {
     Default,
     Prop,
     Character,
+    Player,
+    Sensor,
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
