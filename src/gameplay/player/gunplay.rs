@@ -1,4 +1,10 @@
-use crate::third_party::avian3d::CollisionLayer;
+use crate::{
+    gameplay::{
+        health::{Death, Health},
+        npc::Npc,
+    },
+    third_party::avian3d::CollisionLayer,
+};
 
 use super::{camera::PlayerCamera, default_input::Shoot};
 use avian3d::prelude::*;
@@ -11,7 +17,8 @@ pub(crate) struct Shooting;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_observer(shooting);
-    app.add_observer(print_hits);
+    app.add_observer(handle_hits);
+    app.add_observer(on_death);
 }
 
 fn shooting(trigger: Trigger<Started<Shoot>>, mut commands: Commands) {
@@ -19,11 +26,11 @@ fn shooting(trigger: Trigger<Started<Shoot>>, mut commands: Commands) {
     commands.entity(entity).insert(Shooting);
 }
 
-fn print_hits(
+fn handle_hits(
     _trigger: Trigger<Started<Shoot>>,
     spatial_query: SpatialQuery,
     player_camera_parent: Single<&Transform, With<PlayerCamera>>,
-    name: Query<NameOrEntity>,
+    mut npcs: Query<&mut Health, With<Npc>>,
 ) {
     // Ray origin and direction
     let origin = player_camera_parent.translation;
@@ -36,12 +43,20 @@ fn print_hits(
         SpatialQueryFilter::default().with_mask([CollisionLayer::Npc, CollisionLayer::Prop]);
 
     // Cast ray and print first hit
-    if let Some(first_hit) = spatial_query.cast_ray(origin, direction, max_distance, solid, &filter)
-    {
-        let name = name.get(first_hit.entity).unwrap();
-        info!("First hit: {name}");
-    } else {
-        // Sorry Joona, had to bring in some swiss german ;)
-        info!("denäbe!")
-    }
+    let Some(first_hit) = spatial_query.cast_ray(origin, direction, max_distance, solid, &filter)
+    else {
+        return;
+    };
+    let Ok(mut health) = npcs.get_mut(first_hit.entity) else {
+        return;
+    };
+
+    let gun_damage = 10.0;
+    health.damage(gun_damage);
+}
+
+fn on_death(trigger: Trigger<Death>, name: Query<NameOrEntity>) {
+    let entity = trigger.target();
+    let name = name.get(entity).unwrap();
+    info!("Just died: {name}");
 }
