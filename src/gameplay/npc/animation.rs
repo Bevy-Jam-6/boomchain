@@ -26,7 +26,7 @@ pub(super) fn plugin(app: &mut App) {
 struct NpcAnimations {
     idle: AnimationNodeIndex,
     walk: AnimationNodeIndex,
-    run: AnimationNodeIndex,
+    attack: AnimationNodeIndex,
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
@@ -40,11 +40,11 @@ pub(crate) fn setup_npc_animations(
     let anim_players = q_anim_players.get(trigger.target()).unwrap();
     for anim_player in anim_players.iter() {
         let (graph, indices) = AnimationGraph::from_clips([
-            assets.run_animation.clone(),
+            assets.attack_animation.clone(),
             assets.idle_animation.clone(),
             assets.walk_animation.clone(),
         ]);
-        let [run_index, idle_index, walk_index] = indices.as_slice() else {
+        let [attack_index, idle_index, walk_index] = indices.as_slice() else {
             unreachable!()
         };
         let graph_handle = graphs.add(graph);
@@ -52,7 +52,7 @@ pub(crate) fn setup_npc_animations(
         let animations = NpcAnimations {
             idle: *idle_index,
             walk: *walk_index,
-            run: *run_index,
+            attack: *attack_index,
         };
         let transitions = AnimationTransitions::new();
         commands.entity(anim_player).insert((
@@ -69,7 +69,6 @@ pub(crate) enum NpcAnimationState {
     Standing,
     Airborne,
     Walking(f32),
-    Running(f32),
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
@@ -95,8 +94,6 @@ fn play_animations(
                 let speed = basis_state.running_velocity.length();
                 if controller.is_airborne().unwrap() {
                     NpcAnimationState::Airborne
-                } else if speed > 4.5 {
-                    NpcAnimationState::Running(speed)
                 } else if speed > 0.01 {
                     NpcAnimationState::Walking(speed)
                 } else {
@@ -104,13 +101,11 @@ fn play_animations(
                 }
             }) {
                 TnuaAnimatingStateDirective::Maintain { state } => {
-                    if let NpcAnimationState::Running(speed) | NpcAnimationState::Walking(speed) =
-                        state
-                    {
+                    if let NpcAnimationState::Walking(speed) = state {
                         if let Some((_index, playing_animation)) =
                             anim_player.playing_animations_mut().next()
                         {
-                            let anim_speed = (speed / 3.0).max(0.3);
+                            let anim_speed = (speed / 5.0).max(0.2);
                             playing_animation.set_speed(anim_speed);
                         }
                     }
@@ -123,7 +118,11 @@ fn play_animations(
                 } => match state {
                     NpcAnimationState::Airborne => {
                         transitions
-                            .play(&mut anim_player, animations.run, Duration::from_millis(200))
+                            .play(
+                                &mut anim_player,
+                                animations.walk,
+                                Duration::from_millis(200),
+                            )
                             .repeat();
                     }
                     NpcAnimationState::Standing => {
@@ -142,11 +141,6 @@ fn play_animations(
                                 animations.walk,
                                 Duration::from_millis(300),
                             )
-                            .repeat();
-                    }
-                    NpcAnimationState::Running(_speed) => {
-                        transitions
-                            .play(&mut anim_player, animations.run, Duration::from_millis(400))
                             .repeat();
                     }
                 },

@@ -24,7 +24,7 @@ pub(crate) struct NpcAssets {
     #[dependency]
     pub(crate) walk_animation: Handle<AnimationClip>,
     #[dependency]
-    pub(crate) run_animation: Handle<AnimationClip>,
+    pub(crate) attack_animation: Handle<AnimationClip>,
     #[dependency]
     pub(crate) steps: ShuffleBag<Handle<AudioSource>>,
 }
@@ -35,7 +35,7 @@ impl FromWorld for NpcAssets {
         let rng = &mut rand::thread_rng();
         Self {
             _model: assets.load(Npc::scene_path()),
-            run_animation: assets.load(Npc::animation_path(0)),
+            attack_animation: assets.load(Npc::animation_path(0)),
             idle_animation: assets.load(Npc::animation_path(1)),
             walk_animation: assets.load(Npc::animation_path(2)),
             steps: ShuffleBag::try_new(
