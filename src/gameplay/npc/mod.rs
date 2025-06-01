@@ -15,7 +15,7 @@ use crate::third_party::{
     bevy_yarnspinner::YarnNode,
 };
 
-use super::animation::AnimationPlayerAncestor;
+use super::{animation::AnimationPlayerAncestor, health::Health};
 mod ai_state;
 mod animation;
 mod assets;
@@ -64,7 +64,11 @@ fn on_add(trigger: Trigger<OnAdd, Npc>, mut commands: Commands, assets: Res<Asse
             LockedAxes::ROTATION_LOCKED.unlock_rotation_y(),
             TnuaAnimatingState::<NpcAnimationState>::default(),
             AnimationPlayerAncestor,
-            CollisionLayers::new(CollisionLayer::Character, LayerMask::ALL),
+            CollisionLayers::new(
+                [CollisionLayer::Character, CollisionLayer::Npc],
+                LayerMask::ALL,
+            ),
+            Health::new(100.0),
             // The Yarn Node is what we use to trigger dialogue.
             YarnNode::new("Npc"),
             AiState::default(),
