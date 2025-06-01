@@ -1,37 +1,20 @@
-use super::{Player, animation::PlayerAnimations, camera::PlayerCamera, default_input::Shoot};
-use crate::gameplay::{animation::AnimationPlayers, crosshair::CrosshairState};
+use super::{Player, camera::PlayerCamera, default_input::Shoot};
 use avian3d::prelude::*;
 use bevy::prelude::*;
 use bevy_enhanced_input::events::Started;
-use std::time::Duration;
+
+#[derive(Component, Debug, Reflect)]
+#[reflect(Component)]
+pub(crate) struct Shooting;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_observer(shooting);
     app.add_observer(print_hits);
 }
 
-fn shooting(
-    _trigger: Trigger<Started<Shoot>>,
-    mut query: Query<&AnimationPlayers>,
-    mut q_animation: Query<(
-        &PlayerAnimations,
-        &mut AnimationPlayer,
-        &mut AnimationTransitions,
-    )>,
-    crosshair_state: Single<&CrosshairState>,
-) {
-    for anim_players in &mut query {
-        let mut iter = q_animation.iter_many_mut(anim_players.iter());
-        while let Some((animations, mut anim_player, mut transitions)) = iter.fetch_next() {
-            if crosshair_state.wants_invisible.is_empty() {
-                transitions.play(
-                    &mut anim_player,
-                    animations.shooting,
-                    Duration::from_millis(150),
-                );
-            }
-        }
-    }
+fn shooting(trigger: Trigger<Started<Shoot>>, mut commands: Commands) {
+    let entity = trigger.target();
+    commands.entity(entity).insert(Shooting);
 }
 
 fn print_hits(
@@ -41,8 +24,6 @@ fn print_hits(
     name: Query<NameOrEntity>,
     player: Single<Entity, With<Player>>,
 ) {
-    info!("pew!");
-
     // Ray origin and direction
     let origin = player_camera_parent.translation;
     let direction = player_camera_parent.forward();
@@ -66,5 +47,10 @@ fn print_hits(
     for hit in hits.iter() {
         let name = name.get(hit.entity).unwrap();
         info!("Hit: {name}");
+    }
+
+    if hits.len() == 0 {
+        // Sorry Joona, had to bring in some swiss german ;).
+        info!("denäbe!")
     }
 }

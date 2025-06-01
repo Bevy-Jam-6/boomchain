@@ -9,7 +9,7 @@ use bevy_tnua::{TnuaAnimatingState, TnuaAnimatingStateDirective};
 
 use crate::{
     PostPhysicsAppSystems,
-    gameplay::{animation::AnimationPlayers, crosshair::CrosshairState},
+    gameplay::{animation::AnimationPlayers, crosshair::CrosshairState, player::gunplay::Shooting},
     screens::Screen,
 };
 
@@ -72,13 +72,16 @@ pub(crate) fn setup_player_animations(
 pub(crate) enum PlayerAnimationState {
     None,
     Idle,
+    Shooting,
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn play_animations(
     mut query: Query<(
+        Entity,
         &mut TnuaAnimatingState<PlayerAnimationState>,
         &AnimationPlayers,
+        Has<Shooting>,
     )>,
     mut q_animation: Query<(
         &PlayerAnimations,
@@ -86,14 +89,26 @@ fn play_animations(
         &mut AnimationTransitions,
     )>,
     crosshair_state: Single<&CrosshairState>,
+    mut commands: Commands,
 ) {
-    for (mut animating_state, anim_players) in &mut query {
+    for (entity, mut animating_state, anim_players, is_shooting) in &mut query {
         let mut iter = q_animation.iter_many_mut(anim_players.iter());
         while let Some((animations, mut anim_player, mut transitions)) = iter.fetch_next() {
             match animating_state.update_by_discriminant(
                 // we show the player's hands exactly if and only if the crosshair is visible
                 if crosshair_state.wants_invisible.is_empty() {
-                    PlayerAnimationState::Idle
+                    if is_shooting {
+                        if anim_player.is_playing_animation(animations.shooting)
+                            && anim_player.all_finished()
+                        {
+                            commands.entity(entity).remove::<Shooting>();
+                            PlayerAnimationState::Idle
+                        } else {
+                            PlayerAnimationState::Shooting
+                        }
+                    } else {
+                        PlayerAnimationState::Idle
+                    }
                 } else {
                     PlayerAnimationState::None
                 },
@@ -120,6 +135,13 @@ fn play_animations(
                                 Duration::from_millis(150),
                             )
                             .repeat();
+                    }
+                    PlayerAnimationState::Shooting => {
+                        transitions.play(
+                            &mut anim_player,
+                            animations.shooting,
+                            Duration::from_millis(50),
+                        );
                     }
                 },
             }
