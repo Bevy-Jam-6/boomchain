@@ -1,4 +1,6 @@
-use super::{Player, camera::PlayerCamera, default_input::Shoot};
+use crate::third_party::avian3d::CollisionLayer;
+
+use super::{camera::PlayerCamera, default_input::Shoot};
 use avian3d::prelude::*;
 use bevy::prelude::*;
 use bevy_enhanced_input::events::Started;
@@ -22,7 +24,6 @@ fn print_hits(
     spatial_query: SpatialQuery,
     player_camera_parent: Single<&Transform, With<PlayerCamera>>,
     name: Query<NameOrEntity>,
-    player: Single<Entity, With<Player>>,
 ) {
     // Ray origin and direction
     let origin = player_camera_parent.translation;
@@ -31,7 +32,8 @@ fn print_hits(
     // Configuration for the ray cast
     let max_distance = 100.0;
     let solid = true;
-    let filter = SpatialQueryFilter::default().with_excluded_entities([*player]);
+    let filter =
+        SpatialQueryFilter::default().with_mask([CollisionLayer::Npc, CollisionLayer::Prop]);
 
     // Cast ray and print first hit
     if let Some(first_hit) = spatial_query.cast_ray(origin, direction, max_distance, solid, &filter)
