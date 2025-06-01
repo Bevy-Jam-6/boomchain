@@ -60,7 +60,7 @@ pub(crate) struct Player;
 /// The radius of the player character's capsule.
 pub(crate) const PLAYER_RADIUS: f32 = 0.5;
 /// The length of the player character's capsule. Note that
-const PLAYER_CAPSULE_LENGTH: f32 = 1.0;
+const PLAYER_CAPSULE_LENGTH: f32 = 0.5;
 
 /// The total height of the player character's capsule. A capsule's height is `length + 2 * radius`.
 const PLAYER_HEIGHT: f32 = PLAYER_CAPSULE_LENGTH + 2.0 * PLAYER_RADIUS;
@@ -73,7 +73,7 @@ const PLAYER_HALF_HEIGHT: f32 = PLAYER_HEIGHT / 2.0;
 /// using a spring. It's important to make sure that this floating height is greater (even if by little) than the half height.
 ///
 /// In this case, we use 30 cm of padding to make the player float nicely up stairs.
-const PLAYER_FLOAT_HEIGHT: f32 = PLAYER_HALF_HEIGHT + 0.01;
+const PLAYER_FLOAT_HEIGHT: f32 = PLAYER_HALF_HEIGHT + 0.5;
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn setup_player(
