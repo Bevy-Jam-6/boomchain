@@ -1,5 +1,6 @@
 //! NPC handling. In the demo, the NPC is a fox that moves towards the player. We can interact with the NPC to trigger dialogue.
 
+use ai_state::AiState;
 use animation::{NpcAnimationState, setup_npc_animations};
 use avian3d::prelude::*;
 use bevy::prelude::*;
@@ -15,13 +16,20 @@ use crate::third_party::{
 };
 
 use super::animation::AnimationPlayerAncestor;
-pub(crate) mod ai;
+mod ai_state;
 mod animation;
 mod assets;
+pub(crate) mod navigation;
 mod sound;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_plugins((ai::plugin, animation::plugin, assets::plugin, sound::plugin));
+    app.add_plugins((
+        navigation::plugin,
+        animation::plugin,
+        assets::plugin,
+        sound::plugin,
+        ai_state::plugin,
+    ));
     app.register_type::<Npc>();
     app.add_observer(on_add);
 }
@@ -57,6 +65,7 @@ fn on_add(trigger: Trigger<OnAdd, Npc>, mut commands: Commands, assets: Res<Asse
             CollisionLayers::new(CollisionLayer::Character, LayerMask::ALL),
             // The Yarn Node is what we use to trigger dialogue.
             YarnNode::new("Npc"),
+            AiState::default(),
         ))
         .with_child((
             Name::new("Npc Model"),

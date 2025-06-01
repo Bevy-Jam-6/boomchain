@@ -19,7 +19,7 @@ use crate::{
     screens::Screen,
 };
 
-use super::{NPC_FLOAT_HEIGHT, NPC_RADIUS, Npc};
+use super::{NPC_FLOAT_HEIGHT, NPC_RADIUS, Npc, ai_state::AiState};
 
 pub(crate) const NPC_MAX_SLOPE: f32 = TAU / 6.0;
 
@@ -77,13 +77,20 @@ struct WantsToFollowPlayer;
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn update_agent_target(
-    mut agents: Query<&mut AgentTarget3d, With<WantsToFollowPlayer>>,
+    mut agents: Query<(&mut AgentTarget3d, &ChildOf), With<WantsToFollowPlayer>>,
+    ai_state: Query<&AiState>,
     player_position: Single<&LastValidPlayerNavmeshPosition>,
 ) {
     let Some(player_position) = player_position.0 else {
         return;
     };
-    for mut target in &mut agents {
+    for (mut target, child_of) in &mut agents {
+        let Ok(ai_state) = ai_state.get(child_of.0) else {
+            continue;
+        };
+        if !matches!(ai_state, AiState::Chase) {
+            continue;
+        }
         *target = AgentTarget3d::Point(player_position);
     }
 }
