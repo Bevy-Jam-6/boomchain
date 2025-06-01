@@ -6,6 +6,7 @@ use bevy::prelude::*;
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
 use bevy_tnua::{TnuaAnimatingState, TnuaAnimatingStateDirective, prelude::*};
+use rand::Rng;
 
 use crate::{PostPhysicsAppSystems, gameplay::animation::AnimationPlayers, screens::Screen};
 
@@ -151,13 +152,15 @@ fn play_animations(
                             .repeat();
                     }
                     NpcAnimationState::Attack => {
+                        let speed = rand::thread_rng().gen_range(1.2..=2.1);
+                        let transition_millis = rand::thread_rng().gen_range(100..=300);
                         transitions
                             .play(
                                 &mut anim_player,
                                 animations.attack,
-                                Duration::from_millis(100),
+                                Duration::from_millis(transition_millis),
                             )
-                            .set_speed(2.0);
+                            .set_speed(speed);
                     }
                     NpcAnimationState::Walking(_speed) => {
                         transitions
