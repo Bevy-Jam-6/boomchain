@@ -30,6 +30,7 @@ pub(super) fn plugin(app: &mut App) {
 pub(crate) struct PlayerAnimations {
     idle: AnimationNodeIndex,
     a_pose: AnimationNodeIndex,
+    pub shooting: AnimationNodeIndex,
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
@@ -45,8 +46,9 @@ pub(crate) fn setup_player_animations(
         let (graph, indices) = AnimationGraph::from_clips([
             assets.idle_animation.clone(),
             assets.a_pose_animation.clone(),
+            assets.shooting_animation.clone(),
         ]);
-        let [idle_index, a_pose_index] = indices.as_slice() else {
+        let [idle_index, a_pose_index, shooting_index] = indices.as_slice() else {
             unreachable!()
         };
         let graph_handle = graphs.add(graph);
@@ -54,6 +56,7 @@ pub(crate) fn setup_player_animations(
         let animations = PlayerAnimations {
             idle: *idle_index,
             a_pose: *a_pose_index,
+            shooting: *shooting_index,
         };
         let transitions = AnimationTransitions::new();
         commands.entity(anim_player).insert((

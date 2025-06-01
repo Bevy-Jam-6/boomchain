@@ -50,6 +50,10 @@ pub(crate) struct PickupProp;
 #[input_action(output = bool)]
 pub(crate) struct DropProp;
 
+#[derive(Debug, InputAction)]
+#[input_action(output = bool)]
+pub(crate) struct Shoot;
+
 #[derive(Debug, InputContext, Default)]
 pub(crate) struct DefaultInputContext;
 
@@ -82,9 +86,9 @@ fn default_binding(
         .bind::<Jump>()
         .to((KeyCode::Space, GamepadButton::South));
 
-    actions
-        .bind::<Interact>()
-        .to((KeyCode::KeyE, GamepadButton::South));
+    // actions
+    //     .bind::<Interact>()
+    //     .to((KeyCode::KeyE, GamepadButton::South));
 
     const DEFAULT_SENSITIVITY: f32 = 0.002;
     actions
@@ -94,11 +98,13 @@ fn default_binding(
 
     actions
         .bind::<PickupProp>()
-        .to((MouseButton::Left, GamepadButton::East));
+        .to((KeyCode::KeyE, GamepadButton::East));
 
     actions
         .bind::<DropProp>()
-        .to((MouseButton::Right, GamepadButton::East));
+        .to((KeyCode::KeyG, GamepadButton::East));
+
+    actions.bind::<Shoot>().to(MouseButton::Left);
 }
 
 #[derive(Resource, Default, Reflect, Deref, DerefMut)]

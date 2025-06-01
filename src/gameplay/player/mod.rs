@@ -23,6 +23,7 @@ pub(crate) mod assets;
 pub(crate) mod camera;
 pub(crate) mod default_input;
 pub(crate) mod dialogue;
+pub(crate) mod gunplay;
 pub(crate) mod movement;
 pub(crate) mod movement_sound;
 pub(crate) mod navmesh_position;
@@ -40,6 +41,7 @@ pub(super) fn plugin(app: &mut App) {
         movement_sound::plugin,
         pickup::plugin,
         navmesh_position::plugin,
+        gunplay::plugin,
     ));
     app.add_observer(setup_player);
     app.add_systems(PreUpdate, assert_only_one_player);
