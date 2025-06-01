@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 use bevy_landmass::AgentState;
 
+use crate::gameplay::player::Player;
+
 use super::{attack::Attacking, navigation::Agent};
 
 pub(super) fn plugin(app: &mut App) {
@@ -17,11 +19,12 @@ pub(crate) enum AiState {
 }
 
 fn update_ai_state(
-    mut ai_state: Query<(Entity, &mut AiState, &Agent, Has<Attacking>)>,
+    mut ai_state: Query<(Entity, &mut AiState, &Agent, &Transform, Has<Attacking>)>,
+    player: Single<&Transform, With<Player>>,
     agent_state: Query<&AgentState>,
     mut commands: Commands,
 ) {
-    for (entity, mut ai_state, agent, attacking) in &mut ai_state {
+    for (entity, mut ai_state, agent, transform, attacking) in &mut ai_state {
         let Ok(agent_state) = agent_state.get(**agent) else {
             continue;
         };
@@ -29,7 +32,14 @@ fn update_ai_state(
             AiState::Chase => {
                 if matches!(agent_state, AgentState::ReachedTarget) {
                     *ai_state = AiState::Attack;
-                    commands.entity(entity).insert(Attacking);
+                    let target = Vec3::new(
+                        player.translation.x,
+                        transform.translation.y,
+                        player.translation.z,
+                    );
+                    commands.entity(entity).insert(Attacking {
+                        dir: Dir3::try_from(target - transform.translation).ok(),
+                    });
                 }
             }
             AiState::Attack => {

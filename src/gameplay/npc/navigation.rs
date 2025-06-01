@@ -20,7 +20,7 @@ use crate::{
     screens::Screen,
 };
 
-use super::{NPC_FLOAT_HEIGHT, NPC_RADIUS, Npc, ai_state::AiState};
+use super::{NPC_FLOAT_HEIGHT, NPC_RADIUS, Npc, ai_state::AiState, attack::Attacking};
 
 pub(crate) const NPC_MAX_SLOPE: f32 = TAU / 6.0;
 
@@ -109,24 +109,18 @@ pub(crate) struct Agent(Entity);
 /// Use the desired velocity as the agent's velocity.
 #[cfg_attr(feature = "hot_patch", hot)]
 fn set_controller_velocity(
-    mut agent_query: Query<(&mut TnuaController, &Agent, &AiState, &Transform)>,
-    player: Single<&Transform, With<Player>>,
+    mut agent_query: Query<(&mut TnuaController, &Agent, Option<&Attacking>)>,
     desired_velocity_query: Query<&LandmassAgentDesiredVelocity>,
 ) {
-    for (mut controller, agent, state, transform) in &mut agent_query {
+    for (mut controller, agent, attacking) in &mut agent_query {
         let Ok(desired_velocity) = desired_velocity_query.get(**agent) else {
             continue;
         };
         let velocity = desired_velocity.velocity();
-        let forward = if matches!(state, AiState::Chase) {
-            Dir3::try_from(velocity).ok()
+        let forward = if let Some(attacking) = attacking {
+            attacking.dir
         } else {
-            let target = Vec3::new(
-                player.translation.x,
-                transform.translation.y,
-                player.translation.z,
-            );
-            Dir3::try_from(target - transform.translation).ok()
+            Dir3::try_from(velocity).ok()
         };
         controller.basis(TnuaBuiltinWalk {
             desired_velocity: velocity,

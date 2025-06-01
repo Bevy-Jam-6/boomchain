@@ -9,6 +9,8 @@ pub(super) fn plugin(app: &mut App) {
 
 fn start_attack(trigger: Trigger<OnAdd, Attacking>) {}
 
-#[derive(Component, Debug, Default, Reflect)]
+#[derive(Component, Debug, Reflect)]
 #[reflect(Component)]
-pub(crate) struct Attacking;
+pub(crate) struct Attacking {
+    pub(crate) dir: Option<Dir3>,
+}
