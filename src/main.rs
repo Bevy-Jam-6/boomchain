@@ -144,6 +144,8 @@ enum PostPhysicsAppSystems {
     PlayAnimations,
     /// Do everything else (consider splitting this into further variants).
     Update,
+    /// Trigger death.
+    TriggerDeath,
 }
 
 /// This enum is converted to an `isize` to be used as a camera's order.

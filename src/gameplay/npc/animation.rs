@@ -6,10 +6,11 @@ use bevy::prelude::*;
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
 use bevy_tnua::{TnuaAnimatingState, TnuaAnimatingStateDirective, prelude::*};
+use rand::Rng;
 
 use crate::{PostPhysicsAppSystems, gameplay::animation::AnimationPlayers, screens::Screen};
 
-use super::assets::NpcAssets;
+use super::{assets::NpcAssets, attack::Attacking};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<NpcAnimations>();
@@ -26,7 +27,7 @@ pub(super) fn plugin(app: &mut App) {
 struct NpcAnimations {
     idle: AnimationNodeIndex,
     walk: AnimationNodeIndex,
-    run: AnimationNodeIndex,
+    attack: AnimationNodeIndex,
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
@@ -40,11 +41,11 @@ pub(crate) fn setup_npc_animations(
     let anim_players = q_anim_players.get(trigger.target()).unwrap();
     for anim_player in anim_players.iter() {
         let (graph, indices) = AnimationGraph::from_clips([
-            assets.run_animation.clone(),
+            assets.attack_animation.clone(),
             assets.idle_animation.clone(),
             assets.walk_animation.clone(),
         ]);
-        let [run_index, idle_index, walk_index] = indices.as_slice() else {
+        let [attack_index, idle_index, walk_index] = indices.as_slice() else {
             unreachable!()
         };
         let graph_handle = graphs.add(graph);
@@ -52,7 +53,7 @@ pub(crate) fn setup_npc_animations(
         let animations = NpcAnimations {
             idle: *idle_index,
             walk: *walk_index,
-            run: *run_index,
+            attack: *attack_index,
         };
         let transitions = AnimationTransitions::new();
         commands.entity(anim_player).insert((
@@ -68,49 +69,60 @@ pub(crate) fn setup_npc_animations(
 pub(crate) enum NpcAnimationState {
     Standing,
     Airborne,
+    Attack,
     Walking(f32),
-    Running(f32),
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn play_animations(
     mut query: Query<(
+        Entity,
         &mut TnuaAnimatingState<NpcAnimationState>,
         &TnuaController,
         &AnimationPlayers,
+        Has<Attacking>,
     )>,
     mut q_animation: Query<(
         &NpcAnimations,
         &mut AnimationPlayer,
         &mut AnimationTransitions,
     )>,
+    mut commands: Commands,
 ) {
-    for (mut animating_state, controller, anim_players) in &mut query {
+    for (entity, mut animating_state, controller, anim_players, attacking) in &mut query {
         let mut iter = q_animation.iter_many_mut(anim_players.iter());
         while let Some((animations, mut anim_player, mut transitions)) = iter.fetch_next() {
             match animating_state.update_by_discriminant({
-                let Some((_, basis_state)) = controller.concrete_basis::<TnuaBuiltinWalk>() else {
-                    continue;
-                };
-                let speed = basis_state.running_velocity.length();
-                if controller.is_airborne().unwrap() {
-                    NpcAnimationState::Airborne
-                } else if speed > 4.5 {
-                    NpcAnimationState::Running(speed)
-                } else if speed > 0.01 {
-                    NpcAnimationState::Walking(speed)
+                if attacking {
+                    if anim_player.is_playing_animation(animations.attack)
+                        && anim_player.all_finished()
+                    {
+                        commands.entity(entity).remove::<Attacking>();
+                        NpcAnimationState::Standing
+                    } else {
+                        NpcAnimationState::Attack
+                    }
                 } else {
-                    NpcAnimationState::Standing
+                    let Some((_, basis_state)) = controller.concrete_basis::<TnuaBuiltinWalk>()
+                    else {
+                        continue;
+                    };
+                    let speed = basis_state.running_velocity.length();
+                    if controller.is_airborne().unwrap() {
+                        NpcAnimationState::Airborne
+                    } else if speed > 0.01 {
+                        NpcAnimationState::Walking(speed)
+                    } else {
+                        NpcAnimationState::Standing
+                    }
                 }
             }) {
                 TnuaAnimatingStateDirective::Maintain { state } => {
-                    if let NpcAnimationState::Running(speed) | NpcAnimationState::Walking(speed) =
-                        state
-                    {
+                    if let NpcAnimationState::Walking(speed) = state {
                         if let Some((_index, playing_animation)) =
                             anim_player.playing_animations_mut().next()
                         {
-                            let anim_speed = (speed / 3.0).max(0.3);
+                            let anim_speed = (speed / 5.0).max(0.2);
                             playing_animation.set_speed(anim_speed);
                         }
                     }
@@ -123,7 +135,11 @@ fn play_animations(
                 } => match state {
                     NpcAnimationState::Airborne => {
                         transitions
-                            .play(&mut anim_player, animations.run, Duration::from_millis(200))
+                            .play(
+                                &mut anim_player,
+                                animations.walk,
+                                Duration::from_millis(200),
+                            )
                             .repeat();
                     }
                     NpcAnimationState::Standing => {
@@ -135,6 +151,17 @@ fn play_animations(
                             )
                             .repeat();
                     }
+                    NpcAnimationState::Attack => {
+                        let speed = rand::thread_rng().gen_range(1.2..=2.1);
+                        let transition_millis = rand::thread_rng().gen_range(100..=300);
+                        transitions
+                            .play(
+                                &mut anim_player,
+                                animations.attack,
+                                Duration::from_millis(transition_millis),
+                            )
+                            .set_speed(speed);
+                    }
                     NpcAnimationState::Walking(_speed) => {
                         transitions
                             .play(
@@ -142,11 +169,6 @@ fn play_animations(
                                 animations.walk,
                                 Duration::from_millis(300),
                             )
-                            .repeat();
-                    }
-                    NpcAnimationState::Running(_speed) => {
-                        transitions
-                            .play(&mut anim_player, animations.run, Duration::from_millis(400))
                             .repeat();
                     }
                 },

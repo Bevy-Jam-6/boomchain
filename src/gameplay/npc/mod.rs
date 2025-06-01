@@ -1,5 +1,6 @@
 //! NPC handling. In the demo, the NPC is a fox that moves towards the player. We can interact with the NPC to trigger dialogue.
 
+use ai_state::AiState;
 use animation::{NpcAnimationState, setup_npc_animations};
 use avian3d::prelude::*;
 use bevy::prelude::*;
@@ -14,14 +15,23 @@ use crate::third_party::{
     bevy_yarnspinner::YarnNode,
 };
 
-use super::animation::AnimationPlayerAncestor;
-pub(crate) mod ai;
+use super::{animation::AnimationPlayerAncestor, health::Health};
+mod ai_state;
 mod animation;
 mod assets;
+mod attack;
+pub(crate) mod navigation;
 mod sound;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_plugins((ai::plugin, animation::plugin, assets::plugin, sound::plugin));
+    app.add_plugins((
+        navigation::plugin,
+        animation::plugin,
+        assets::plugin,
+        sound::plugin,
+        ai_state::plugin,
+        attack::plugin,
+    ));
     app.register_type::<Npc>();
     app.add_observer(on_add);
 }
@@ -29,16 +39,16 @@ pub(super) fn plugin(app: &mut App) {
 #[derive(PointClass, Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
 #[reflect(QuakeClass, Component)]
 #[base(Transform, Visibility)]
-#[model("models/fox/Fox.gltf")]
+#[model("models/zombie_3/zombie_3.gltf")]
 // In Wasm, TrenchBroom classes are not automatically registered.
 // So, we need to manually register the class in `src/third_party/bevy_trenchbroom/mod.rs`.
 pub(crate) struct Npc;
 
-pub(crate) const NPC_RADIUS: f32 = 0.6;
-const NPC_CAPSULE_LENGTH: f32 = 0.1;
+pub(crate) const NPC_RADIUS: f32 = 0.4;
+const NPC_CAPSULE_LENGTH: f32 = 0.6;
 pub(crate) const NPC_HEIGHT: f32 = NPC_CAPSULE_LENGTH + 2.0 * NPC_RADIUS;
 const NPC_HALF_HEIGHT: f32 = NPC_HEIGHT / 2.0;
-const NPC_FLOAT_HEIGHT: f32 = NPC_HALF_HEIGHT + 0.01;
+const NPC_FLOAT_HEIGHT: f32 = NPC_HALF_HEIGHT + 0.5;
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn on_add(trigger: Trigger<OnAdd, Npc>, mut commands: Commands, assets: Res<AssetServer>) {
@@ -54,9 +64,14 @@ fn on_add(trigger: Trigger<OnAdd, Npc>, mut commands: Commands, assets: Res<Asse
             LockedAxes::ROTATION_LOCKED.unlock_rotation_y(),
             TnuaAnimatingState::<NpcAnimationState>::default(),
             AnimationPlayerAncestor,
-            CollisionLayers::new(CollisionLayer::Character, LayerMask::ALL),
+            CollisionLayers::new(
+                [CollisionLayer::Character, CollisionLayer::Npc],
+                LayerMask::ALL,
+            ),
+            Health::new(100.0),
             // The Yarn Node is what we use to trigger dialogue.
             YarnNode::new("Npc"),
+            AiState::default(),
         ))
         .with_child((
             Name::new("Npc Model"),

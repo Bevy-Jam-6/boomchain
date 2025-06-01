@@ -19,7 +19,7 @@ use crate::{
     screens::Screen,
 };
 
-use super::{NPC_FLOAT_HEIGHT, NPC_RADIUS, Npc};
+use super::{NPC_FLOAT_HEIGHT, NPC_RADIUS, Npc, ai_state::AiState, attack::Attacking};
 
 pub(crate) const NPC_MAX_SLOPE: f32 = TAU / 6.0;
 
@@ -77,39 +77,50 @@ struct WantsToFollowPlayer;
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn update_agent_target(
-    mut agents: Query<&mut AgentTarget3d, With<WantsToFollowPlayer>>,
+    mut agents: Query<(&mut AgentTarget3d, &AgentOf), With<WantsToFollowPlayer>>,
+    ai_state: Query<&AiState>,
     player_position: Single<&LastValidPlayerNavmeshPosition>,
 ) {
     let Some(player_position) = player_position.0 else {
         return;
     };
-    for mut target in &mut agents {
+    for (mut target, agent_of) in &mut agents {
+        let Ok(ai_state) = ai_state.get(agent_of.0) else {
+            continue;
+        };
+        if !matches!(ai_state, AiState::Chase) {
+            continue;
+        }
         *target = AgentTarget3d::Point(player_position);
     }
 }
 
-#[derive(Component, Deref, Debug, Reflect)]
+#[derive(Component, Deref, DerefMut, Debug, Reflect)]
 #[reflect(Component)]
 #[relationship(relationship_target = Agent)]
-struct AgentOf(Entity);
+pub(crate) struct AgentOf(Entity);
 
-#[derive(Component, Deref, Debug, Reflect)]
+#[derive(Component, Deref, DerefMut, Debug, Reflect)]
 #[reflect(Component)]
 #[relationship_target(relationship = AgentOf)]
-struct Agent(Entity);
+pub(crate) struct Agent(Entity);
 
 /// Use the desired velocity as the agent's velocity.
 #[cfg_attr(feature = "hot_patch", hot)]
 fn set_controller_velocity(
-    mut agent_query: Query<(&mut TnuaController, &Agent)>,
+    mut agent_query: Query<(&mut TnuaController, &Agent, Option<&Attacking>)>,
     desired_velocity_query: Query<&LandmassAgentDesiredVelocity>,
 ) {
-    for (mut controller, agent) in &mut agent_query {
+    for (mut controller, agent, attacking) in &mut agent_query {
         let Ok(desired_velocity) = desired_velocity_query.get(**agent) else {
             continue;
         };
         let velocity = desired_velocity.velocity();
-        let forward = Dir3::try_from(velocity).ok();
+        let forward = if let Some(attacking) = attacking {
+            attacking.dir
+        } else {
+            Dir3::try_from(velocity).ok()
+        };
         controller.basis(TnuaBuiltinWalk {
             desired_velocity: velocity,
             desired_forward: forward,

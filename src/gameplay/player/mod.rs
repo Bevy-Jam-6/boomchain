@@ -18,11 +18,14 @@ use navmesh_position::LastValidPlayerNavmeshPosition;
 
 use crate::third_party::avian3d::CollisionLayer;
 
+use super::health::Health;
+
 mod animation;
 pub(crate) mod assets;
 pub(crate) mod camera;
 pub(crate) mod default_input;
 pub(crate) mod dialogue;
+pub(crate) mod gunplay;
 pub(crate) mod movement;
 pub(crate) mod movement_sound;
 pub(crate) mod navmesh_position;
@@ -40,6 +43,7 @@ pub(super) fn plugin(app: &mut App) {
         movement_sound::plugin,
         pickup::plugin,
         navmesh_position::plugin,
+        gunplay::plugin,
     ));
     app.add_observer(setup_player);
     app.add_systems(PreUpdate, assert_only_one_player);
@@ -56,7 +60,7 @@ pub(crate) struct Player;
 /// The radius of the player character's capsule.
 pub(crate) const PLAYER_RADIUS: f32 = 0.5;
 /// The length of the player character's capsule. Note that
-const PLAYER_CAPSULE_LENGTH: f32 = 1.0;
+const PLAYER_CAPSULE_LENGTH: f32 = 0.5;
 
 /// The total height of the player character's capsule. A capsule's height is `length + 2 * radius`.
 const PLAYER_HEIGHT: f32 = PLAYER_CAPSULE_LENGTH + 2.0 * PLAYER_RADIUS;
@@ -69,7 +73,7 @@ const PLAYER_HALF_HEIGHT: f32 = PLAYER_HEIGHT / 2.0;
 /// using a spring. It's important to make sure that this floating height is greater (even if by little) than the half height.
 ///
 /// In this case, we use 30 cm of padding to make the player float nicely up stairs.
-const PLAYER_FLOAT_HEIGHT: f32 = PLAYER_HALF_HEIGHT + 0.01;
+const PLAYER_FLOAT_HEIGHT: f32 = PLAYER_HALF_HEIGHT + 0.5;
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn setup_player(
@@ -99,7 +103,11 @@ fn setup_player(
                 combine_rule: CoefficientCombine::Multiply,
             },
             ColliderDensity(100.0),
-            CollisionLayers::new(CollisionLayer::Character, LayerMask::ALL),
+            CollisionLayers::new(
+                [CollisionLayer::Character, CollisionLayer::Player],
+                LayerMask::ALL,
+            ),
+            Health::new(100.0),
             TnuaAnimatingState::<PlayerAnimationState>::default(),
             children![(
                 Name::new("Player Landmass Character"),
