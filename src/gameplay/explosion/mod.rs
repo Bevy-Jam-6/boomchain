@@ -221,7 +221,7 @@ impl ExplosionHelper<'_, '_> {
     ///
     /// This also triggers the [`OnExplode`] event for any explosive entities hit by the explosion.
     pub fn apply_explosion(&mut self, explosive: &Explosive, point: Vec3) {
-        // Query for all collider entities of characters and props within the explosion radius,
+        // Query for all collider entities of characters and props within the explosion radius.
         let shape = Collider::sphere(explosive.radius);
         let filter =
             SpatialQueryFilter::from_mask([CollisionLayer::Character, CollisionLayer::Prop]);
