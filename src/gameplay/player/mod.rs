@@ -18,6 +18,8 @@ use navmesh_position::LastValidPlayerNavmeshPosition;
 
 use crate::third_party::avian3d::CollisionLayer;
 
+use super::health::Health;
+
 mod animation;
 pub(crate) mod assets;
 pub(crate) mod camera;
@@ -103,6 +105,7 @@ fn setup_player(
                 LayerMask::from([CollisionLayer::Character, CollisionLayer::Player]),
                 LayerMask::ALL,
             ),
+            Health::new(100.0),
             TnuaAnimatingState::<PlayerAnimationState>::default(),
             children![(
                 Name::new("Player Landmass Character"),

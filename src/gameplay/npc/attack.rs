@@ -1,9 +1,12 @@
 use avian3d::prelude::*;
-use bevy::{ecs::spawn::SpawnWith, prelude::*, state::commands};
+use bevy::prelude::*;
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
 
-use crate::third_party::avian3d::CollisionLayer;
+use crate::{
+    gameplay::{health::Health, player::Player},
+    third_party::avian3d::CollisionLayer,
+};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Attacking>();
@@ -13,7 +16,6 @@ pub(super) fn plugin(app: &mut App) {
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn start_attack(trigger: Trigger<OnAdd, Attacking>, mut commands: Commands) {
-    info!("start_attack");
     let entity = trigger.target();
     commands
         .spawn((
@@ -30,13 +32,25 @@ fn start_attack(trigger: Trigger<OnAdd, Attacking>, mut commands: Commands) {
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn stop_attack(trigger: Trigger<OnRemove, Attacking>, mut commands: Commands) {
-    info!("stop_attack");
     let entity = trigger.target();
     commands.entity(entity).despawn_related::<Hitbox>();
 }
 
-fn hit_player(trigger: Trigger<OnCollisionStart>, mut commands: Commands) {
-    info!("hit_player");
+fn hit_player(
+    trigger: Trigger<OnCollisionStart>,
+    mut player: Query<&mut Health, With<Player>>,
+    name: Query<NameOrEntity>,
+) {
+    let Some(body) = trigger.event().body else {
+        error!("Enemy hit collision without body");
+        return;
+    };
+    let Ok(mut health) = player.get_mut(body) else {
+        let name = name.get(body).unwrap();
+        error!("Enemy hit non-player: {name}");
+        return;
+    };
+    health.damage(10.0);
 }
 
 #[derive(Component, Deref, DerefMut, Debug, Reflect)]
