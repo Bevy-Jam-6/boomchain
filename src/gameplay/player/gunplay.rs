@@ -38,19 +38,8 @@ fn print_hits(
     {
         let name = name.get(first_hit.entity).unwrap();
         info!("First hit: {name}");
-    }
-
-    // Cast ray and get up to 20 hits
-    let hits = spatial_query.ray_hits(origin, direction, max_distance, 20, solid, &filter);
-
-    // Print hits
-    for hit in hits.iter() {
-        let name = name.get(hit.entity).unwrap();
-        info!("Hit: {name}");
-    }
-
-    if hits.len() == 0 {
-        // Sorry Joona, had to bring in some swiss german ;).
+    } else {
+        // Sorry Joona, had to bring in some swiss german ;)
         info!("denäbe!")
     }
 }
