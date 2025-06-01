@@ -75,6 +75,7 @@ pub(crate) enum NpcAnimationState {
 #[cfg_attr(feature = "hot_patch", hot)]
 fn play_animations(
     mut query: Query<(
+        Entity,
         &mut TnuaAnimatingState<NpcAnimationState>,
         &TnuaController,
         &AnimationPlayers,
@@ -85,13 +86,21 @@ fn play_animations(
         &mut AnimationPlayer,
         &mut AnimationTransitions,
     )>,
+    mut commands: Commands,
 ) {
-    for (mut animating_state, controller, anim_players, attacking) in &mut query {
+    for (entity, mut animating_state, controller, anim_players, attacking) in &mut query {
         let mut iter = q_animation.iter_many_mut(anim_players.iter());
         while let Some((animations, mut anim_player, mut transitions)) = iter.fetch_next() {
             match animating_state.update_by_discriminant({
                 if attacking {
-                    NpcAnimationState::Attack
+                    if anim_player.is_playing_animation(animations.attack)
+                        && anim_player.all_finished()
+                    {
+                        commands.entity(entity).remove::<Attacking>();
+                        NpcAnimationState::Standing
+                    } else {
+                        NpcAnimationState::Attack
+                    }
                 } else {
                     let Some((_, basis_state)) = controller.concrete_basis::<TnuaBuiltinWalk>()
                     else {
@@ -142,11 +151,13 @@ fn play_animations(
                             .repeat();
                     }
                     NpcAnimationState::Attack => {
-                        transitions.play(
-                            &mut anim_player,
-                            animations.attack,
-                            Duration::from_millis(100),
-                        );
+                        transitions
+                            .play(
+                                &mut anim_player,
+                                animations.attack,
+                                Duration::from_millis(100),
+                            )
+                            .set_speed(2.0);
                     }
                     NpcAnimationState::Walking(_speed) => {
                         transitions

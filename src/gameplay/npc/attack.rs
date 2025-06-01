@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::gameplay::player::Player;
+
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Attacking>();
     app.add_observer(start_attack);

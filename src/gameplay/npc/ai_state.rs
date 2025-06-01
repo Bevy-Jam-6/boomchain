@@ -17,11 +17,11 @@ pub(crate) enum AiState {
 }
 
 fn update_ai_state(
-    mut ai_state: Query<(Entity, &mut AiState, &Agent)>,
+    mut ai_state: Query<(Entity, &mut AiState, &Agent, Has<Attacking>)>,
     agent_state: Query<&AgentState>,
     mut commands: Commands,
 ) {
-    for (entity, mut ai_state, agent) in &mut ai_state {
+    for (entity, mut ai_state, agent, attacking) in &mut ai_state {
         let Ok(agent_state) = agent_state.get(**agent) else {
             continue;
         };
@@ -33,7 +33,7 @@ fn update_ai_state(
                 }
             }
             AiState::Attack => {
-                if matches!(agent_state, AgentState::ReachedTarget) {
+                if !attacking {
                     *ai_state = AiState::Chase;
                 }
             }

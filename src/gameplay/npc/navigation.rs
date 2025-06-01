@@ -15,7 +15,8 @@ use bevy_simple_subsecond_system::hot;
 use bevy_tnua::prelude::*;
 
 use crate::{
-    PrePhysicsAppSystems, gameplay::player::navmesh_position::LastValidPlayerNavmeshPosition,
+    PrePhysicsAppSystems,
+    gameplay::player::{Player, navmesh_position::LastValidPlayerNavmeshPosition},
     screens::Screen,
 };
 
@@ -108,15 +109,25 @@ pub(crate) struct Agent(Entity);
 /// Use the desired velocity as the agent's velocity.
 #[cfg_attr(feature = "hot_patch", hot)]
 fn set_controller_velocity(
-    mut agent_query: Query<(&mut TnuaController, &Agent)>,
+    mut agent_query: Query<(&mut TnuaController, &Agent, &AiState, &Transform)>,
+    player: Single<&Transform, With<Player>>,
     desired_velocity_query: Query<&LandmassAgentDesiredVelocity>,
 ) {
-    for (mut controller, agent) in &mut agent_query {
+    for (mut controller, agent, state, transform) in &mut agent_query {
         let Ok(desired_velocity) = desired_velocity_query.get(**agent) else {
             continue;
         };
         let velocity = desired_velocity.velocity();
-        let forward = Dir3::try_from(velocity).ok();
+        let forward = if matches!(state, AiState::Chase) {
+            Dir3::try_from(velocity).ok()
+        } else {
+            let target = Vec3::new(
+                player.translation.x,
+                transform.translation.y,
+                player.translation.z,
+            );
+            Dir3::try_from(target - transform.translation).ok()
+        };
         controller.basis(TnuaBuiltinWalk {
             desired_velocity: velocity,
             desired_forward: forward,
