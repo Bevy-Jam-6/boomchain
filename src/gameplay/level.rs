@@ -47,8 +47,7 @@ impl FromWorld for LevelAssets {
         let assets = world.resource::<AssetServer>();
 
         Self {
-            // Our main level is inspired by the TheDarkMod fan mission [Volta I: The Stone](https://www.thedarkmod.com/missiondetails/?internalName=volta1_3)
-            level: assets.load("maps/volta_i/volta_i.map#Scene"),
+            level: assets.load("maps/main/main.map#Scene"),
             music: assets.load("audio/music/Ambiance_Rain_Calm_Loop_Stereo.ogg"),
             env_map_specular: assets.load("cubemaps/NightSkyHDRI001_4K-HDR_specular.ktx2"),
             env_map_diffuse: assets.load("cubemaps/NightSkyHDRI001_4K-HDR_diffuse.ktx2"),
