@@ -60,7 +60,7 @@ pub(crate) struct Player;
 /// The radius of the player character's capsule.
 pub(crate) const PLAYER_RADIUS: f32 = 0.5;
 /// The length of the player character's capsule. Note that
-const PLAYER_CAPSULE_LENGTH: f32 = 0.7;
+const PLAYER_CAPSULE_LENGTH: f32 = 0.5;
 
 /// The total height of the player character's capsule. A capsule's height is `length + 2 * radius`.
 const PLAYER_HEIGHT: f32 = PLAYER_CAPSULE_LENGTH + 2.0 * PLAYER_RADIUS;
