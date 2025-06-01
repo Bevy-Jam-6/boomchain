@@ -29,7 +29,7 @@ pub(super) fn plugin(app: &mut App) {
 #[derive(PointClass, Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
 #[reflect(QuakeClass, Component)]
 #[base(Transform, Visibility)]
-#[model("models/fox/Fox.gltf")]
+#[model("models/zombie-test.glb")]
 // In Wasm, TrenchBroom classes are not automatically registered.
 // So, we need to manually register the class in `src/third_party/bevy_trenchbroom/mod.rs`.
 pub(crate) struct Npc;
