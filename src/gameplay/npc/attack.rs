@@ -30,27 +30,35 @@ fn start_attack(trigger: Trigger<OnAdd, Attacking>, mut commands: Commands) {
         .observe(hit_player);
 }
 
-#[cfg_attr(feature = "hot_patch", hot)]
-fn stop_attack(trigger: Trigger<OnRemove, Attacking>, mut commands: Commands) {
-    let entity = trigger.target();
-    commands.entity(entity).despawn_related::<Hitbox>();
-}
-
 fn hit_player(
     trigger: Trigger<OnCollisionStart>,
+    collider_of: Query<&ColliderOf>,
     mut player: Query<&mut Health, With<Player>>,
     name: Query<NameOrEntity>,
 ) {
-    let Some(body) = trigger.event().body else {
-        error!("Enemy hit collision without body");
+    let collider = trigger.event().collider;
+    let Ok(collider_of) = collider_of.get(collider) else {
+        error!("Enemy hit collision without collider of");
         return;
     };
+    let body = collider_of.body;
     let Ok(mut health) = player.get_mut(body) else {
         let name = name.get(body).unwrap();
         error!("Enemy hit non-player: {name}");
         return;
     };
     health.damage(10.0);
+}
+
+#[cfg_attr(feature = "hot_patch", hot)]
+fn stop_attack(trigger: Trigger<OnRemove, Attacking>, mut commands: Commands) {
+    let entity = trigger.target();
+    commands.entity(entity).queue_handled(
+        |mut entity: EntityWorldMut| {
+            entity.despawn_related::<Hitbox>();
+        },
+        bevy::ecs::error::ignore,
+    );
 }
 
 #[derive(Component, Deref, DerefMut, Debug, Reflect)]
