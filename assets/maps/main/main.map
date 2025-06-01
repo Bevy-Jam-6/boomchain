@@ -543,9 +543,9 @@
 }
 // brush 60
 {
-( 544 512 208 ) ( 544 544 208 ) ( 672 544 208 ) darkmod/stone/cobblestones/blocks_uneven_blue [ 1 0 0 0 ] [ 0 -1 0 416 ] 270 0.1 0.1
 ( 544 528 224 ) ( 544 529 224 ) ( 544 528 225 ) darkmod/stone/cobblestones/blocks_uneven_blue [ 0 -1 0 416 ] [ 0 0 -1 0 ] 270 0.1 0.1
 ( 544 512 176 ) ( 544 480 208 ) ( 672 480 208 ) darkmod/stone/cobblestones/blocks_uneven_blue [ -1 0 0 0 ] [ 0 -0.7071067811865476 0.7071067811865476 0 ] 90 0.1 0.1
+( 544 512 208 ) ( 544 544 208 ) ( 672 544 208 ) darkmod/stone/cobblestones/blocks_uneven_blue [ 1 0 0 0 ] [ 0 -1 0 416 ] 270 0.1 0.1
 ( 544 512 176 ) ( 672 512 208 ) ( 544 512 208 ) darkmod/stone/cobblestones/blocks_uneven_blue [ -1 0 0 0 ] [ 0 0 -1 0 ] 270 0.1 0.1
 ( 576 544 240 ) ( 576 544 241 ) ( 576 545 240 ) darkmod/stone/cobblestones/blocks_uneven_blue [ 0 1 0 -416 ] [ 0 0 -1 0 ] 270 0.1 0.1
 }
@@ -1204,4 +1204,9 @@
 {
 "classname" "lamp_sitting"
 "origin" "1176 -232 168"
+}
+// entity 8
+{
+"classname" "npc"
+"origin" "216 232 24"
 }

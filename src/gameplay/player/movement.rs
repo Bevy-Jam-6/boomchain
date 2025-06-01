@@ -77,6 +77,7 @@ fn apply_movement(
         float_height: PLAYER_FLOAT_HEIGHT,
         // Restrict the max slope so that the player cannot walk up slightly angled chairs.
         max_slope: TAU / 8.0,
+        spring_strength: 700.0,
         ..default()
     });
 }
