@@ -102,7 +102,7 @@ fn setup_player(
             },
             ColliderDensity(100.0),
             CollisionLayers::new(
-                LayerMask::from([CollisionLayer::Character, CollisionLayer::Player]),
+                [CollisionLayer::Character, CollisionLayer::Player],
                 LayerMask::ALL,
             ),
             Health::new(100.0),

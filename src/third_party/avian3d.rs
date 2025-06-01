@@ -18,6 +18,7 @@ pub(crate) enum CollisionLayer {
     Character,
     Player,
     Sensor,
+    Npc,
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
