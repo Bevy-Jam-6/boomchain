@@ -16,7 +16,7 @@ use bevy_tnua::prelude::*;
 
 use crate::{
     PrePhysicsAppSystems,
-    gameplay::player::{Player, navmesh_position::LastValidPlayerNavmeshPosition},
+    gameplay::player::navmesh_position::LastValidPlayerNavmeshPosition,
     screens::Screen,
 };
 
