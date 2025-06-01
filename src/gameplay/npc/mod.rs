@@ -44,8 +44,8 @@ pub(super) fn plugin(app: &mut App) {
 // So, we need to manually register the class in `src/third_party/bevy_trenchbroom/mod.rs`.
 pub(crate) struct Npc;
 
-pub(crate) const NPC_RADIUS: f32 = 0.6;
-const NPC_CAPSULE_LENGTH: f32 = 0.1;
+pub(crate) const NPC_RADIUS: f32 = 0.4;
+const NPC_CAPSULE_LENGTH: f32 = 1.0;
 pub(crate) const NPC_HEIGHT: f32 = NPC_CAPSULE_LENGTH + 2.0 * NPC_RADIUS;
 const NPC_HALF_HEIGHT: f32 = NPC_HEIGHT / 2.0;
 const NPC_FLOAT_HEIGHT: f32 = NPC_HALF_HEIGHT + 0.01;
