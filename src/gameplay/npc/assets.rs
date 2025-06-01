@@ -1,6 +1,6 @@
 //! Preload NPC assets.
 
-use bevy::{asset::RenderAssetUsages, gltf::GltfLoaderSettings, prelude::*};
+use bevy::prelude::*;
 use bevy_shuffle_bag::ShuffleBag;
 
 use crate::{
@@ -24,7 +24,7 @@ pub(crate) struct NpcAssets {
     #[dependency]
     pub(crate) walk_animation: Handle<AnimationClip>,
     #[dependency]
-    pub(crate) run_animation: Handle<AnimationClip>,
+    pub(crate) attack_animation: Handle<AnimationClip>,
     #[dependency]
     pub(crate) steps: ShuffleBag<Handle<AudioSource>>,
 }
@@ -34,14 +34,8 @@ impl FromWorld for NpcAssets {
         let assets = world.resource::<AssetServer>();
         let rng = &mut rand::thread_rng();
         Self {
-            _model: assets.load_with_settings(
-                Npc::scene_path(),
-                |settings: &mut GltfLoaderSettings| {
-                    settings.load_meshes = RenderAssetUsages::RENDER_WORLD;
-                    settings.load_materials = RenderAssetUsages::RENDER_WORLD;
-                },
-            ),
-            run_animation: assets.load(Npc::animation_path(0)),
+            _model: assets.load(Npc::scene_path()),
+            attack_animation: assets.load(Npc::animation_path(0)),
             idle_animation: assets.load(Npc::animation_path(1)),
             walk_animation: assets.load(Npc::animation_path(2)),
             steps: ShuffleBag::try_new(

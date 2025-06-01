@@ -6996,3 +6996,28 @@
 "origin" "2824 -312 360"
 "angles" "0 90 0"
 }
+// entity 157
+{
+"classname" "npc"
+"origin" "424 -24 8"
+}
+// entity 158
+{
+"classname" "npc"
+"origin" "568 296 8"
+}
+// entity 159
+{
+"classname" "npc"
+"origin" "568 376 8"
+}
+// entity 160
+{
+"classname" "npc"
+"origin" "488 -568 168"
+}
+// entity 161
+{
+"classname" "npc"
+"origin" "552 -488 168"
+}

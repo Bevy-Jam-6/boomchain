@@ -1,6 +1,6 @@
 //! Assets for the player.
 
-use bevy::{asset::RenderAssetUsages, gltf::GltfLoaderSettings, prelude::*};
+use bevy::prelude::*;
 use bevy_shuffle_bag::ShuffleBag;
 
 use crate::{
@@ -40,13 +40,7 @@ impl FromWorld for PlayerAssets {
         let assets = world.resource::<AssetServer>();
         let rng = &mut rand::thread_rng();
         Self {
-            _model: assets.load_with_settings(
-                Player::scene_path(),
-                |settings: &mut GltfLoaderSettings| {
-                    settings.load_meshes = RenderAssetUsages::RENDER_WORLD;
-                    settings.load_materials = RenderAssetUsages::RENDER_WORLD;
-                },
-            ),
+            _model: assets.load(Player::scene_path()),
             throw_sound: assets.load("audio/sound_effects/throw.ogg"),
             steps: ShuffleBag::try_new(
                 [

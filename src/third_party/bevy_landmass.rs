@@ -2,7 +2,7 @@
 //! The underlying navmesh is generated using [Oxidized Navigation](https://github.com/TheGrimsey/oxidized_navigation).
 
 use super::bevy_trenchbroom::Worldspawn;
-use crate::gameplay::npc::{NPC_HEIGHT, NPC_RADIUS, ai::NPC_MAX_SLOPE};
+use crate::gameplay::npc::{NPC_HEIGHT, NPC_RADIUS, navigation::NPC_MAX_SLOPE};
 use avian3d::prelude::*;
 use bevy::ecs::relationship::Relationship as _;
 use bevy::prelude::*;
