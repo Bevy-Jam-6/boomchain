@@ -30,6 +30,8 @@ pub(crate) struct PlayerAssets {
     #[dependency]
     pub(crate) jump_start_sounds: ShuffleBag<Handle<AudioSource>>,
     #[dependency]
+    pub(crate) shooting_sounds: ShuffleBag<Handle<AudioSource>>,
+    #[dependency]
     pub(crate) idle_animation: Handle<AnimationClip>,
     #[dependency]
     pub(crate) a_pose_animation: Handle<AnimationClip>,
@@ -89,6 +91,16 @@ impl FromWorld for PlayerAssets {
                     assets.load("audio/sound_effects/jump_start/Footsteps_Rock_Jump_Start_04.ogg"),
                     assets.load("audio/sound_effects/jump_start/Footsteps_Rock_Jump_Start_05.ogg"),
                     assets.load("audio/sound_effects/jump_start/Footsteps_Rock_Jump_Start_06.ogg"),
+                ],
+                rng,
+            )
+            .unwrap(),
+            shooting_sounds: ShuffleBag::try_new(
+                [
+                    assets.load("audio/sound_effects/shoot/Shotgun_Shot-001.ogg"),
+                    assets.load("audio/sound_effects/shoot/Shotgun_Shot-002.ogg"),
+                    assets.load("audio/sound_effects/shoot/Shotgun_Shot-003.ogg"),
+                    assets.load("audio/sound_effects/shoot/Shotgun_Shot-004.ogg"),
                 ],
                 rng,
             )

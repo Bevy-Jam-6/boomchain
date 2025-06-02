@@ -1,4 +1,5 @@
 use crate::{
+    audio::sound_effect,
     gameplay::{
         health::{Death, Health},
         npc::Npc,
@@ -6,7 +7,7 @@ use crate::{
     third_party::avian3d::CollisionLayer,
 };
 
-use super::{camera::PlayerCamera, default_input::Shoot};
+use super::{assets::PlayerAssets, camera::PlayerCamera, default_input::Shoot};
 use avian3d::prelude::*;
 use bevy::prelude::*;
 use bevy_enhanced_input::events::Started;
@@ -17,6 +18,7 @@ pub(crate) struct Shooting;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_observer(shooting);
+    app.add_observer(shooting_sounds);
     app.add_observer(handle_hits);
     app.add_observer(on_death);
 }
@@ -24,6 +26,17 @@ pub(super) fn plugin(app: &mut App) {
 fn shooting(trigger: Trigger<Started<Shoot>>, mut commands: Commands) {
     let entity = trigger.target();
     commands.entity(entity).insert(Shooting);
+}
+
+fn shooting_sounds(
+    _trigger: Trigger<Started<Shoot>>,
+    mut commands: Commands,
+    mut player_assets: ResMut<PlayerAssets>,
+) {
+    let rng = &mut rand::thread_rng();
+    let shooting_sound = player_assets.shooting_sounds.pick(rng).clone();
+
+    commands.spawn(sound_effect(shooting_sound));
 }
 
 fn handle_hits(
