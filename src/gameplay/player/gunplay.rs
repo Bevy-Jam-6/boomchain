@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use crate::{
     audio::sound_effect,
     gameplay::{
@@ -16,20 +18,77 @@ use bevy_enhanced_input::events::Started;
 #[reflect(Component)]
 pub(crate) struct Shooting;
 
+#[derive(Component, Debug, Reflect)]
+#[reflect(Component)]
+pub(crate) struct Reloading;
+
 pub(super) fn plugin(app: &mut App) {
     app.add_observer(shooting);
     app.add_observer(shooting_sounds);
     app.add_observer(handle_hits);
     app.add_observer(on_death);
+    app.add_observer(shooting_sounds_reload);
+    // Only until the animations work again.
+    app.add_systems(Update, remove_shooting);
+    app.add_systems(Update, trigger_reload_sound);
 }
 
-fn shooting(trigger: Trigger<Started<Shoot>>, mut commands: Commands) {
+fn shooting(
+    trigger: Trigger<Started<Shoot>>,
+    mut commands: Commands,
+    shooting: Query<(), With<Shooting>>,
+) {
     let entity = trigger.target();
+
+    if shooting.contains(entity) {
+        return;
+    }
+
     commands.entity(entity).insert(Shooting);
 }
 
+fn remove_shooting(
+    shooting: Single<Entity, (With<Shooting>, With<Reloading>)>,
+    time: Res<Time>,
+    mut timer: Local<Option<Timer>>,
+    mut commands: Commands,
+) {
+    let reload_time = 500;
+    let timer = timer.get_or_insert_with(|| {
+        Timer::new(Duration::from_millis(reload_time), TimerMode::Repeating)
+    });
+    timer.tick(time.delta());
+    if !timer.finished() {
+        return;
+    }
+
+    commands.entity(*shooting).remove::<Shooting>();
+    commands.entity(*shooting).remove::<Reloading>();
+}
+
+fn trigger_reload_sound(
+    shooting: Single<Entity, With<Shooting>>,
+    time: Res<Time>,
+    mut timer: Local<Option<Timer>>,
+    mut commands: Commands,
+) {
+    let shooting_sound_len = 200;
+    let timer = timer.get_or_insert_with(|| {
+        Timer::new(
+            Duration::from_millis(shooting_sound_len),
+            TimerMode::Repeating,
+        )
+    });
+    timer.tick(time.delta());
+    if !timer.finished() {
+        return;
+    }
+
+    commands.entity(*shooting).insert(Reloading);
+}
+
 fn shooting_sounds(
-    _trigger: Trigger<Started<Shoot>>,
+    _trigger: Trigger<OnAdd, Shooting>,
     mut commands: Commands,
     mut player_assets: ResMut<PlayerAssets>,
 ) {
@@ -39,8 +98,16 @@ fn shooting_sounds(
     commands.spawn(sound_effect(shooting_sound));
 }
 
+fn shooting_sounds_reload(
+    _trigger: Trigger<OnAdd, Reloading>,
+    mut commands: Commands,
+    player_assets: ResMut<PlayerAssets>,
+) {
+    commands.spawn(sound_effect(player_assets.reload_sound.clone()));
+}
+
 fn handle_hits(
-    _trigger: Trigger<Started<Shoot>>,
+    _trigger: Trigger<OnAdd, Shooting>,
     spatial_query: SpatialQuery,
     player_camera_parent: Single<&Transform, With<PlayerCamera>>,
     mut npcs: Query<&mut Health, With<Npc>>,
