@@ -29,6 +29,7 @@ use crate::{
     gameplay::{
         animation::{AnimationPlayerAncestor, AnimationPlayerOf, AnimationPlayers},
         level::LevelAssets,
+        player::camera_shake::{CameraShake, NonTraumaTransform},
     },
     screens::{Screen, loading::LoadingScreen},
     third_party::{avian3d::CollisionLayer, bevy_trenchbroom::LoadTrenchbroomModel as _},
@@ -95,6 +96,8 @@ fn spawn_view_model(
             Name::new("Player Camera Parent"),
             PlayerCamera,
             *player_transform,
+            CameraShake::default(),
+            NonTraumaTransform(player_transform.clone()),
             StateScoped(Screen::Gameplay),
             StateScoped(LoadingScreen::Shaders),
             AvianPickupActor {
@@ -232,7 +235,7 @@ fn configure_player_view_model(
 #[cfg_attr(feature = "hot_patch", hot)]
 fn rotate_camera_yaw_and_pitch(
     trigger: Trigger<Fired<Rotate>>,
-    mut transform: Single<&mut Transform, With<PlayerCamera>>,
+    mut transform: Single<&mut NonTraumaTransform, With<PlayerCamera>>,
     sensitivity: Res<CameraSensitivity>,
     window: Single<&Window>,
 ) {
@@ -272,7 +275,7 @@ fn rotate_camera_yaw_and_pitch(
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn sync_camera_translation_with_player(
-    mut player_camera_parent: Single<&mut Transform, With<PlayerCamera>>,
+    mut player_camera_parent: Single<&mut NonTraumaTransform, With<PlayerCamera>>,
     player: Single<&Transform, (With<Player>, Without<PlayerCamera>)>,
 ) {
     let camera_height = 1.84;
