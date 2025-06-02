@@ -14,6 +14,7 @@ use super::{assets::PlayerAssets, camera::PlayerCamera, default_input::Shoot};
 use avian3d::prelude::*;
 use bevy::prelude::*;
 use bevy_enhanced_input::events::Started;
+use rand::prelude::*;
 
 #[derive(Component, Debug, Reflect)]
 #[reflect(Component)]
@@ -115,27 +116,65 @@ fn handle_hits(
     player_camera_parent: Single<&Transform, With<PlayerCamera>>,
     mut npcs: Query<&mut Health, With<Npc>>,
 ) {
-    // Ray origin and direction
+    let mut rng = &mut rand::thread_rng();
+
+    // Ray origin and base direction
     let origin = player_camera_parent.translation;
-    let direction = player_camera_parent.forward();
+    let base_direction = player_camera_parent.forward();
 
-    // Configuration for the ray cast
-    let max_distance = 100.0;
-    let solid = true;
-    let filter =
-        SpatialQueryFilter::default().with_mask([CollisionLayer::Npc, CollisionLayer::Prop]);
+    // Spread configuration - adjust this value to control spread amount (in radians)
+    // According to Claude Sonnet 4:
+    // 0.05 = small spread (good for rifles)
+    // 0.1 = medium spread (good for pistols)
+    // 0.2 = large spread (good for shotguns)
+    let spread_radius = 0.2;
 
-    // Cast ray and print first hit
-    let Some(first_hit) = spatial_query.cast_ray(origin, direction, max_distance, solid, &filter)
-    else {
-        return;
-    };
-    let Ok(mut health) = npcs.get_mut(first_hit.entity) else {
-        return;
-    };
+    for i in 1..=8 {
+        // Sample random point within a circle for spread
+        let (offset_x, offset_y) = sample_circle(&mut rng, spread_radius);
 
-    let gun_damage = 10.0;
-    health.damage(gun_damage);
+        // Create perpendicular vectors to the forward direction for spreading
+        let right = player_camera_parent.right();
+        let up = player_camera_parent.up();
+
+        // Apply spread to the direction
+        let spread_vec = base_direction.as_vec3() + right * offset_x + up * offset_y;
+        let spread_direction = Dir3::new(spread_vec).unwrap_or(Dir3::NEG_Z); // TODO: Is NEG_Z good enough?
+
+        // Configuration for the ray cast
+        let max_distance = 100.0;
+        let solid = true;
+        let filter =
+            SpatialQueryFilter::default().with_mask([CollisionLayer::Npc, CollisionLayer::Prop]);
+
+        // Cast ray with spread and handle first hit
+        let Some(first_hit) =
+            spatial_query.cast_ray(origin, spread_direction, max_distance, solid, &filter)
+        else {
+            return;
+        };
+        let Ok(mut health) = npcs.get_mut(first_hit.entity) else {
+            return;
+        };
+
+        info!("Hit {i}/8 did hit {:?}", first_hit.entity);
+
+        let gun_damage = 10.0;
+        health.damage(gun_damage);
+    }
+}
+
+/// Sample a random point within a circle using uniform distribution
+/// This was AI generated using Claude Sonnet 4. I have no clue if it's correct tbh.
+fn sample_circle(rng: &mut ThreadRng, radius: f32) -> (f32, f32) {
+    // Generate random angle
+    let angle = rng.gen_range(0.0..std::f32::consts::TAU);
+
+    // Generate random radius with square root for uniform distribution
+    let r = radius * rng.r#gen::<f32>().sqrt();
+
+    // Convert to Cartesian coordinates
+    (r * angle.cos(), r * angle.sin())
 }
 
 fn on_death(trigger: Trigger<Death>, name: Query<NameOrEntity>) {
