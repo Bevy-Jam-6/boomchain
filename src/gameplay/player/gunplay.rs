@@ -3,6 +3,7 @@ use std::time::Duration;
 use crate::{
     audio::sound_effect,
     gameplay::{
+        crosshair::CrosshairState,
         health::{Death, Health},
         npc::Npc,
     },
@@ -37,10 +38,11 @@ fn shooting(
     trigger: Trigger<Started<Shoot>>,
     mut commands: Commands,
     shooting: Query<(), With<Shooting>>,
+    crosshair_state: Single<&CrosshairState>,
 ) {
     let entity = trigger.target();
 
-    if shooting.contains(entity) {
+    if shooting.contains(entity) || !crosshair_state.wants_invisible.is_empty() {
         return;
     }
 
