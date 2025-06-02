@@ -55,7 +55,7 @@ fn remove_shooting(
     mut timer: Local<Option<Timer>>,
     mut commands: Commands,
 ) {
-    let reload_time = 500;
+    let reload_time = 410;
     let timer = timer.get_or_insert_with(|| {
         Timer::new(Duration::from_millis(reload_time), TimerMode::Repeating)
     });
@@ -74,7 +74,8 @@ fn trigger_reload_sound(
     mut timer: Local<Option<Timer>>,
     mut commands: Commands,
 ) {
-    let shooting_sound_len = 200;
+    // The name is not precise, we simply start the reload time after this time of the shooting sound (they overlap a little)
+    let shooting_sound_len = 175;
     let timer = timer.get_or_insert_with(|| {
         Timer::new(
             Duration::from_millis(shooting_sound_len),
