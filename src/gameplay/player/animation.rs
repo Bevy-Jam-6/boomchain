@@ -41,30 +41,30 @@ pub(crate) fn setup_player_animations(
     assets: Res<PlayerAssets>,
     mut graphs: ResMut<Assets<AnimationGraph>>,
 ) {
-    let anim_players = q_anim_players.get(trigger.target()).unwrap();
-    for anim_player in anim_players.iter() {
-        let (graph, indices) = AnimationGraph::from_clips([
-            assets.idle_animation.clone(),
-            assets.a_pose_animation.clone(),
-            assets.shooting_animation.clone(),
-        ]);
-        let [idle_index, a_pose_index, shooting_index] = indices.as_slice() else {
-            unreachable!()
-        };
-        let graph_handle = graphs.add(graph);
+    // let anim_players = q_anim_players.get(trigger.target()).unwrap();
+    // for anim_player in anim_players.iter() {
+    //     let (graph, indices) = AnimationGraph::from_clips([
+    //         assets.idle_animation.clone(),
+    //         assets.a_pose_animation.clone(),
+    //         assets.shooting_animation.clone(),
+    //     ]);
+    //     let [idle_index, a_pose_index, shooting_index] = indices.as_slice() else {
+    //         unreachable!()
+    //     };
+    //     let graph_handle = graphs.add(graph);
 
-        let animations = PlayerAnimations {
-            idle: *idle_index,
-            a_pose: *a_pose_index,
-            shooting: *shooting_index,
-        };
-        let transitions = AnimationTransitions::new();
-        commands.entity(anim_player).insert((
-            animations,
-            AnimationGraphHandle(graph_handle),
-            transitions,
-        ));
-    }
+    //     let animations = PlayerAnimations {
+    //         idle: *idle_index,
+    //         a_pose: *a_pose_index,
+    //         shooting: *shooting_index,
+    //     };
+    //     let transitions = AnimationTransitions::new();
+    //     commands.entity(anim_player).insert((
+    //         animations,
+    //         AnimationGraphHandle(graph_handle),
+    //         transitions,
+    //     ));
+    // }
 }
 
 /// Managed by [`play_animations`]
@@ -121,27 +121,27 @@ fn play_animations(
                     state,
                 } => match state {
                     PlayerAnimationState::None => {
-                        transitions.play(
-                            &mut anim_player,
-                            animations.a_pose,
-                            Duration::from_millis(400),
-                        );
+                        // transitions.play(
+                        //     &mut anim_player,
+                        //     animations.a_pose,
+                        //     Duration::from_millis(400),
+                        // );
                     }
                     PlayerAnimationState::Idle => {
-                        transitions
-                            .play(
-                                &mut anim_player,
-                                animations.idle,
-                                Duration::from_millis(150),
-                            )
-                            .repeat();
+                        // transitions
+                        //     .play(
+                        //         &mut anim_player,
+                        //         animations.idle,
+                        //         Duration::from_millis(150),
+                        //     )
+                        //     .repeat();
                     }
                     PlayerAnimationState::Shooting => {
-                        transitions.play(
-                            &mut anim_player,
-                            animations.shooting,
-                            Duration::from_millis(50),
-                        );
+                        // transitions.play(
+                        //     &mut anim_player,
+                        //     animations.shooting,
+                        //     Duration::from_millis(50),
+                        // );
                     }
                 },
             }
