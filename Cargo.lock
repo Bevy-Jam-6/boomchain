@@ -461,6 +461,7 @@ dependencies = [
  "nalgebra",
  "parry3d",
  "parry3d-f64",
+ "serde",
  "thread_local",
 ]
 
@@ -976,6 +977,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_firework"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "037ef14692547dc32135dfefc6999605af61b80424d975e72954d90cbec860d4"
+dependencies = [
+ "avian3d",
+ "bevy",
+ "bevy_utilitarian",
+ "bytemuck",
+ "rand 0.8.5",
+ "serde",
+]
+
+[[package]]
 name = "bevy_fix_cursor_unlock_web"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1120,7 +1135,6 @@ dependencies = [
  "ron",
  "serde",
  "thiserror 2.0.12",
- "typetag",
  "wgpu",
 ]
 
@@ -1132,6 +1146,7 @@ checksum = "34ccc861fea2ff58c67f4df119512e204050bd7631a3a9c65e1a5e9d162cce28"
 dependencies = [
  "bevy_math",
  "bevy_reflect",
+ "serde",
 ]
 
 [[package]]
@@ -1802,6 +1817,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72c7c6c4e6a3d5415b3a29a17bd20c17cd0e2f068b96b24e263316d58d5346ea"
 dependencies = [
  "bevy",
+ "serde",
 ]
 
 [[package]]
@@ -1882,6 +1898,17 @@ dependencies = [
  "taffy",
  "thiserror 2.0.12",
  "tracing",
+]
+
+[[package]]
+name = "bevy_utilitarian"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a85574bc9239e88df6deba91ea6fec1643e83ea03bebe78a4e7796a43201cf50"
+dependencies = [
+ "bevy",
+ "rand 0.8.5",
+ "serde",
 ]
 
 [[package]]
@@ -2117,6 +2144,7 @@ dependencies = [
  "bevy-tnua",
  "bevy-tnua-avian3d",
  "bevy_enhanced_input",
+ "bevy_firework",
  "bevy_fix_cursor_unlock_web",
  "bevy_framepace",
  "bevy_hanabi",
@@ -2136,6 +2164,7 @@ dependencies = [
  "rand 0.8.5",
  "regex",
  "tracing",
+ "web-sys",
 ]
 
 [[package]]
@@ -4010,15 +4039,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "inventory"
-version = "0.3.20"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ab08d7cd2c5897f2c949e5383ea7c7db03fb19130ffcfbf7eda795137ae3cb83"
-dependencies = [
- "rustversion",
-]
-
-[[package]]
 name = "io-kit-sys"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4516,6 +4536,7 @@ dependencies = [
  "num-complex",
  "num-rational",
  "num-traits",
+ "serde",
  "simba",
  "typenum",
 ]
@@ -4747,6 +4768,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73f88a1307638156682bada9d7604135552957b7818057dcef22705b4d509495"
 dependencies = [
  "num-traits",
+ "serde",
 ]
 
 [[package]]
@@ -5273,6 +5295,7 @@ dependencies = [
  "rayon",
  "rstar",
  "rustc-hash 2.1.1",
+ "serde",
  "simba",
  "slab",
  "smallvec",
@@ -5300,6 +5323,7 @@ dependencies = [
  "rayon",
  "rstar",
  "rustc-hash 2.1.1",
+ "serde",
  "simba",
  "slab",
  "smallvec",
@@ -6798,30 +6822,6 @@ name = "typenum"
 version = "1.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1dccffe3ce07af9386bfd29e80c0ab1a8205a2fc34e4bcd40364df902cfa8f3f"
-
-[[package]]
-name = "typetag"
-version = "0.2.20"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "73f22b40dd7bfe8c14230cf9702081366421890435b2d625fa92b4acc4c3de6f"
-dependencies = [
- "erased-serde",
- "inventory",
- "once_cell",
- "serde",
- "typetag-impl",
-]
-
-[[package]]
-name = "typetag-impl"
-version = "0.2.20"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "35f5380909ffc31b4de4f4bdf96b877175a016aa2ca98cee39fcfd8c4d53d952"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
 
 [[package]]
 name = "unicode-bidi"

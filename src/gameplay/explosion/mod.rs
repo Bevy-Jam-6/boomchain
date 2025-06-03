@@ -1,16 +1,27 @@
+mod assets;
+pub(crate) mod effects;
+
 use avian3d::prelude::*;
-use bevy::{ecs::system::SystemParam, prelude::*};
+use bevy::{
+    ecs::{error::ignore, system::SystemParam},
+    prelude::*,
+};
 use bevy_enhanced_input::events::Started;
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
 
-use super::player::{Player, camera::PlayerCamera, default_input::Interact};
-use crate::third_party::avian3d::CollisionLayer;
+use super::player::{Player, camera::PlayerCamera, default_input::Shoot};
+use crate::{
+    auto_timer::{AutoTimer, OnAutoTimerFinish},
+    third_party::avian3d::CollisionLayer,
+};
 
 pub(super) fn plugin(app: &mut App) {
-    app.register_type::<(Explosive, ExplodeOnInteract, ExplodeOnContact)>();
+    app.add_plugins((assets::plugin, effects::plugin));
 
-    app.add_observer(on_interact_explosive);
+    app.register_type::<(Explosive, ExplodeOnShoot, ExplodeOnContact)>();
+
+    app.add_observer(on_shoot_explosive);
     app.add_observer(on_touch_explosive);
     app.add_observer(on_explode);
 
@@ -67,12 +78,12 @@ pub struct Exploded;
 #[derive(Component, Clone, Copy, Debug, PartialEq, Reflect)]
 #[reflect(Component)]
 #[require(Explosive)]
-pub struct ExplodeOnInteract {
+pub struct ExplodeOnShoot {
     /// The maximum distance the explosion can be triggered from.
     pub max_distance: f32,
 }
 
-impl Default for ExplodeOnInteract {
+impl Default for ExplodeOnShoot {
     fn default() -> Self {
         Self {
             max_distance: f32::MAX,
@@ -98,12 +109,12 @@ impl Default for ExplodeOnContact {
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
-fn on_interact_explosive(
-    _trigger: Trigger<Started<Interact>>,
+fn on_shoot_explosive(
+    _trigger: Trigger<Started<Shoot>>,
     player_camera: Single<&GlobalTransform, With<PlayerCamera>>,
     player_collider: Single<Entity, With<Player>>,
     collider_of_query: Query<&ColliderOf>,
-    explosive_query: Query<&ExplodeOnInteract>,
+    explosive_query: Query<&ExplodeOnShoot>,
     spatial_query: SpatialQuery,
     mut commands: Commands,
 ) {
@@ -172,6 +183,13 @@ fn on_explode(
 ) {
     let entity = trigger.target();
 
+    // Get the explosive properties and global center of mass.
+    let Ok((explosive, explosive_transform, local_com)) = query.get(entity) else {
+        return;
+    };
+    let explosive_rotation = explosive_transform.rotation();
+    let explosive_global_com = explosive_transform.translation() + explosive_rotation * local_com.0;
+
     // Mark the explosive as exploded. This prevents the explosion
     // from being triggered multiple times in the case of chain reactions.
     //
@@ -182,17 +200,16 @@ fn on_explode(
     //       to get the correct ordering and avoid infinite recursion.
     //       Using `Commands` that are local to this system breaks things :D
     //       (It took me an hour to figure this out...)
-    explosion_helper.commands.entity(entity).insert(Exploded);
-
-    // Get the explosive properties and global center of mass.
-    let Ok((explosive, explosive_transform, local_com)) = query.get(entity) else {
-        return;
-    };
-    let explosive_rotation = explosive_transform.rotation();
-    let explosive_global_com = explosive_transform.translation() + explosive_rotation * local_com.0;
+    explosion_helper
+        .commands
+        .entity(entity)
+        .try_insert(Exploded);
 
     // Apply the explosion at the center of mass of the explosive.
     explosion_helper.apply_explosion(explosive, explosive_global_com);
+
+    // Despawn the explosive entity after the explosion.
+    explosion_helper.commands.entity(entity).try_despawn();
 }
 
 /// A [`SystemParam`] for applying explosions in the world.
@@ -205,6 +222,7 @@ pub struct ExplosionHelper<'w, 's> {
         'w,
         's,
         (
+            &'static RigidBody,
             &'static GlobalTransform,
             &'static mut LinearVelocity,
             &'static mut AngularVelocity,
@@ -223,8 +241,7 @@ impl ExplosionHelper<'_, '_> {
     pub fn apply_explosion(&mut self, explosive: &Explosive, point: Vec3) {
         // Query for all collider entities of characters and props within the explosion radius.
         let shape = Collider::sphere(explosive.radius);
-        let filter =
-            SpatialQueryFilter::from_mask([CollisionLayer::Character, CollisionLayer::Prop]);
+        let filter = SpatialQueryFilter::default();
         let hit_entities =
             self.spatial_query
                 .shape_intersections(&shape, point, Quat::IDENTITY, &filter);
@@ -243,21 +260,39 @@ impl ExplosionHelper<'_, '_> {
 
         // Apply the explosion impulse to each hit body.
         for body in hit_bodies {
-            // If the entity is also an explosive, trigger its explosion.
-            // A chain reaction of props going boom!
-            if self.explosive_query.contains(body) {
-                // TODO: A small delay here could be nice so that the chain of explosions
-                //       is more visible and doesn't happen all at once.
-                self.commands.entity(body).trigger(OnExplode);
-            }
-
             // Get the body's transform, velocity, center of mass, and attached colliders.
-            let Ok((transform, mut lin_vel, mut ang_vel, local_com, colliders)) =
+            let Ok((rb, transform, mut lin_vel, mut ang_vel, local_com, colliders)) =
                 self.body_query.get_mut(body)
             else {
                 continue;
             };
             let global_com = transform.translation() + transform.rotation() * local_com.0;
+
+            // If the entity is also an explosive, trigger its explosion.
+            // A chain reaction of props going boom!
+            if self.explosive_query.contains(body) {
+                // Delay the explosion slightly based on distance.
+                let delay = point.distance(global_com) * 0.05;
+                self.commands
+                    .entity(body)
+                    .try_insert_if_new(AutoTimer(Timer::from_seconds(delay, TimerMode::Once)))
+                    .observe(
+                        |trigger: Trigger<OnAutoTimerFinish>, mut commands: Commands| {
+                            // We need to use `queue_handled` in case the explosion was triggered twice
+                            // and the entity was already despawned.
+                            commands.entity(trigger.target()).queue_handled(
+                                |mut entity_mut: EntityWorldMut| {
+                                    entity_mut.trigger(OnExplode);
+                                },
+                                ignore,
+                            );
+                        },
+                    );
+            }
+
+            if !rb.is_dynamic() {
+                continue;
+            }
 
             // Iterate over the colliders of the body to find the point closest
             // to the source of the explosion.
