@@ -33,12 +33,14 @@ pub(crate) struct PlayerAssets {
     pub(crate) shooting_sounds: ShuffleBag<Handle<AudioSource>>,
     #[dependency]
     pub(crate) reload_sound: Handle<AudioSource>,
-    // #[dependency]
-    // pub(crate) idle_animation: Handle<AnimationClip>,
-    // #[dependency]
-    // pub(crate) a_pose_animation: Handle<AnimationClip>,
-    // #[dependency]
-    // pub(crate) shooting_animation: Handle<AnimationClip>,
+    #[dependency]
+    pub(crate) hidden_animation: Handle<AnimationClip>,
+    #[dependency]
+    pub(crate) idle_animation: Handle<AnimationClip>,
+    #[dependency]
+    pub(crate) walk_animation: Handle<AnimationClip>,
+    #[dependency]
+    pub(crate) shoot_animation: Handle<AnimationClip>,
 }
 
 impl FromWorld for PlayerAssets {
@@ -108,9 +110,10 @@ impl FromWorld for PlayerAssets {
             )
             .unwrap(),
             reload_sound: assets.load("audio/sound_effects/shoot/Shotgun_Pump.ogg"),
-            // idle_animation: assets.load(Player::animation_path(9)),
-            // a_pose_animation: assets.load(Player::animation_path(5)),
-            // shooting_animation: assets.load(Player::animation_path(4)),
+            hidden_animation: assets.load(Player::animation_path(0)),
+            idle_animation: assets.load(Player::animation_path(1)),
+            shoot_animation: assets.load(Player::animation_path(2)),
+            walk_animation: assets.load(Player::animation_path(3)),
         }
     }
 }
