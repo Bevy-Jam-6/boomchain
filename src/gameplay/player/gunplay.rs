@@ -6,6 +6,7 @@ use crate::{
         crosshair::CrosshairState,
         health::{Death, Health},
         npc::Npc,
+        player::camera_shake::OnTrauma,
     },
     third_party::avian3d::CollisionLayer,
 };
@@ -65,6 +66,7 @@ fn shooting(
     }
 
     commands.entity(entity).insert(Shooting);
+    commands.trigger(OnTrauma(0.4));
 }
 
 fn remove_shooting(

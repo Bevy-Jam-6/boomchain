@@ -34,7 +34,7 @@ impl Default for CameraShake {
     fn default() -> Self {
         Self {
             trauma: 0.0,
-            trauma_decay: 0.5,
+            trauma_decay: 1.0,
             yaw_seed: NoiseRng(1),
             pitch_seed: NoiseRng(2),
             roll_seed: NoiseRng(3),
