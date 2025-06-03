@@ -18,7 +18,7 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<AttackStopwatch>();
     app.add_systems(
         RunFixedMainLoop,
-        update_attack_phase.in_set(PrePhysicsAppSystems::UpdateEnemyAttack),
+        update_attack_phase.in_set(PrePhysicsAppSystems::AdvanceEnemyAttack),
     );
     app.add_observer(start_attack);
     app.add_observer(stop_attack);
