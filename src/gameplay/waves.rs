@@ -4,7 +4,7 @@ use bevy::{platform::collections::HashMap, prelude::*, time::Stopwatch};
 use bevy_trenchbroom::prelude::*;
 use rand::seq::SliceRandom as _;
 
-use crate::PrePhysicsAppSystems;
+use crate::{PrePhysicsAppSystems, gameplay::npc::Npc};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Waves>();
@@ -46,10 +46,19 @@ impl Default for SpawnPackets {
     }
 }
 
-fn advance_waves(mut waves: Single<&mut Waves>, packets: Res<SpawnPackets>, time: Res<Time>) {
+fn advance_waves(
+    mut waves: Single<&mut Waves>,
+    packets: Res<SpawnPackets>,
+    time: Res<Time>,
+    enemies: Query<(), With<Npc>>,
+) {
     waves.tick(time.delta());
     if waves.is_finished() {
-        info_once!("Game finished");
+        if enemies.is_empty() {
+            info_once!("Game finished");
+        } else {
+            info!("Game finished, but there are still enemies");
+        }
         return;
     }
     if waves.is_preparing() {
@@ -63,7 +72,6 @@ fn advance_waves(mut waves: Single<&mut Waves>, packets: Res<SpawnPackets>, time
         );
     } else {
         let difficulties = waves.pop_difficulties_to_spawn();
-        info!("Difficulties to spawn: {difficulties:?}");
         for difficulty in difficulties {
             let available_packets = packets.filter_difficulty(difficulty);
             let Some(packet) = available_packets.choose(&mut rand::thread_rng()) else {
@@ -116,9 +124,8 @@ impl Waves {
         if !self.is_finished()
             && self
                 .current_wave()
-                .expect("Is not finished, but there is no current wave")
-                .packet_kinds
-                .is_empty()
+                .map(|wave| wave.packet_kinds.is_empty())
+                .unwrap_or(false)
         {
             self.advance_wave();
         }
@@ -154,7 +161,6 @@ impl Waves {
 
         let elapsed = self.elapsed_millis();
         let Some(current_wave) = self.current_wave() else {
-            error!("Tried to pop difficulties to spawn, but there is no current wave");
             return difficulties;
         };
         for (millis, difficulty) in current_wave.packet_kinds_ordered() {
@@ -186,7 +192,7 @@ impl Waves {
     }
 
     fn is_finished(&self) -> bool {
-        self.current_wave >= self.waves.len()
+        self.current_wave >= self.waves.len() && self.current_packets.is_empty()
     }
 }
 
@@ -204,7 +210,7 @@ impl Default for Spawner {
     }
 }
 
-#[derive(Reflect)]
+#[derive(Reflect, Debug)]
 struct Wave {
     prep_time: Millis,
     packet_kinds: HashMap<Millis, Difficulty>,
@@ -222,7 +228,7 @@ impl Wave {
     }
 }
 
-#[derive(Deref, DerefMut, Hash, PartialEq, Eq, PartialOrd, Ord, Reflect, Copy, Clone)]
+#[derive(Deref, DerefMut, Hash, PartialEq, Eq, PartialOrd, Ord, Reflect, Copy, Clone, Debug)]
 struct Millis(u64);
 
 impl std::fmt::Display for Millis {
@@ -243,7 +249,7 @@ impl From<Duration> for Millis {
     }
 }
 
-#[derive(Deref, DerefMut, Hash, PartialEq, Eq, PartialOrd, Ord, Reflect, Copy, Clone)]
+#[derive(Deref, DerefMut, Hash, PartialEq, Eq, PartialOrd, Ord, Reflect, Copy, Clone, Debug)]
 struct Difficulty(u32);
 
 impl std::fmt::Display for Difficulty {
