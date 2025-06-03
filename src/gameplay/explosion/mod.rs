@@ -13,6 +13,7 @@ use bevy_simple_subsecond_system::hot;
 use super::player::{Player, camera::PlayerCamera, default_input::Shoot};
 use crate::{
     auto_timer::{AutoTimer, OnAutoTimerFinish},
+    gameplay::{health::Health, npc::Npc},
     third_party::avian3d::CollisionLayer,
 };
 
@@ -55,6 +56,8 @@ pub struct Explosive {
     pub radius: f32,
     /// The strength of the explosion impulse.
     pub impulse_strength: f32,
+    /// The damage dealt by the explosion.
+    pub damage: f32,
 }
 
 impl Default for Explosive {
@@ -62,6 +65,7 @@ impl Default for Explosive {
         Self {
             radius: 3.0,
             impulse_strength: 15.0,
+            damage: 100.0,
         }
     }
 }
@@ -230,6 +234,7 @@ pub struct ExplosionHelper<'w, 's> {
             &'static RigidBodyColliders,
         ),
     >,
+    npc_health_query: Query<'w, 's, &'static mut Health, With<Npc>>,
     spatial_query: SpatialQuery<'w, 's>,
     commands: Commands<'w, 's>,
 }
@@ -260,6 +265,11 @@ impl ExplosionHelper<'_, '_> {
 
         // Apply the explosion impulse to each hit body.
         for body in hit_bodies {
+            if let Ok(mut health) = self.npc_health_query.get_mut(body) {
+                // If the body is an NPC, apply damage.
+                health.damage(explosive.damage);
+            }
+
             // Get the body's transform, velocity, center of mass, and attached colliders.
             let Ok((rb, transform, mut lin_vel, mut ang_vel, local_com, colliders)) =
                 self.body_query.get_mut(body)
