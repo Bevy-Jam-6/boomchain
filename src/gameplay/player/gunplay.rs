@@ -6,15 +6,13 @@ use crate::{
     gameplay::{
         crosshair::CrosshairState, health::Health, npc::Npc, player::camera_shake::OnTrauma,
     },
-    third_party::avian3d::CollisionLayer,
 };
 
 use super::{Player, assets::PlayerAssets, camera::PlayerCamera, default_input::Shoot};
 use avian3d::prelude::*;
-use bevy::{math::VectorSpace, prelude::*, render::view::RenderLayers};
+use bevy::{prelude::*, render::view::RenderLayers};
 use bevy_enhanced_input::events::Started;
 use bevy_hanabi::prelude::*;
-use rand::Rng;
 
 #[derive(Component, Debug, Reflect)]
 #[reflect(Component)]
