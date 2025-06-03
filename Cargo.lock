@@ -1104,8 +1104,8 @@ dependencies = [
 
 [[package]]
 name = "bevy_hanabi"
-version = "0.16.0-dev"
-source = "git+https://github.com/djeedai/bevy_hanabi?branch=main#e5cf6f505bc7f6071ee8b8cfa271486d14c21aa3"
+version = "0.16.0"
+source = "git+https://github.com/djeedai/bevy_hanabi?branch=main#783f0b16c54f244bd1c5a9a92191e38cffa1862c"
 dependencies = [
  "anyhow",
  "bevy",
@@ -1987,7 +1987,7 @@ dependencies = [
  "bitflags 2.9.1",
  "cexpr",
  "clang-sys",
- "itertools 0.11.0",
+ "itertools 0.13.0",
  "log",
  "prettyplease",
  "proc-macro2",
@@ -5533,7 +5533,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "81bddcdb20abf9501610992b6759a4c888aef7d1a7247ef75e2404275ac24af1"
 dependencies = [
  "anyhow",
- "itertools 0.11.0",
+ "itertools 0.12.1",
  "proc-macro2",
  "quote",
  "syn",

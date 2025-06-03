@@ -50,7 +50,7 @@ fn hit_player(
         return;
     };
     health.damage(10.0);
-    commands.trigger(OnTrauma(0.5));
+    commands.trigger(OnTrauma(0.7));
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]

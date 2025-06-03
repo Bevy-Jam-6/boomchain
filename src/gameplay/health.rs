@@ -65,10 +65,10 @@ fn spawn_health_hud(mut commands: Commands) {
 fn trigger_death(health: Query<(Entity, &Health), Changed<Health>>, mut commands: Commands) {
     for (entity, health) in health.iter() {
         if health.is_dead() {
-            commands.entity(entity).trigger(Death);
+            commands.entity(entity).trigger(OnDeath);
         }
     }
 }
 
 #[derive(Debug, Event)]
-pub(crate) struct Death;
+pub(crate) struct OnDeath;

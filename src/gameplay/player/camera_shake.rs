@@ -34,7 +34,7 @@ impl Default for CameraShake {
     fn default() -> Self {
         Self {
             trauma: 0.0,
-            trauma_decay: 0.5,
+            trauma_decay: 1.0,
             yaw_seed: NoiseRng(1),
             pitch_seed: NoiseRng(2),
             roll_seed: NoiseRng(3),
@@ -83,6 +83,4 @@ fn set_final_camera_transform(
     let shake_rotation = Quat::from_euler(EulerRot::YXZ, yaw, pitch, roll);
     *transform = **non_trauma_transform;
     transform.rotate(shake_rotation);
-
-    info!("trauma: {}", camera_shake.trauma);
 }

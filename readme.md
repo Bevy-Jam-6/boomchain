@@ -68,3 +68,6 @@ Foxtrot uses [TrenchBroom](https://trenchbroom.github.io/) as a level editor by 
 To edit the levels, download the [latest TrenchBroom release](https://github.com/TrenchBroom/TrenchBroom/releases/latest) and run Foxtrot once.
 You should see a message in your logs saying that some TrenchBroom config was written. After that, you can simply open `assets/maps/volta_i/volta_i.map` in TrenchBroom
 to edit the main map.
+
+## Credits
+- FPS SFX asset pack (https://lmglolo.itch.io/free-fps-sfx)

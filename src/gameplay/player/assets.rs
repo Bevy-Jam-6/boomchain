@@ -30,11 +30,17 @@ pub(crate) struct PlayerAssets {
     #[dependency]
     pub(crate) jump_start_sounds: ShuffleBag<Handle<AudioSource>>,
     #[dependency]
+    pub(crate) shooting_sounds: ShuffleBag<Handle<AudioSource>>,
+    #[dependency]
+    pub(crate) reload_sound: Handle<AudioSource>,
+    #[dependency]
+    pub(crate) hidden_animation: Handle<AnimationClip>,
+    #[dependency]
     pub(crate) idle_animation: Handle<AnimationClip>,
     #[dependency]
-    pub(crate) a_pose_animation: Handle<AnimationClip>,
+    pub(crate) walk_animation: Handle<AnimationClip>,
     #[dependency]
-    pub(crate) shooting_animation: Handle<AnimationClip>,
+    pub(crate) shoot_animation: Handle<AnimationClip>,
 }
 
 impl FromWorld for PlayerAssets {
@@ -93,9 +99,21 @@ impl FromWorld for PlayerAssets {
                 rng,
             )
             .unwrap(),
-            idle_animation: assets.load(Player::animation_path(9)),
-            a_pose_animation: assets.load(Player::animation_path(5)),
-            shooting_animation: assets.load(Player::animation_path(4)),
+            shooting_sounds: ShuffleBag::try_new(
+                [
+                    assets.load("audio/sound_effects/shoot/Shotgun_Shot-001.ogg"),
+                    assets.load("audio/sound_effects/shoot/Shotgun_Shot-002.ogg"),
+                    assets.load("audio/sound_effects/shoot/Shotgun_Shot-003.ogg"),
+                    assets.load("audio/sound_effects/shoot/Shotgun_Shot-004.ogg"),
+                ],
+                rng,
+            )
+            .unwrap(),
+            reload_sound: assets.load("audio/sound_effects/shoot/Shotgun_Pump.ogg"),
+            hidden_animation: assets.load(Player::animation_path(0)),
+            idle_animation: assets.load(Player::animation_path(1)),
+            shoot_animation: assets.load(Player::animation_path(2)),
+            walk_animation: assets.load(Player::animation_path(3)),
         }
     }
 }

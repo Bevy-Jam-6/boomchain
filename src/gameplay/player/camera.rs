@@ -172,7 +172,7 @@ fn spawn_view_model(
                     // We use whatever FOV we set in the animation software, e.g. Blender.
                     // Tip: if you want to set a camera in Blender to the same defaults as Bevy,
                     // see [this issue](https://github.com/kaosat-dev/Blenvy/issues/223)
-                    fov: 62.0_f32.to_radians(),
+                    fov: 47.1_f32.to_radians(),
                     ..default()
                 }),
                 // Only render objects belonging to the view model.
