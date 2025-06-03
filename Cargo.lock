@@ -2164,7 +2164,7 @@ dependencies = [
  "rand 0.8.5",
  "regex",
  "tracing",
- "webgpu_check",
+ "web-sys",
 ]
 
 [[package]]
@@ -7207,15 +7207,6 @@ checksum = "5a6580f308b1fad9207618087a65c04e7a10bc77e02c8e84e9b00dd4b12fa0bb"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
-]
-
-[[package]]
-name = "webgpu_check"
-version = "0.1.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eb4763842b2da60491d1d4abcb8ed36d73737410d7d10bb0043a309d941e0c99"
-dependencies = [
- "web-sys",
 ]
 
 [[package]]

@@ -6,6 +6,8 @@
 
 use bevy::prelude::*;
 
+use crate::platform_support::is_webgpu_or_native;
+
 pub(crate) mod avian3d;
 mod avian_pickup;
 mod bevy_enhanced_input;
@@ -31,7 +33,7 @@ pub(super) fn plugin(app: &mut App) {
         avian_pickup::plugin,
         bevy_framepace::plugin,
     ));
-    if webgpu_check::is_webgpu_available() {
+    if is_webgpu_or_native() {
         app.add_plugins(bevy_hanabi::plugin);
     }
 }
