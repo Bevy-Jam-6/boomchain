@@ -68,12 +68,12 @@ fn set_final_camera_transform(
 ) {
     let (mut transform, non_trauma_transform, mut camera_shake) = camera_shake.into_inner();
     let shake = camera_shake.trauma * camera_shake.trauma;
-    let max_yaw = 50.0_f32.to_radians();
-    let max_pitch = 50.0_f32.to_radians();
+    let max_yaw = 40.0_f32.to_radians();
+    let max_pitch = 40.0_f32.to_radians();
     let max_roll = 10.0_f32.to_radians();
 
     let noise = camera_shake.noise;
-    let speed = 4.0;
+    let speed = 3.0;
     let noise_input = Vec2::new(time.elapsed_secs() * speed, 0.0);
 
     let yaw = max_yaw * shake * noise.evaluate(noise_input, &mut camera_shake.yaw_seed);
