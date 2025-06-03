@@ -63,6 +63,7 @@ fn advance_waves(mut waves: Single<&mut Waves>, packets: Res<SpawnPackets>, time
         );
     } else {
         let difficulties = waves.pop_difficulties_to_spawn();
+        info!("Difficulties to spawn: {difficulties:?}");
         for difficulty in difficulties {
             let available_packets = packets.filter_difficulty(difficulty);
             let Some(packet) = available_packets.choose(&mut rand::thread_rng()) else {
