@@ -43,6 +43,7 @@ pub(super) fn plugin(app: &mut App) {
     // Only until the animations work again.
     app.add_systems(Update, remove_shooting);
     app.add_systems(Update, trigger_reload_sound);
+    app.init_resource::<BulletImpact>();
 }
 
 fn setup_weapon_stats(trigger: Trigger<OnAdd, Player>, mut commands: Commands) {
@@ -135,8 +136,8 @@ fn handle_hits(
     mut npcs: Query<&mut Health, With<Npc>>,
     weapon_stats: Single<&WeaponStats, With<Player>>,
     player: Single<Entity, With<Player>>,
+    bullet_impact: Res<BulletImpact>,
     mut commands: Commands,
-    mut effects: ResMut<Assets<EffectAsset>>,
 ) {
     let mut rng = &mut rand::thread_rng();
 
@@ -168,7 +169,7 @@ fn handle_hits(
         };
         let bias = 0.1;
         commands.spawn((
-            particle_bundle(&mut effects),
+            particle_bundle(&bullet_impact),
             Transform::from_translation(
                 origin + spread_direction * (first_hit.distance - bias).max(0.0),
             ),
@@ -185,19 +186,28 @@ fn handle_hits(
     }
 }
 
-fn particle_bundle(effects: &mut Assets<EffectAsset>) -> impl Bundle {
-    let effect_handle = setup_bullet_impact(effects);
+#[derive(Resource)]
+struct BulletImpact(Handle<EffectAsset>);
+
+impl FromWorld for BulletImpact {
+    fn from_world(world: &mut World) -> Self {
+        let mut effects = world.resource_mut::<Assets<EffectAsset>>();
+        Self(effects.add(create_bullet_impact_asset()))
+    }
+}
+
+fn particle_bundle(effect: &BulletImpact) -> impl Bundle {
     (
-        ParticleEffect::new(effect_handle),
+        ParticleEffect::new(effect.0.clone()),
         RenderLayers::from(RenderLayer::PARTICLES),
     )
 }
-fn setup_bullet_impact(effects: &mut Assets<EffectAsset>) -> Handle<EffectAsset> {
+fn create_bullet_impact_asset() -> EffectAsset {
     let writer = ExprWriter::new();
 
     // init
-    let c = writer.lit(0.1).uniform(writer.lit(0.3));
-    let rgb = c.clone().vec3(c.clone(), c);
+    let c = writer.lit(0.05).uniform(writer.lit(0.4));
+    let rgb = writer.lit(Vec3::ONE) * c;
     let color = rgb.vec4_xyz_w(writer.lit(1.)).pack4x8unorm();
     let init_color = SetAttributeModifier::new(Attribute::COLOR, color.expr());
 
@@ -217,7 +227,7 @@ fn setup_bullet_impact(effects: &mut Assets<EffectAsset>) -> Handle<EffectAsset>
     let init_vel = SetAttributeModifier::new(Attribute::VELOCITY, vel);
 
     // update
-    let update_accel = AccelModifier::new(writer.lit(Vec3::Y * -0.1).expr());
+    let update_accel = AccelModifier::new(writer.lit(Vec3::Y * -0.2).expr());
 
     // render
     let mut module = writer.finish();
@@ -239,18 +249,16 @@ fn setup_bullet_impact(effects: &mut Assets<EffectAsset>) -> Handle<EffectAsset>
         ..default()
     };
 
-    effects.add(
-        EffectAsset::new(1, SpawnerSettings::once(1.0.into()), module)
-            .with_name("bullet_impact")
-            .init(init_pos)
-            .init(init_vel)
-            .init(init_age)
-            .init(init_lifetime)
-            .init(init_color)
-            .init(init_size)
-            .update(update_accel)
-            .render(color_over_lifetime)
-            .render(orientation)
-            .render(round),
-    )
+    EffectAsset::new(1, SpawnerSettings::once(1.0.into()), module)
+        .with_name("bullet_impact")
+        .init(init_pos)
+        .init(init_vel)
+        .init(init_age)
+        .init(init_lifetime)
+        .init(init_color)
+        .init(init_size)
+        .update(update_accel)
+        .render(color_over_lifetime)
+        .render(orientation)
+        .render(round)
 }
