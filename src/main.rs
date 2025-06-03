@@ -123,6 +123,7 @@ fn main() -> AppExit {
 /// call above.
 #[derive(SystemSet, Debug, Clone, Copy, Eq, PartialEq, Hash, PartialOrd, Ord)]
 enum PrePhysicsAppSystems {
+    SpawnWave,
     AdvanceEnemyAttack,
     /// Update last valid positions on the navmesh
     UpdateNavmeshPositions,
