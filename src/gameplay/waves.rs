@@ -57,7 +57,7 @@ fn advance_waves(
         if enemies.is_empty() {
             info_once!("Game finished");
         } else {
-            info!("Game finished, but there are still enemies");
+            info_once!("Game finished, but there are still enemies");
         }
         return;
     }
