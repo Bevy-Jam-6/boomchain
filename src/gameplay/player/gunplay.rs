@@ -11,7 +11,7 @@ use crate::{
 
 use super::{Player, assets::PlayerAssets, camera::PlayerCamera, default_input::Shoot};
 use avian3d::prelude::*;
-use bevy::{prelude::*, render::view::RenderLayers};
+use bevy::{math::VectorSpace, prelude::*, render::view::RenderLayers};
 use bevy_enhanced_input::events::Started;
 use bevy_hanabi::prelude::*;
 use rand::Rng;
@@ -193,17 +193,13 @@ fn particle_bundle(effects: &mut Assets<EffectAsset>) -> impl Bundle {
     )
 }
 fn setup_bullet_impact(effects: &mut Assets<EffectAsset>) -> Handle<EffectAsset> {
-    let mut color_gradient = Gradient::new();
-    let c = rand::thread_rng().gen_range(0.0..=0.05);
-    color_gradient.add_key(0.0, Vec4::new(c, c, c, 1.0)); // solid black
-    color_gradient.add_key(0.5, Vec4::new(c, c, c, 1.0)); // solid black
-    color_gradient.add_key(1.0, Vec4::new(c, c, c, 0.0)); // fade to transparent
-
-    let mut size_gradient = Gradient::new();
-    size_gradient.add_key(0.0, Vec3::splat(0.05));
-    size_gradient.add_key(1.0, Vec3::splat(0.05)); // constant size (or fade if you want)
-
     let writer = ExprWriter::new();
+
+    // init
+    let c = writer.lit(0.1).uniform(writer.lit(0.3));
+    let rgb = c.clone().vec3(c.clone(), c);
+    let color = rgb.vec4_xyz_w(writer.lit(1.)).pack4x8unorm();
+    let init_color = SetAttributeModifier::new(Attribute::COLOR, color.expr());
 
     let age = writer.lit(0.).expr();
     let init_age = SetAttributeModifier::new(Attribute::AGE, age);
@@ -211,26 +207,37 @@ fn setup_bullet_impact(effects: &mut Assets<EffectAsset>) -> Handle<EffectAsset>
     let lifetime = writer.lit(1.0).uniform(writer.lit(2.0)).expr(); // adjust for fade duration
     let init_lifetime = SetAttributeModifier::new(Attribute::LIFETIME, lifetime);
 
-    // No velocity, no acceleration
-    let init_pos = SetPositionCircleModifier {
-        center: writer.lit(Vec3::ZERO).expr(),
-        axis: writer.lit(Vec3::Y).expr(),
-        radius: writer.lit(0.).expr(),
-        dimension: ShapeDimension::Surface,
+    let size = writer.lit(0.05).expr();
+    let init_size = SetAttributeModifier::new(Attribute::SIZE, size);
+
+    let pos = writer.lit(Vec3::ZERO).expr();
+    let init_pos = SetAttributeModifier::new(Attribute::POSITION, pos);
+
+    let vel = writer.lit(Vec3::ZERO).expr();
+    let init_vel = SetAttributeModifier::new(Attribute::VELOCITY, vel);
+
+    // update
+    let update_accel = AccelModifier::new(writer.lit(Vec3::Y * -0.1).expr());
+
+    // render
+    let mut module = writer.finish();
+
+    let mut gradient = Gradient::new();
+    gradient.add_key(0.0, Vec4::ONE);
+    gradient.add_key(0.5, Vec4::ONE);
+    gradient.add_key(1.0, Vec4::ONE.with_w(0.0));
+
+    let color_over_lifetime = ColorOverLifetimeModifier {
+        gradient,
+        blend: ColorBlendMode::Modulate,
+        mask: ColorBlendMask::RGBA,
     };
 
-    let init_vel = SetAttributeModifier::new(Attribute::VELOCITY, writer.lit(Vec3::ZERO).expr());
-
-    let accel = AccelModifier::new(writer.lit(Vec3::Y * -0.1).expr());
-
+    let round = RoundModifier::ellipse(&mut module);
     let orientation = OrientModifier {
         mode: OrientMode::ParallelCameraDepthPlane,
         ..default()
     };
-
-    let mut module = writer.finish();
-
-    let round = RoundModifier::ellipse(&mut module);
 
     effects.add(
         EffectAsset::new(1, SpawnerSettings::once(1.0.into()), module)
@@ -239,12 +246,10 @@ fn setup_bullet_impact(effects: &mut Assets<EffectAsset>) -> Handle<EffectAsset>
             .init(init_vel)
             .init(init_age)
             .init(init_lifetime)
-            .update(accel)
-            .render(ColorOverLifetimeModifier::new(color_gradient))
-            .render(SizeOverLifetimeModifier {
-                gradient: size_gradient,
-                screen_space_size: false,
-            })
+            .init(init_color)
+            .init(init_size)
+            .update(update_accel)
+            .render(color_over_lifetime)
             .render(orientation)
             .render(round),
     )
