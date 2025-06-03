@@ -3,10 +3,7 @@ use std::time::Duration;
 use crate::{
     audio::sound_effect,
     gameplay::{
-        crosshair::CrosshairState,
-        health::{Death, Health},
-        npc::Npc,
-        player::camera_shake::OnTrauma,
+        crosshair::CrosshairState, health::Health, npc::Npc, player::camera_shake::OnTrauma,
     },
     third_party::avian3d::CollisionLayer,
 };
@@ -38,7 +35,6 @@ pub(super) fn plugin(app: &mut App) {
     app.add_observer(shooting);
     app.add_observer(shooting_sounds);
     app.add_observer(handle_hits);
-    app.add_observer(on_death);
     app.add_observer(shooting_sounds_reload);
 
     // Only until the animations work again.
@@ -175,10 +171,4 @@ fn handle_hits(
         let gun_damage = 10.0;
         health.damage(gun_damage);
     }
-}
-
-fn on_death(trigger: Trigger<Death>, name: Query<NameOrEntity>) {
-    let entity = trigger.target();
-    let name = name.get(entity).unwrap();
-    info!("Just died: {name}");
 }

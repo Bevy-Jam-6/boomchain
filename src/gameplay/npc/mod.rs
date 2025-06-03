@@ -20,6 +20,7 @@ mod ai_state;
 mod animation;
 mod assets;
 mod attack;
+mod lifecycle;
 pub(crate) mod navigation;
 mod sound;
 
@@ -31,6 +32,7 @@ pub(super) fn plugin(app: &mut App) {
         sound::plugin,
         ai_state::plugin,
         attack::plugin,
+        lifecycle::plugin,
     ));
     app.register_type::<Npc>();
     app.add_observer(on_add);
