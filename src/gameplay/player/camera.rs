@@ -97,7 +97,7 @@ fn spawn_view_model(
             PlayerCamera,
             *player_transform,
             CameraShake::default(),
-            NonTraumaTransform(player_transform.clone()),
+            NonTraumaTransform(*player_transform),
             StateScoped(Screen::Gameplay),
             StateScoped(LoadingScreen::Shaders),
             AvianPickupActor {
