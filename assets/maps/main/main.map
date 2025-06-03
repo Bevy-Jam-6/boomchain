@@ -3699,3 +3699,43 @@
 "origin" "1112 -1944 328"
 "radius" "15"
 }
+// entity 17
+{
+"classname" "barrel_large_closed"
+"origin" "232 568 72"
+}
+// entity 18
+{
+"classname" "barrel_large_closed"
+"origin" "164 472 72"
+}
+// entity 19
+{
+"classname" "barrel_large_closed"
+"origin" "558 568 72"
+}
+// entity 20
+{
+"classname" "barrel_large_closed"
+"origin" "560 216 72"
+}
+// entity 21
+{
+"classname" "barrel_large_closed"
+"origin" "968 664 104"
+}
+// entity 22
+{
+"classname" "barrel_large_closed"
+"origin" "1160 -104 56"
+}
+// entity 23
+{
+"classname" "barrel_large_closed"
+"origin" "1255 203 56"
+}
+// entity 24
+{
+"classname" "barrel_large_closed"
+"origin" "1056 352 152"
+}
