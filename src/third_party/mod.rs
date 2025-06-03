@@ -13,7 +13,6 @@ mod avian_pickup;
 mod bevy_enhanced_input;
 mod bevy_firework;
 mod bevy_framepace;
-#[cfg(feature = "native")]
 mod bevy_hanabi;
 pub(crate) mod bevy_landmass;
 mod bevy_tnua;
