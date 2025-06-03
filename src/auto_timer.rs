@@ -6,7 +6,7 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 /// A [`Timer`] component that automatically starts ticking when added to an entity,
-/// and triggers the [`AutoTimerFinished`] event when it finishes.
+/// and triggers the [`OnAutoTimerFinish`] event when it finishes.
 #[derive(Component, Debug, Default, Deref, DerefMut, Reflect)]
 #[reflect(Component, Debug, Default)]
 pub struct AutoTimer(pub Timer);

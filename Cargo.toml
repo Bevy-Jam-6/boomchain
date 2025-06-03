@@ -37,7 +37,7 @@ bevy-tnua-avian3d = "0.5"
 bevy_firework = { version = "0.7" }
 bevy_hanabi = { version = "0.16.0-dev", default-features = false, features = [
     "3d",
-], optional = true }
+] }
 
 # navigation
 bevy_landmass = { version = "0.9.0" }
@@ -89,7 +89,7 @@ default = [
     # Default to a native dev build.
     "dev_native",
 ]
-native = ["dep:bevy_hanabi", "bevy/experimental_pbr_pcss"]
+native = ["bevy/experimental_pbr_pcss"]
 dev = [
     # Improve compile times for dev builds by linking Bevy as a dynamic library.
     "bevy/dynamic_linking",
