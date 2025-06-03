@@ -4,7 +4,7 @@ use bevy::prelude::*;
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
 
-use crate::{asset_tracking::LoadResource, audio::music, screens::Screen};
+use crate::{asset_tracking::LoadResource, audio::music, gameplay::waves::Waves, screens::Screen};
 
 pub(super) fn plugin(app: &mut App) {
     app.load_resource::<LevelAssets>();
@@ -21,6 +21,7 @@ pub(crate) fn spawn_level(mut commands: Commands, level_assets: Res<LevelAssets>
         Level,
         children![(Name::new("Level Music"), music(level_assets.music.clone()))],
     ));
+    commands.spawn((Name::new("Waves"), Waves::default()));
     commands.insert_resource(AmbientLight::NONE);
 }
 

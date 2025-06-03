@@ -12,6 +12,7 @@ pub(crate) mod health;
 pub(crate) mod level;
 pub(crate) mod npc;
 pub(crate) mod player;
+pub(crate) mod waves;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
@@ -21,6 +22,7 @@ pub(super) fn plugin(app: &mut App) {
         npc::plugin,
         player::plugin,
         health::plugin,
+        waves::plugin,
         // This plugin preloads the level,
         // so make sure to add it last.
         level::plugin,
