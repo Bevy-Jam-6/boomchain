@@ -21,30 +21,46 @@ impl Default for Waves {
     fn default() -> Self {
         Self::new([Wave {
             prep_time: Millis(0),
-            packet_kinds: [(Millis(0), Difficulty(0))].into(),
+            packet_kinds: [(Millis(0), Difficulty(0)), (Millis(5000), Difficulty(0))].into(),
         }])
     }
 }
 
 impl Default for SpawnPackets {
     fn default() -> Self {
-        Self(vec![SpawnPacket {
-            difficulty: Difficulty(0),
-            spawns: [(Millis(0), SpawnVariant::BasicEnemy)].into(),
-        }])
+        Self(vec![SpawnPacket::new(
+            Difficulty(0),
+            [
+                (Millis(0), SpawnVariant::BasicEnemy),
+                (Millis(100), SpawnVariant::BasicEnemy),
+                (Millis(200), SpawnVariant::BasicEnemy),
+                (Millis(300), SpawnVariant::BasicEnemy),
+                (Millis(400), SpawnVariant::BasicEnemy),
+                (Millis(500), SpawnVariant::BasicEnemy),
+                (Millis(600), SpawnVariant::BasicEnemy),
+                (Millis(700), SpawnVariant::BasicEnemy),
+                (Millis(800), SpawnVariant::BasicEnemy),
+            ]
+            .into(),
+        )])
     }
 }
 
 fn advance_waves(mut waves: Single<&mut Waves>, packets: Res<SpawnPackets>, time: Res<Time>) {
-    info!("tick");
     waves.tick(time.delta());
     if waves.is_finished() {
-        info!("Game finished");
+        info_once!("Game finished");
         return;
     }
     if waves.is_preparing() {
         info!("Preparing wave {}", waves.current_wave);
-        info!("Prep time left: {}", waves.current_wave().prep_time);
+        info!(
+            "Prep time left: {}",
+            waves
+                .current_wave()
+                .expect("Is preparing, but there is not current wave")
+                .prep_time
+        );
     } else {
         let difficulties = waves.pop_difficulties_to_spawn();
         for difficulty in difficulties {
@@ -54,7 +70,7 @@ fn advance_waves(mut waves: Single<&mut Waves>, packets: Res<SpawnPackets>, time
                 continue;
             };
             for (millis, spawn_variant) in packet.spawns.iter() {
-                if waves.elapsed_millis() > *millis {
+                if waves.elapsed_packet_millis() > *millis {
                     match spawn_variant {
                         SpawnVariant::BasicEnemy => {
                             info!("Spawning BasicEnemy at {}", waves.elapsed_millis());
@@ -75,6 +91,7 @@ fn advance_waves(mut waves: Single<&mut Waves>, packets: Res<SpawnPackets>, time
 #[reflect(Component)]
 pub(crate) struct Waves {
     waves: Vec<Wave>,
+    current_packets: Vec<SpawnPacket>,
     wave_stopwatch: Stopwatch,
     current_wave: usize,
     prep_timer: Timer,
@@ -84,6 +101,7 @@ impl Waves {
     fn new(waves: impl Into<Vec<Wave>>) -> Self {
         Self {
             waves: waves.into(),
+            current_packets: Vec::new(),
             wave_stopwatch: Stopwatch::default(),
             current_wave: 0,
             prep_timer: Timer::from_seconds(0.0, TimerMode::Once),
@@ -91,18 +109,31 @@ impl Waves {
     }
 
     fn tick(&mut self, delta: Duration) {
-        if !self.is_finished() && self.current_wave().packet_kinds.is_empty() {
+        if !self.is_finished()
+            && self
+                .current_wave()
+                .expect("Is not finished, but there is no current wave")
+                .packet_kinds
+                .is_empty()
+        {
             self.advance_wave();
         }
         if self.is_preparing() {
             self.prep_timer.tick(delta);
         } else {
             self.wave_stopwatch.tick(delta);
+            for packet in self.current_packets.iter_mut() {
+                packet.tick(delta);
+            }
         }
     }
 
-    fn current_wave(&self) -> &Wave {
-        &self.waves[self.current_wave]
+    fn current_wave(&self) -> Option<&Wave> {
+        self.waves.get(self.current_wave)
+    }
+
+    fn current_wave_mut(&mut self) -> Option<&mut Wave> {
+        self.waves.get_mut(self.current_wave)
     }
 
     fn elapsed_millis(&self) -> Millis {
@@ -113,10 +144,17 @@ impl Waves {
         let mut difficulties = Vec::new();
 
         let elapsed = self.elapsed_millis();
-        for (millis, difficulty) in self.current_wave().packet_kinds_ordered() {
+        let Some(current_wave) = self.current_wave() else {
+            error!("Tried to pop difficulties to spawn, but there is no current wave");
+            return difficulties;
+        };
+        for (millis, difficulty) in current_wave.packet_kinds_ordered() {
             if elapsed > millis {
                 difficulties.push(difficulty);
-                self.current_wave_mut().packet_kinds.remove(&millis);
+                self.current_wave_mut()
+                    .unwrap()
+                    .packet_kinds
+                    .remove(&millis);
             } else {
                 break;
             }
@@ -127,14 +165,13 @@ impl Waves {
     fn is_preparing(&self) -> bool {
         !self.prep_timer.finished()
     }
-
-    fn current_wave_mut(&mut self) -> &mut Wave {
-        &mut self.waves[self.current_wave]
-    }
-
     fn advance_wave(&mut self) {
         self.current_wave += 1;
-        let prep_time = self.current_wave().prep_time;
+        let prep_time = if let Some(current_wave) = self.current_wave() {
+            current_wave.prep_time
+        } else {
+            Millis(0)
+        };
         self.prep_timer = Timer::new(Duration::from_millis(prep_time.0), TimerMode::Once);
         self.wave_stopwatch.reset();
     }
@@ -223,7 +260,22 @@ impl SpawnPackets {
 #[derive(Reflect, Clone)]
 struct SpawnPacket {
     difficulty: Difficulty,
+    stopwatch: Stopwatch,
     spawns: HashMap<Millis, SpawnVariant>,
+}
+
+impl SpawnPacket {
+    fn new(difficulty: Difficulty, spawns: HashMap<Millis, SpawnVariant>) -> Self {
+        Self {
+            difficulty,
+            stopwatch: Stopwatch::default(),
+            spawns,
+        }
+    }
+
+    fn tick(&mut self, delta: Duration) {
+        self.stopwatch.tick(delta);
+    }
 }
 
 #[derive(Reflect, Clone, Copy)]
