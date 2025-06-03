@@ -6,11 +6,13 @@
 
 use bevy::prelude::*;
 
+use crate::platform_support::is_webgpu_or_native;
+
 pub(crate) mod avian3d;
 mod avian_pickup;
 mod bevy_enhanced_input;
+mod bevy_firework;
 mod bevy_framepace;
-#[cfg(feature = "native")]
 mod bevy_hanabi;
 pub(crate) mod bevy_landmass;
 mod bevy_tnua;
@@ -24,12 +26,14 @@ pub(super) fn plugin(app: &mut App) {
         bevy_trenchbroom::plugin,
         avian3d::plugin,
         bevy_enhanced_input::plugin,
+        bevy_firework::plugin,
         bevy_tnua::plugin,
         bevy_landmass::plugin,
         bevy_yarnspinner::plugin,
         avian_pickup::plugin,
-        #[cfg(feature = "native")]
-        bevy_hanabi::plugin,
         bevy_framepace::plugin,
     ));
+    if is_webgpu_or_native() {
+        app.add_plugins(bevy_hanabi::plugin);
+    }
 }
