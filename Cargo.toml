@@ -65,7 +65,7 @@ getrandom = { version = "0.3", default-features = false, features = [
     "wasm_js",
 ] }
 
-bevy_simple_subsecond_system = { version = "0.2.0", optional = true, git = "https://github.com/TheBevyFlock/bevy_simple_subsecond_system" }
+bevy_simple_subsecond_system = { version = "0.2.0", optional = true }
 
 bitflags = "2.9.0"
 anyhow = "1.0.98"
@@ -74,6 +74,7 @@ bevy_fix_cursor_unlock_web = "0.1.2"
 regex = "1.11.1"
 bevy_framepace = "0.19.1"
 bevy_mod_skinned_aabb = "0.2.0"
+noiz = "0.2.0"
 [features]
 default = [
     # Default to a native dev build.
@@ -170,4 +171,4 @@ landmass_oxidized_navigation = { git = "https://github.com/janhohenheim/landmass
 # bevy_hanabi has no 0.16 release yet
 bevy_hanabi = { git = "https://github.com/djeedai/bevy_hanabi", branch = "main", optional = true }
 # This rev includes massive performance improvements due to collider caching
-avian3d = { git = "https://github.com/Jondolf/avian", rev = "4f31166ee5e0cc1116756952d754386333b75cb0" }
+avian3d = { git = "https://github.com/Jondolf/avian" }

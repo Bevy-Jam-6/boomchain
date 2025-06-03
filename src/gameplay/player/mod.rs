@@ -23,6 +23,7 @@ use super::health::Health;
 mod animation;
 pub(crate) mod assets;
 pub(crate) mod camera;
+pub(crate) mod camera_shake;
 pub(crate) mod default_input;
 pub(crate) mod dialogue;
 pub(crate) mod gunplay;
@@ -44,6 +45,7 @@ pub(super) fn plugin(app: &mut App) {
         pickup::plugin,
         navmesh_position::plugin,
         gunplay::plugin,
+        camera_shake::plugin,
     ));
     app.add_observer(setup_player);
     app.add_systems(PreUpdate, assert_only_one_player);

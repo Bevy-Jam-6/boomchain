@@ -4,7 +4,10 @@ use bevy::prelude::*;
 use bevy_simple_subsecond_system::hot;
 
 use crate::{
-    gameplay::{health::Health, player::Player},
+    gameplay::{
+        health::Health,
+        player::{Player, camera_shake::OnTrauma},
+    },
     third_party::avian3d::CollisionLayer,
 };
 
@@ -22,7 +25,7 @@ fn start_attack(trigger: Trigger<OnAdd, Attacking>, mut commands: Commands) {
             HitboxOf(entity),
             ChildOf(entity),
             Sensor,
-            Transform::from_xyz(0.0, 0.0, -0.5),
+            Transform::from_xyz(0.0, 0.0, -1.5),
             Collider::cuboid(1.5, 1.5, 1.5),
             CollisionEventsEnabled,
             CollisionLayers::new(CollisionLayer::Sensor, CollisionLayer::Player),
@@ -30,24 +33,24 @@ fn start_attack(trigger: Trigger<OnAdd, Attacking>, mut commands: Commands) {
         .observe(hit_player);
 }
 
+#[cfg_attr(feature = "hot_patch", hot)]
 fn hit_player(
     trigger: Trigger<OnCollisionStart>,
-    collider_of: Query<&ColliderOf>,
     mut player: Query<&mut Health, With<Player>>,
     name: Query<NameOrEntity>,
+    mut commands: Commands,
 ) {
-    let collider = trigger.event().collider;
-    let Ok(collider_of) = collider_of.get(collider) else {
-        error!("Enemy hit collision without collider of");
+    let Some(body) = trigger.event().body else {
+        error!("Enemy hit collision without body");
         return;
     };
-    let body = collider_of.body;
     let Ok(mut health) = player.get_mut(body) else {
         let name = name.get(body).unwrap();
         error!("Enemy hit non-player: {name}");
         return;
     };
     health.damage(10.0);
+    commands.trigger(OnTrauma(0.5));
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
