@@ -1,5 +1,6 @@
-//! [Hanabi](https://github.com/djeedai/bevy_hanabi) is our GPU particle system. Note that we don't use Hanabi
-//! on Wasm as it is not supported on WebGL. If we only target WebGPU, we can safely reactivate it.
+//! [Hanabi](https://github.com/djeedai/bevy_hanabi) is our GPU particle system.
+//! It is used for native builds and WebGPU, but it does not work on WebGL, so we use
+//! `bevy_firework` as a fallback.
 
 use bevy::prelude::*;
 use bevy_hanabi::prelude::*;

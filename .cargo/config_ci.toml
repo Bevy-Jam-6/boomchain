@@ -36,6 +36,8 @@ rustflags = [
     "-Dwarnings",
     "-Cdebuginfo=line-tables-only",
     "--cfg",
+    "web_sys_unstable_apis",
+    "--cfg",
     "getrandom_backend=\"wasm_js\"",
     # Nightly
     "-Zshare-generics=y",
@@ -47,7 +49,6 @@ rustdocflags = [
     "-Zshare-generics=y",
     "-Zthreads=0",
 ]
-
 
 [target.x86_64-unknown-linux-gnu]
 linker = "clang"

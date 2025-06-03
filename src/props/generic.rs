@@ -1,3 +1,5 @@
+use crate::gameplay::explosion::{ExplodeOnShoot, effects::PropExplosionVfx};
+
 use super::setup::*;
 use bevy::prelude::*;
 use bevy_trenchbroom::prelude::*;
@@ -85,6 +87,7 @@ pub(crate) struct Generator2;
 #[base(Transform, Visibility)]
 #[model("models/darkmod/containers/barrel_large_closed.gltf")]
 #[spawn_hooks(SpawnHooks::new().preload_model::<Self>())]
+#[require(ExplodeOnShoot, PropExplosionVfx)]
 pub(crate) struct BarrelLargeClosed;
 
 #[derive(PointClass, Component, Debug, Reflect)]

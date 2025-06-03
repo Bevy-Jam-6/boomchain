@@ -3669,3 +3669,43 @@
 "classname" "light_lamp_plain"
 "origin" "520 680 408"
 }
+// entity 12
+{
+"classname" "barrel_large_closed"
+"origin" "232 568 72"
+}
+// entity 13
+{
+"classname" "barrel_large_closed"
+"origin" "164 472 72"
+}
+// entity 14
+{
+"classname" "barrel_large_closed"
+"origin" "558 568 72"
+}
+// entity 15
+{
+"classname" "barrel_large_closed"
+"origin" "560 216 72"
+}
+// entity 16
+{
+"classname" "barrel_large_closed"
+"origin" "968 664 104"
+}
+// entity 17
+{
+"classname" "barrel_large_closed"
+"origin" "1160 -104 56"
+}
+// entity 18
+{
+"classname" "barrel_large_closed"
+"origin" "1255 203 56"
+}
+// entity 19
+{
+"classname" "barrel_large_closed"
+"origin" "1056 352 152"
+}
