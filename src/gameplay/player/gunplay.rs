@@ -10,11 +10,10 @@ use crate::{
     third_party::avian3d::CollisionLayer,
 };
 
-use super::{assets::PlayerAssets, camera::PlayerCamera, default_input::Shoot};
+use super::{Player, assets::PlayerAssets, camera::PlayerCamera, default_input::Shoot};
 use avian3d::prelude::*;
 use bevy::prelude::*;
 use bevy_enhanced_input::events::Started;
-use rand::prelude::*;
 
 #[derive(Component, Debug, Reflect)]
 #[reflect(Component)]
@@ -24,15 +23,33 @@ pub(crate) struct Shooting;
 #[reflect(Component)]
 pub(crate) struct Reloading;
 
+#[derive(Debug, Component, Reflect)]
+#[reflect(Component)]
+struct WeaponStats {
+    pellets: u32,
+    spread_radius: f32,
+}
+
 pub(super) fn plugin(app: &mut App) {
+    // Only until there is a weapon pickup/selection system
+    app.add_observer(setup_weapon_stats);
+
     app.add_observer(shooting);
     app.add_observer(shooting_sounds);
     app.add_observer(handle_hits);
     app.add_observer(on_death);
     app.add_observer(shooting_sounds_reload);
+
     // Only until the animations work again.
     app.add_systems(Update, remove_shooting);
     app.add_systems(Update, trigger_reload_sound);
+}
+
+fn setup_weapon_stats(trigger: Trigger<OnAdd, Player>, mut commands: Commands) {
+    commands.entity(trigger.target()).insert(WeaponStats {
+        pellets: 8,
+        spread_radius: 0.2,
+    });
 }
 
 fn shooting(
@@ -115,6 +132,7 @@ fn handle_hits(
     spatial_query: SpatialQuery,
     player_camera_parent: Single<&Transform, With<PlayerCamera>>,
     mut npcs: Query<&mut Health, With<Npc>>,
+    weapon_stats: Single<&WeaponStats, With<Player>>,
 ) {
     let mut rng = &mut rand::thread_rng();
 
@@ -122,11 +140,9 @@ fn handle_hits(
     let origin = player_camera_parent.translation;
     let base_direction = player_camera_parent.forward();
 
-    let spread_radius = 0.2;
-
-    for i in 1..=8 {
+    for i in 1..=weapon_stats.pellets {
         // Sample random point within a circle for spread
-        let point = Circle::new(spread_radius).sample_interior(&mut rng);
+        let point = Circle::new(weapon_stats.spread_radius).sample_interior(&mut rng);
 
         // Create perpendicular vectors to the forward direction for spreading
         let right = player_camera_parent.right();
