@@ -122,24 +122,19 @@ fn handle_hits(
     let origin = player_camera_parent.translation;
     let base_direction = player_camera_parent.forward();
 
-    // Spread configuration - adjust this value to control spread amount (in radians)
-    // According to Claude Sonnet 4:
-    // 0.05 = small spread (good for rifles)
-    // 0.1 = medium spread (good for pistols)
-    // 0.2 = large spread (good for shotguns)
     let spread_radius = 0.2;
 
     for i in 1..=8 {
         // Sample random point within a circle for spread
-        let (offset_x, offset_y) = sample_circle(&mut rng, spread_radius);
+        let point = Circle::new(spread_radius).sample_interior(&mut rng);
 
         // Create perpendicular vectors to the forward direction for spreading
         let right = player_camera_parent.right();
         let up = player_camera_parent.up();
 
         // Apply spread to the direction
-        let spread_vec = base_direction.as_vec3() + right * offset_x + up * offset_y;
-        let spread_direction = Dir3::new(spread_vec).unwrap_or(Dir3::NEG_Z); // TODO: Is NEG_Z good enough?
+        let spread_vec = base_direction.as_vec3() + right * point.x + up * point.y;
+        let spread_direction = Dir3::new(spread_vec).unwrap_or(Dir3::NEG_Z);
 
         // Configuration for the ray cast
         let max_distance = 100.0;
@@ -162,19 +157,6 @@ fn handle_hits(
         let gun_damage = 10.0;
         health.damage(gun_damage);
     }
-}
-
-/// Sample a random point within a circle using uniform distribution
-/// This was AI generated using Claude Sonnet 4. I have no clue if it's correct tbh.
-fn sample_circle(rng: &mut ThreadRng, radius: f32) -> (f32, f32) {
-    // Generate random angle
-    let angle = rng.gen_range(0.0..std::f32::consts::TAU);
-
-    // Generate random radius with square root for uniform distribution
-    let r = radius * rng.r#gen::<f32>().sqrt();
-
-    // Convert to Cartesian coordinates
-    (r * angle.cos(), r * angle.sin())
 }
 
 fn on_death(trigger: Trigger<Death>, name: Query<NameOrEntity>) {
