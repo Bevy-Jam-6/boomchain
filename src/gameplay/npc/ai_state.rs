@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_landmass::AgentState;
+use rand::Rng as _;
 
 use crate::gameplay::player::Player;
 
@@ -39,6 +40,7 @@ fn update_ai_state(
                     );
                     commands.entity(entity).insert(Attacking {
                         dir: Dir3::try_from(target - transform.translation).ok(),
+                        speed: rand::thread_rng().gen_range(1.2..=2.1),
                     });
                 }
             }
