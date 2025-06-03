@@ -69,18 +69,21 @@ fn advance_waves(mut waves: Single<&mut Waves>, packets: Res<SpawnPackets>, time
                 error!("No packets available for difficulty {difficulty}");
                 continue;
             };
-            for (millis, spawn_variant) in packet.spawns.iter() {
-                if waves.elapsed_packet_millis() > *millis {
-                    match spawn_variant {
-                        SpawnVariant::BasicEnemy => {
-                            info!("Spawning BasicEnemy at {}", waves.elapsed_millis());
-                        }
-                        SpawnVariant::ExplosiveBarrel => {
-                            info!("Spawning ExplosiveBarrel at {}", waves.elapsed_millis());
-                        }
-                    }
-                } else {
-                    break;
+            waves.current_packets.push(packet.clone());
+        }
+        let spawns = waves
+            .current_packets
+            .iter_mut()
+            .flat_map(|packet| packet.pop_spawns())
+            .collect::<Vec<_>>();
+        waves.clean_finished_packets();
+        for spawn in spawns {
+            match spawn {
+                SpawnVariant::BasicEnemy => {
+                    info!("Spawning BasicEnemy at {}", waves.elapsed_millis());
+                }
+                SpawnVariant::ExplosiveBarrel => {
+                    info!("Spawning ExplosiveBarrel at {}", waves.elapsed_millis());
                 }
             }
         }
@@ -126,6 +129,11 @@ impl Waves {
                 packet.tick(delta);
             }
         }
+    }
+
+    fn clean_finished_packets(&mut self) {
+        self.current_packets
+            .retain(|packet| !packet.spawns.is_empty());
     }
 
     fn current_wave(&self) -> Option<&Wave> {
@@ -273,8 +281,28 @@ impl SpawnPacket {
         }
     }
 
+    fn pop_spawns(&mut self) -> Vec<SpawnVariant> {
+        let mut spawns = Vec::new();
+        for (millis, spawn_variant) in self
+            .spawns
+            .iter()
+            .map(|(millis, spawn_variant)| (*millis, *spawn_variant))
+            .collect::<Vec<_>>()
+        {
+            if self.elapsed_millis() > millis {
+                spawns.push(spawn_variant);
+                self.spawns.remove(&millis);
+            }
+        }
+        spawns
+    }
+
     fn tick(&mut self, delta: Duration) {
         self.stopwatch.tick(delta);
+    }
+
+    fn elapsed_millis(&self) -> Millis {
+        self.stopwatch.elapsed().into()
     }
 }
 
