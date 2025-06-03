@@ -121,26 +121,23 @@ pub(super) fn hanabi_prop_explosion(world: &mut World) -> EffectAsset {
     // to be over the surface of a sphere of radius 2 units.
     let init_pos = SetPositionSphereModifier {
         center: writer.lit(Vec3::ZERO).expr(),
-        radius: writer.lit(2.).expr(),
+        radius: writer.lit(2.0).expr(),
         dimension: ShapeDimension::Volume,
     };
 
-    // Also initialize a radial initial velocity to 6 units/sec
-    // away from the (same) sphere center.
+    // Initialize a radial initial velocity.
     let init_vel = SetVelocitySphereModifier {
         center: writer.lit(Vec3::ZERO).expr(),
         speed: (writer.rand(ScalarType::Float) * writer.lit(10.0)).expr(),
     };
 
+    // Initialize the size of the particle.
     let init_size = SetAttributeModifier::new(
         Attribute::SIZE,
         (writer.rand(ScalarType::Float) * writer.lit(0.1) + writer.lit(0.01)).expr(),
     );
 
-    // Initialize the total lifetime of the particle, that is
-    // the time for which it's simulated and rendered. This modifier
-    // is almost always required, otherwise the particles will stay
-    // alive forever, and new particles can't be spawned instead.
+    // Initialize the total lifetime of the particle.
     let lifetime = (writer.rand(ScalarType::Float) * writer.lit(0.8) + writer.lit(0.2)).expr();
     let init_lifetime = SetAttributeModifier::new(Attribute::LIFETIME, lifetime);
 
@@ -150,12 +147,12 @@ pub(super) fn hanabi_prop_explosion(world: &mut World) -> EffectAsset {
     let drag = module.lit(7.0);
     let update_drag = LinearDragModifier::new(drag);
 
-    // Every frame, add a gravity-like acceleration downward
+    // Every frame, add a gravity-like acceleration downward.
     let accel = module.lit(Vec3::new(0.0, -8.0, 0.0));
     let update_accel = AccelModifier::new(accel);
 
-    // Create the effect asset
-    EffectAsset::new(10_000, SpawnerSettings::once(600.0.into()), module)
+    // Create the effect asset.
+    EffectAsset::new(100_000, SpawnerSettings::once(5000.0.into()), module)
         .with_name("PropExplosionEffect")
         .init(init_pos)
         .init(init_vel)
@@ -163,9 +160,6 @@ pub(super) fn hanabi_prop_explosion(world: &mut World) -> EffectAsset {
         .init(init_lifetime)
         .update(update_drag)
         .update(update_accel)
-        // Render the particles with a color gradient over their
-        // lifetime. This maps the gradient key 0 to the particle spawn
-        // time, and the gradient key 1 to the particle death (10s).8
         .render(ColorOverLifetimeModifier {
             gradient,
             blend: ColorBlendMode::Overwrite,
