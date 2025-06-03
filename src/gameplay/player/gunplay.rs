@@ -1,17 +1,18 @@
 use std::time::Duration;
 
 use crate::{
+    RenderLayer,
     audio::sound_effect,
     gameplay::{
         crosshair::CrosshairState, health::Health, npc::Npc, player::camera_shake::OnTrauma,
     },
-    third_party::avian3d::CollisionLayer,
 };
 
 use super::{Player, assets::PlayerAssets, camera::PlayerCamera, default_input::Shoot};
 use avian3d::prelude::*;
-use bevy::prelude::*;
+use bevy::{prelude::*, render::view::RenderLayers};
 use bevy_enhanced_input::events::Started;
+use bevy_hanabi::prelude::*;
 
 #[derive(Component, Debug, Reflect)]
 #[reflect(Component)]
@@ -40,6 +41,7 @@ pub(super) fn plugin(app: &mut App) {
     // Only until the animations work again.
     app.add_systems(Update, remove_shooting);
     app.add_systems(Update, trigger_reload_sound);
+    app.init_resource::<BulletImpact>();
 }
 
 fn setup_weapon_stats(trigger: Trigger<OnAdd, Player>, mut commands: Commands) {
@@ -131,39 +133,48 @@ fn handle_hits(
     player_camera_parent: Single<&Transform, With<PlayerCamera>>,
     mut npcs: Query<&mut Health, With<Npc>>,
     weapon_stats: Single<&WeaponStats, With<Player>>,
+    player: Single<Entity, With<Player>>,
+    bullet_impact: Res<BulletImpact>,
+    mut commands: Commands,
 ) {
     let mut rng = &mut rand::thread_rng();
 
     // Ray origin and base direction
     let origin = player_camera_parent.translation;
     let base_direction = player_camera_parent.forward();
+    // Create perpendicular vectors to the forward direction for spreading
+    let right = player_camera_parent.right();
+    let up = player_camera_parent.up();
 
     for i in 1..=weapon_stats.pellets {
         // Sample random point within a circle for spread
         let point = Circle::new(weapon_stats.spread_radius).sample_interior(&mut rng);
-
-        // Create perpendicular vectors to the forward direction for spreading
-        let right = player_camera_parent.right();
-        let up = player_camera_parent.up();
 
         // Apply spread to the direction
         let spread_vec = base_direction.as_vec3() + right * point.x + up * point.y;
         let spread_direction = Dir3::new(spread_vec).unwrap_or(Dir3::NEG_Z);
 
         // Configuration for the ray cast
-        let max_distance = 100.0;
+        let max_distance = 300.0;
         let solid = true;
-        let filter =
-            SpatialQueryFilter::default().with_mask([CollisionLayer::Npc, CollisionLayer::Prop]);
+        let filter = SpatialQueryFilter::default().with_excluded_entities([*player]);
 
         // Cast ray with spread and handle first hit
         let Some(first_hit) =
             spatial_query.cast_ray(origin, spread_direction, max_distance, solid, &filter)
         else {
-            return;
+            continue;
         };
+        let bias = 0.1;
+        commands.spawn((
+            particle_bundle(&bullet_impact),
+            Transform::from_translation(
+                origin + spread_direction * (first_hit.distance - bias).max(0.0),
+            ),
+        ));
+
         let Ok(mut health) = npcs.get_mut(first_hit.entity) else {
-            return;
+            continue;
         };
 
         info!("Hit {i}/8 did hit {:?}", first_hit.entity);
@@ -171,4 +182,81 @@ fn handle_hits(
         let gun_damage = 10.0;
         health.damage(gun_damage);
     }
+}
+
+#[derive(Resource)]
+struct BulletImpact(Handle<EffectAsset>);
+
+impl FromWorld for BulletImpact {
+    fn from_world(world: &mut World) -> Self {
+        let mut effects = world.resource_mut::<Assets<EffectAsset>>();
+        Self(effects.add(create_bullet_impact_asset()))
+    }
+}
+
+fn particle_bundle(effect: &BulletImpact) -> impl Bundle {
+    (
+        ParticleEffect::new(effect.0.clone()),
+        RenderLayers::from(RenderLayer::PARTICLES),
+    )
+}
+fn create_bullet_impact_asset() -> EffectAsset {
+    let writer = ExprWriter::new();
+
+    // init
+    let c = writer.lit(0.05).uniform(writer.lit(0.4));
+    let rgb = writer.lit(Vec3::ONE) * c;
+    let color = rgb.vec4_xyz_w(writer.lit(1.)).pack4x8unorm();
+    let init_color = SetAttributeModifier::new(Attribute::COLOR, color.expr());
+
+    let age = writer.lit(0.).expr();
+    let init_age = SetAttributeModifier::new(Attribute::AGE, age);
+
+    let lifetime = writer.lit(1.0).uniform(writer.lit(2.0)).expr(); // adjust for fade duration
+    let init_lifetime = SetAttributeModifier::new(Attribute::LIFETIME, lifetime);
+
+    let size = writer.lit(0.05).expr();
+    let init_size = SetAttributeModifier::new(Attribute::SIZE, size);
+
+    let pos = writer.lit(Vec3::ZERO).expr();
+    let init_pos = SetAttributeModifier::new(Attribute::POSITION, pos);
+
+    let vel = writer.lit(Vec3::ZERO).expr();
+    let init_vel = SetAttributeModifier::new(Attribute::VELOCITY, vel);
+
+    // update
+    let update_accel = AccelModifier::new(writer.lit(Vec3::Y * -0.2).expr());
+
+    // render
+    let mut module = writer.finish();
+
+    let mut gradient = Gradient::new();
+    gradient.add_key(0.0, Vec4::ONE);
+    gradient.add_key(0.5, Vec4::ONE);
+    gradient.add_key(1.0, Vec4::ONE.with_w(0.0));
+
+    let color_over_lifetime = ColorOverLifetimeModifier {
+        gradient,
+        blend: ColorBlendMode::Modulate,
+        mask: ColorBlendMask::RGBA,
+    };
+
+    let round = RoundModifier::ellipse(&mut module);
+    let orientation = OrientModifier {
+        mode: OrientMode::ParallelCameraDepthPlane,
+        ..default()
+    };
+
+    EffectAsset::new(1, SpawnerSettings::once(1.0.into()), module)
+        .with_name("bullet_impact")
+        .init(init_pos)
+        .init(init_vel)
+        .init(init_age)
+        .init(init_lifetime)
+        .init(init_color)
+        .init(init_size)
+        .update(update_accel)
+        .render(color_over_lifetime)
+        .render(orientation)
+        .render(round)
 }

@@ -19,6 +19,7 @@ bevy = { version = "0.16", features = [
     "ktx2",
     "png",
     "wayland",
+    "webgpu",
     # Due to some Bevy bug, we need to enable the UI debug plugin even in non-dev builds,
     # otherwise we only render the view model and the skybox.
     "bevy_ui_debug",
@@ -35,7 +36,7 @@ bevy-tnua-avian3d = "0.5"
 
 # VFX and decals
 bevy_firework = { version = "0.7" }
-bevy_hanabi = { version = "0.16.0-dev", default-features = false, features = [
+bevy_hanabi = { version = "0.16.0", default-features = false, features = [
     "3d",
 ] }
 
@@ -177,7 +178,5 @@ inherits = "dev"
 # oxidized_navigation and landmass_oxidized_navigation have no 0.16 releases yet
 oxidized_navigation = { git = "https://github.com/janhohenheim/oxidized_navigation", branch = "bevy-0.16" }
 landmass_oxidized_navigation = { git = "https://github.com/janhohenheim/landmass", branch = "bevy-0.16-oxidized" }
-# bevy_hanabi has no 0.16 release yet
-bevy_hanabi = { git = "https://github.com/djeedai/bevy_hanabi", branch = "main", optional = true }
 # This rev includes massive performance improvements due to collider caching
 avian3d = { git = "https://github.com/Jondolf/avian" }
