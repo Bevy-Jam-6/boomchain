@@ -19,6 +19,7 @@ bevy = { version = "0.16", features = [
     "ktx2",
     "png",
     "wayland",
+    "webgpu",
     # Due to some Bevy bug, we need to enable the UI debug plugin even in non-dev builds,
     # otherwise we only render the view model and the skybox.
     "bevy_ui_debug",
@@ -45,7 +46,7 @@ bevy_trenchbroom = { version = "0.8.1", features = ["avian"] }
 bevy_yarnspinner = "0.5"
 bevy_yarnspinner_example_dialogue_view = "0.5"
 
-bevy_hanabi = { version = "0.16.0-dev", optional = true }
+bevy_hanabi = "0.16.0"
 bevy_shuffle_bag = "0.2"
 
 # Keep this in sync with Bevy
@@ -80,7 +81,7 @@ default = [
     # Default to a native dev build.
     "dev_native",
 ]
-native = ["dep:bevy_hanabi", "bevy/experimental_pbr_pcss"]
+native = ["bevy/experimental_pbr_pcss"]
 dev = [
     # Improve compile times for dev builds by linking Bevy as a dynamic library.
     "bevy/dynamic_linking",
@@ -168,7 +169,5 @@ inherits = "dev"
 # oxidized_navigation and landmass_oxidized_navigation have no 0.16 releases yet
 oxidized_navigation = { git = "https://github.com/janhohenheim/oxidized_navigation", branch = "bevy-0.16" }
 landmass_oxidized_navigation = { git = "https://github.com/janhohenheim/landmass", branch = "bevy-0.16-oxidized" }
-# bevy_hanabi has no 0.16 release yet
-bevy_hanabi = { git = "https://github.com/djeedai/bevy_hanabi", branch = "main", optional = true }
 # This rev includes massive performance improvements due to collider caching
 avian3d = { git = "https://github.com/Jondolf/avian" }
