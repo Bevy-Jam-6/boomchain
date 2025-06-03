@@ -36,7 +36,7 @@ rustflags = [
     "-Dwarnings",
     "-Cdebuginfo=line-tables-only",
     "--cfg",
-    "--cfg=web_sys_unstable_apis",
+    "web_sys_unstable_apis",
     "getrandom_backend=\"wasm_js\"",
     # Nightly
     "-Zshare-generics=y",
