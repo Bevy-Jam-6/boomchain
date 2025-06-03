@@ -4,7 +4,7 @@ use bevy::{platform::collections::HashMap, prelude::*, time::Stopwatch};
 use bevy_trenchbroom::prelude::*;
 use rand::seq::SliceRandom as _;
 
-use crate::{PrePhysicsAppSystems, gameplay::npc::Npc};
+use crate::{PrePhysicsAppSystems, gameplay::npc::Npc, props::generic::BarrelLargeClosed};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Waves>();
@@ -19,10 +19,20 @@ pub(super) fn plugin(app: &mut App) {
 
 impl Default for Waves {
     fn default() -> Self {
-        Self::new([Wave {
-            prep_time: Millis(0),
-            packet_kinds: [(Millis(0), Difficulty(0)), (Millis(5000), Difficulty(0))].into(),
-        }])
+        Self::new([
+            Wave {
+                prep_time: Millis(0),
+                packet_kinds: [(Millis(0), Difficulty(0)), (Millis(5000), Difficulty(0))].into(),
+            },
+            Wave {
+                prep_time: Millis(10000),
+                packet_kinds: [(Millis(0), Difficulty(0)), (Millis(5000), Difficulty(0))].into(),
+            },
+            Wave {
+                prep_time: Millis(10000),
+                packet_kinds: [(Millis(0), Difficulty(0)), (Millis(5000), Difficulty(0))].into(),
+            },
+        ])
     }
 }
 
@@ -34,9 +44,9 @@ impl Default for SpawnPackets {
                 (Millis(0), SpawnVariant::BasicEnemy),
                 (Millis(100), SpawnVariant::BasicEnemy),
                 (Millis(200), SpawnVariant::BasicEnemy),
-                (Millis(300), SpawnVariant::BasicEnemy),
+                (Millis(300), SpawnVariant::ExplosiveBarrel),
                 (Millis(400), SpawnVariant::BasicEnemy),
-                (Millis(500), SpawnVariant::BasicEnemy),
+                (Millis(500), SpawnVariant::ExplosiveBarrel),
                 (Millis(600), SpawnVariant::BasicEnemy),
             ]
             .into(),
@@ -63,13 +73,7 @@ fn advance_waves(
     }
     if waves.is_preparing() {
         info!("Preparing wave {}", waves.current_wave);
-        info!(
-            "Prep time left: {}",
-            waves
-                .current_wave()
-                .expect("Is preparing, but there is not current wave")
-                .prep_time
-        );
+        info!("Prep time left: {} s", waves.prep_timer.remaining_secs());
     } else {
         let difficulties = waves.pop_difficulties_to_spawn();
         for difficulty in difficulties {
@@ -88,19 +92,18 @@ fn advance_waves(
         waves.clean_finished_packets();
         let spawners = spawners.iter().collect::<Vec<_>>();
         for spawn in spawns {
+            let Some((transform, spawner)) = spawners.choose(&mut rand::thread_rng()) else {
+                error!("No spawners available");
+                continue;
+            };
+            let spawner_transform = transform.translation;
+            let spawner_radius = spawner.radius;
+            let pos2 = Circle::new(spawner_radius).sample_interior(&mut rand::thread_rng());
+            let pos3 = Vec3::new(pos2.x, 0.0, pos2.y);
+            let spawn_position = spawner_transform + pos3;
             match spawn {
                 SpawnVariant::BasicEnemy => {
-                    let Some((transform, spawner)) = spawners.choose(&mut rand::thread_rng())
-                    else {
-                        error!("No spawners available");
-                        continue;
-                    };
                     info!("Spawning BasicEnemy at {}", waves.elapsed_millis());
-                    let spawner_transform = transform.translation;
-                    let spawner_radius = spawner.radius;
-                    let pos2 = Circle::new(spawner_radius).sample_interior(&mut rand::thread_rng());
-                    let pos3 = Vec3::new(pos2.x, 0.0, pos2.y);
-                    let spawn_position = spawner_transform + pos3;
                     commands.spawn((
                         Npc,
                         Visibility::Inherited,
@@ -109,6 +112,11 @@ fn advance_waves(
                 }
                 SpawnVariant::ExplosiveBarrel => {
                     info!("Spawning ExplosiveBarrel at {}", waves.elapsed_millis());
+                    commands.spawn((
+                        BarrelLargeClosed,
+                        Visibility::Inherited,
+                        Transform::from_translation(spawn_position),
+                    ));
                 }
             }
         }

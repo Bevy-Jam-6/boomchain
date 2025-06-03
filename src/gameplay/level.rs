@@ -21,7 +21,11 @@ pub(crate) fn spawn_level(mut commands: Commands, level_assets: Res<LevelAssets>
         Level,
         children![(Name::new("Level Music"), music(level_assets.music.clone()))],
     ));
-    commands.spawn((Name::new("Waves"), Waves::default()));
+    commands.spawn((
+        Name::new("Waves"),
+        StateScoped(Screen::Gameplay),
+        Waves::default(),
+    ));
     commands.insert_resource(AmbientLight::NONE);
 }
 

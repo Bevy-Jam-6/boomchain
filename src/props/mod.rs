@@ -5,7 +5,7 @@ use bevy::prelude::*;
 
 mod brush_entity;
 mod effects;
-mod generic;
+pub(crate) mod generic;
 mod setup;
 mod specific;
 
