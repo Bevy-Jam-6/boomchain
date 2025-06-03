@@ -5,7 +5,7 @@ use bevy::prelude::*;
 use crate::{
     gameplay::{
         crosshair::CrosshairState,
-        health::Death,
+        health::OnDeath,
         player::{Player, default_input::BlocksInput},
     },
     screens::Screen,
@@ -17,7 +17,7 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 fn on_player_death(
-    trigger: Trigger<Death>,
+    trigger: Trigger<OnDeath>,
     player: Query<(), With<Player>>,
     mut crosshair: Single<&mut CrosshairState>,
     mut block_input: ResMut<BlocksInput>,
