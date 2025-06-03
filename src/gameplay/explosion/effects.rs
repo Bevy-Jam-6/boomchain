@@ -16,7 +16,7 @@ use bevy_hanabi::{
 };
 
 use super::{OnExplode, assets::ExplosionAssets};
-use crate::{audio::SoundEffect, platform_support::is_webgpu_or_native};
+use crate::audio::SoundEffect;
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<PropExplosionVfx>();
@@ -55,7 +55,7 @@ fn on_explode_prop(
         .id();
 
     // Use Hanabi if supported, otherwise use `bevy_firework` as a fallback.
-    if is_webgpu_or_native() {
+    if webgpu_check::is_webgpu_available() {
         commands.entity(entity).insert(ParticleEffect::new(
             explosion_assets.prop_explosion_vfx.clone(),
         ));
