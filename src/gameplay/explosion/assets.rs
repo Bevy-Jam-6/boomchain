@@ -14,7 +14,7 @@ pub(super) fn plugin(app: &mut App) {
 
 #[derive(Resource, Asset, Clone, Reflect)]
 #[reflect(Resource)]
-pub(crate) struct ExplosionAssets {
+pub struct ExplosionAssets {
     #[dependency]
     pub(crate) prop_explosion_sfx: ShuffleBag<Handle<AudioSource>>,
     pub(crate) prop_explosion_vfx: Handle<EffectAsset>,

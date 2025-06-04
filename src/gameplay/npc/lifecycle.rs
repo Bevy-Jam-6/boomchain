@@ -16,6 +16,7 @@ use crate::{
         health::{OnDamage, OnDeath},
         npc::{ai_state::AiState, assets::NpcAssets, stats::NpcStats},
     },
+    screens::Screen,
     third_party::avian3d::CollisionLayer,
 };
 
@@ -69,6 +70,7 @@ fn on_enemy_death(
                         [CollisionLayer::Default],
                     )),
                 DespawnAfter::new(Duration::from_secs(10)),
+                StateScoped(Screen::Gameplay),
             ))
             .observe(remove_shadow_interactions);
     }
