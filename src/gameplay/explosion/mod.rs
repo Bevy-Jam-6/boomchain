@@ -2,10 +2,7 @@ mod assets;
 pub(crate) mod effects;
 
 use avian3d::prelude::*;
-use bevy::{
-    ecs::{error::ignore, system::SystemParam},
-    prelude::*,
-};
+use bevy::{ecs::system::SystemParam, prelude::*};
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
 
@@ -26,6 +23,7 @@ pub(super) fn plugin(app: &mut App) {
 
     app.add_observer(on_shoot_explosive);
     app.add_observer(on_touch_explosive);
+    app.add_observer(on_enemy_death);
     app.add_observer(on_explode);
 
     // Insert `CollisionEventsEnabled` for all entities that can explode on contact,
@@ -65,8 +63,8 @@ pub(crate) struct Explosive {
 impl Default for Explosive {
     fn default() -> Self {
         Self {
-            radius: 3.0,
-            impulse_strength: 15.0,
+            radius: 3.5,
+            impulse_strength: 25.0,
             damage: 100.0,
         }
     }
@@ -114,6 +112,12 @@ impl Default for ExplodeOnContact {
     }
 }
 
+/// A marker component for entities that should explode on death.
+#[derive(Component, Clone, Copy, Debug, PartialEq, Reflect)]
+#[reflect(Component)]
+#[require(Explosive)]
+pub(crate) struct ExplodeOnDeath;
+
 #[cfg_attr(feature = "hot_patch", hot)]
 fn on_shoot_explosive(
     trigger: Trigger<OnDeath>,
@@ -155,6 +159,21 @@ fn on_touch_explosive(
 
     // Trigger the explosion.
     commands.entity(body).trigger(OnExplode);
+}
+
+#[cfg_attr(feature = "hot_patch", hot)]
+fn on_enemy_death(
+    trigger: Trigger<OnDeath>,
+    mut commands: Commands,
+    explosive_query: Query<(), With<ExplodeOnDeath>>,
+) {
+    let entity = trigger.target();
+
+    // Check if the entity has the `ExplodeOnDeath` component.
+    if explosive_query.contains(entity) {
+        // Trigger the explosion.
+        commands.entity(entity).trigger(OnExplode);
+    }
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
@@ -268,14 +287,7 @@ impl ExplosionHelper<'_, '_> {
                     .try_insert_if_new(AutoTimer(Timer::from_seconds(delay, TimerMode::Once)))
                     .observe(
                         |trigger: Trigger<OnAutoTimerFinish>, mut commands: Commands| {
-                            // We need to use `queue_handled` in case the explosion was triggered twice
-                            // and the entity was already despawned.
-                            commands.entity(trigger.target()).queue_handled(
-                                |mut entity_mut: EntityWorldMut| {
-                                    entity_mut.trigger(OnExplode);
-                                },
-                                ignore,
-                            );
+                            commands.entity(trigger.target()).trigger(OnExplode);
                         },
                     );
             }
