@@ -51,7 +51,8 @@ impl Default for SpawnPackets {
                 (Millis(300), SpawnVariant::ExplosiveBarrel),
                 (Millis(400), SpawnVariant::BasicEnemy),
                 (Millis(500), SpawnVariant::ExplosiveBarrel),
-                (Millis(600), SpawnVariant::BasicEnemy),
+                (Millis(600), SpawnVariant::SmallEnemy),
+                (Millis(700), SpawnVariant::BasicEnemy),
             ]
             .into(),
         )])
@@ -127,12 +128,26 @@ fn advance_waves(
                         Name::new("Big Enemy"),
                         Npc,
                         NpcStats {
-                            health: 200.0,
+                            health: 300.0,
                             desired_speed: 5.0,
                             max_speed: 5.0,
-                            attack_damage: 20.0,
+                            attack_damage: 30.0,
                             attack_speed_range: 0.9..1.4,
                             size: 2.0,
+                        },
+                    ));
+                }
+                SpawnVariant::SmallEnemy => {
+                    spawn_commands.insert((
+                        Name::new("Small Enemy"),
+                        Npc,
+                        NpcStats {
+                            health: 50.0,
+                            desired_speed: 13.0,
+                            max_speed: 13.0,
+                            attack_damage: 10.0,
+                            attack_speed_range: 1.8..2.6,
+                            size: 0.7,
                         },
                     ));
                 }
@@ -362,5 +377,6 @@ impl SpawnPacket {
 enum SpawnVariant {
     BasicEnemy,
     BigEnemy,
+    SmallEnemy,
     ExplosiveBarrel,
 }
