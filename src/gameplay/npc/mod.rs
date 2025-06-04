@@ -10,9 +10,12 @@ use bevy_tnua::{TnuaAnimatingState, prelude::*};
 use bevy_tnua_avian3d::TnuaAvian3dSensorShape;
 use bevy_trenchbroom::prelude::*;
 
-use crate::third_party::{
-    avian3d::CollisionLayer, bevy_trenchbroom::LoadTrenchbroomModel as _,
-    bevy_yarnspinner::YarnNode,
+use crate::{
+    gameplay::npc::stats::NpcStats,
+    third_party::{
+        avian3d::CollisionLayer, bevy_trenchbroom::LoadTrenchbroomModel as _,
+        bevy_yarnspinner::YarnNode,
+    },
 };
 
 use super::{animation::AnimationPlayerAncestor, health::Health};
@@ -23,6 +26,7 @@ mod attack;
 mod lifecycle;
 pub(crate) mod navigation;
 mod sound;
+mod stats;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
@@ -33,6 +37,7 @@ pub(super) fn plugin(app: &mut App) {
         ai_state::plugin,
         attack::plugin,
         lifecycle::plugin,
+        stats::plugin,
     ));
     app.register_type::<Npc>();
     app.add_observer(on_add);
@@ -42,6 +47,7 @@ pub(super) fn plugin(app: &mut App) {
 #[reflect(QuakeClass, Component)]
 #[base(Transform, Visibility)]
 #[model("models/zombie_3/zombie_3.gltf")]
+#[require(NpcStats)]
 // In Wasm, TrenchBroom classes are not automatically registered.
 // So, we need to manually register the class in `src/third_party/bevy_trenchbroom/mod.rs`.
 pub(crate) struct Npc;
