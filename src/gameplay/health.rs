@@ -7,7 +7,9 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<Health>();
     app.add_systems(
         Update,
-        trigger_death.in_set(PostPhysicsAppSystems::TriggerDeath),
+        (kill_out_of_bounds, trigger_death)
+            .chain()
+            .in_set(PostPhysicsAppSystems::TriggerDeath),
     );
 }
 
@@ -26,6 +28,10 @@ impl Health {
     pub(crate) fn damage(&mut self, amount: f32) {
         self.current -= amount;
         self.current = self.current.max(0.0);
+    }
+
+    pub(crate) fn kill(&mut self) {
+        self.current = 0.0;
     }
 
     pub(crate) fn is_dead(&self) -> bool {
@@ -72,3 +78,11 @@ fn trigger_death(health: Query<(Entity, &Health), Changed<Health>>, mut commands
 
 #[derive(Debug, Event)]
 pub(crate) struct OnDeath;
+
+fn kill_out_of_bounds(mut health: Query<(&mut Health, &Transform)>) {
+    for (mut health, transform) in health.iter_mut() {
+        if transform.translation.y < -300.0 {
+            health.kill();
+        }
+    }
+}

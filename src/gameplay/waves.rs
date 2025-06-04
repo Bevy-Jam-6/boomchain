@@ -4,7 +4,11 @@ use bevy::{platform::collections::HashMap, prelude::*, time::Stopwatch};
 use bevy_trenchbroom::prelude::*;
 use rand::seq::SliceRandom as _;
 
-use crate::{PrePhysicsAppSystems, gameplay::npc::Npc, props::generic::BarrelLargeClosed};
+use crate::{
+    PrePhysicsAppSystems,
+    gameplay::npc::{Npc, stats::NpcStats},
+    props::generic::BarrelLargeClosed,
+};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Waves>();
@@ -43,7 +47,7 @@ impl Default for SpawnPackets {
             [
                 (Millis(0), SpawnVariant::BasicEnemy),
                 (Millis(100), SpawnVariant::BasicEnemy),
-                (Millis(200), SpawnVariant::BasicEnemy),
+                (Millis(200), SpawnVariant::BigEnemy),
                 (Millis(300), SpawnVariant::ExplosiveBarrel),
                 (Millis(400), SpawnVariant::BasicEnemy),
                 (Millis(500), SpawnVariant::ExplosiveBarrel),
@@ -99,22 +103,41 @@ fn advance_waves(
             let pos2 = Circle::new(spawner_radius).sample_interior(&mut rand::thread_rng());
             let pos3 = Vec3::new(pos2.x, 0.0, pos2.y);
             let spawn_position = spawner_transform + pos3;
+            let mut spawn_commands = commands.spawn((
+                Visibility::Inherited,
+                Transform::from_translation(spawn_position),
+            ));
             match spawn {
                 SpawnVariant::BasicEnemy => {
-                    info!("Spawning BasicEnemy at {}", waves.elapsed_millis());
-                    commands.spawn((
+                    spawn_commands.insert((
+                        Name::new("Basic Enemy"),
                         Npc,
-                        Visibility::Inherited,
-                        Transform::from_translation(spawn_position),
+                        NpcStats {
+                            health: 100.0,
+                            desired_speed: 10.0,
+                            max_speed: 10.0,
+                            attack_damage: 10.0,
+                            attack_speed_range: 1.2..2.1,
+                            size: 1.0,
+                        },
+                    ));
+                }
+                SpawnVariant::BigEnemy => {
+                    spawn_commands.insert((
+                        Name::new("Big Enemy"),
+                        Npc,
+                        NpcStats {
+                            health: 200.0,
+                            desired_speed: 5.0,
+                            max_speed: 5.0,
+                            attack_damage: 20.0,
+                            attack_speed_range: 0.6..1.2,
+                            size: 2.0,
+                        },
                     ));
                 }
                 SpawnVariant::ExplosiveBarrel => {
-                    info!("Spawning ExplosiveBarrel at {}", waves.elapsed_millis());
-                    commands.spawn((
-                        BarrelLargeClosed,
-                        Visibility::Inherited,
-                        Transform::from_translation(spawn_position),
-                    ));
+                    spawn_commands.insert((Name::new("Explosive Barrel"), BarrelLargeClosed));
                 }
             }
         }
@@ -338,5 +361,6 @@ impl SpawnPacket {
 #[derive(Reflect, Clone, Copy)]
 enum SpawnVariant {
     BasicEnemy,
+    BigEnemy,
     ExplosiveBarrel,
 }

@@ -12,10 +12,7 @@ use bevy_trenchbroom::prelude::*;
 
 use crate::{
     gameplay::npc::stats::NpcStats,
-    third_party::{
-        avian3d::CollisionLayer, bevy_trenchbroom::LoadTrenchbroomModel as _,
-        bevy_yarnspinner::YarnNode,
-    },
+    third_party::{avian3d::CollisionLayer, bevy_trenchbroom::LoadTrenchbroomModel as _},
 };
 
 use super::{animation::AnimationPlayerAncestor, health::Health};
@@ -26,7 +23,7 @@ mod attack;
 mod lifecycle;
 pub(crate) mod navigation;
 mod sound;
-mod stats;
+pub(crate) mod stats;
 
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((
@@ -77,8 +74,6 @@ fn on_add(trigger: Trigger<OnAdd, Npc>, mut commands: Commands, assets: Res<Asse
                 LayerMask::ALL,
             ),
             Health::new(100.0),
-            // The Yarn Node is what we use to trigger dialogue.
-            YarnNode::new("Npc"),
             AiState::default(),
         ))
         .with_child((
