@@ -120,6 +120,8 @@ fn advance_waves(
                             attack_damage: 10.0,
                             attack_speed_range: 1.2..2.1,
                             size: 1.0,
+                            stagger_chance: 0.3,
+                            stagger_duration: 0.2..0.4,
                         },
                     ));
                 }
@@ -134,6 +136,8 @@ fn advance_waves(
                             attack_damage: 30.0,
                             attack_speed_range: 0.9..1.4,
                             size: 2.0,
+                            stagger_chance: 0.2,
+                            stagger_duration: 0.1..0.3,
                         },
                     ));
                 }
@@ -148,6 +152,8 @@ fn advance_waves(
                             attack_damage: 10.0,
                             attack_speed_range: 1.8..2.6,
                             size: 0.7,
+                            stagger_chance: 0.4,
+                            stagger_duration: 0.2..0.3,
                         },
                     ));
                 }
