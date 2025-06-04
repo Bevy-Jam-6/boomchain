@@ -1,4 +1,4 @@
-mod assets;
+pub(crate) mod assets;
 pub(crate) mod effects;
 
 use avian3d::prelude::*;
