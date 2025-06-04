@@ -51,14 +51,14 @@ pub(super) fn plugin(app: &mut App) {
 /// The explosion can be activated by triggering the [`OnExplode`] event.
 #[derive(Component, Clone, Copy, Debug, PartialEq, Reflect)]
 #[reflect(Component)]
-pub struct Explosive {
+pub(crate) struct Explosive {
     // TODO: Do we want to support a falloff?
     /// The radius of the explosion. Only entities within this radius will be affected.
-    pub radius: f32,
+    pub(crate) radius: f32,
     /// The strength of the explosion impulse.
-    pub impulse_strength: f32,
+    pub(crate) impulse_strength: f32,
     /// The damage dealt by the explosion.
-    pub damage: f32,
+    pub(crate) damage: f32,
 }
 
 impl Default for Explosive {
@@ -73,19 +73,19 @@ impl Default for Explosive {
 
 /// An event that is triggered when an explosive should explode.
 #[derive(Event, Clone, Copy, Debug, PartialEq)]
-pub struct OnExplode;
+pub(crate) struct OnExplode;
 
 /// A marker component for entities that have exploded or are in the process of exploding.
 #[derive(Component, Clone, Copy, Debug, Default, PartialEq, Reflect)]
-pub struct Exploded;
+pub(crate) struct Exploded;
 
 /// A marker component for entities that should explode when interacted with.
 #[derive(Component, Clone, Copy, Debug, PartialEq, Reflect)]
 #[reflect(Component)]
 #[require(Explosive)]
-pub struct ExplodeOnShoot {
+pub(crate) struct ExplodeOnShoot {
     /// The maximum distance the explosion can be triggered from.
-    pub max_distance: f32,
+    pub(crate) max_distance: f32,
 }
 
 impl Default for ExplodeOnShoot {
@@ -100,9 +100,9 @@ impl Default for ExplodeOnShoot {
 #[derive(Component, Clone, Copy, Debug, PartialEq, Reflect)]
 #[reflect(Component)]
 #[require(Explosive)]
-pub struct ExplodeOnContact {
+pub(crate) struct ExplodeOnContact {
     /// A [`LayerMask`] determining which [`CollisionLayers`] can trigger the explosion on contact.
-    pub layers: LayerMask,
+    pub(crate) layers: LayerMask,
 }
 
 impl Default for ExplodeOnContact {
@@ -195,7 +195,7 @@ fn on_explode(
 
 /// A [`SystemParam`] for applying explosions in the world.
 #[derive(SystemParam)]
-pub struct ExplosionHelper<'w, 's> {
+pub(crate) struct ExplosionHelper<'w, 's> {
     collider_query: Query<'w, 's, (&'static Collider, &'static GlobalTransform)>,
     explosive_query: Query<'w, 's, (), (With<Explosive>, Without<Exploded>)>,
     collider_of_query: Query<'w, 's, &'static ColliderOf>,
@@ -220,7 +220,7 @@ impl ExplosionHelper<'_, '_> {
     /// Applies an explosion to all entities within the explosion radius at the given point.
     ///
     /// This also triggers the [`OnExplode`] event for any explosive entities hit by the explosion.
-    pub fn apply_explosion(&mut self, explosive: &Explosive, point: Vec3) {
+    pub(crate) fn apply_explosion(&mut self, explosive: &Explosive, point: Vec3) {
         // Query for all collider entities of characters and props within the explosion radius.
         let shape = Collider::sphere(explosive.radius);
         let filter = SpatialQueryFilter::default();

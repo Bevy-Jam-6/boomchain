@@ -15,11 +15,12 @@ use bevy_simple_subsecond_system::hot;
 use bevy_tnua::prelude::*;
 
 use crate::{
-    PrePhysicsAppSystems, gameplay::player::navmesh_position::LastValidPlayerNavmeshPosition,
+    PrePhysicsAppSystems,
+    gameplay::{npc::stats::NpcStats, player::navmesh_position::LastValidPlayerNavmeshPosition},
     screens::Screen,
 };
 
-use super::{NPC_FLOAT_HEIGHT, NPC_RADIUS, Npc, ai_state::AiState, attack::Attacking};
+use super::{ai_state::AiState, attack::Attacking};
 
 pub(crate) const NPC_MAX_SLOPE: f32 = TAU / 6.0;
 
@@ -46,24 +47,28 @@ pub(super) fn plugin(app: &mut App) {
 /// Since we use a floating character controller, we need to offset the agent's position by the character's float height.
 #[cfg_attr(feature = "hot_patch", hot)]
 fn setup_npc_agent(
-    trigger: Trigger<OnAdd, Npc>,
+    trigger: Trigger<OnAdd, NpcStats>,
+    stats: Query<&NpcStats>,
     mut commands: Commands,
     archipelago: Single<Entity, With<Archipelago3d>>,
 ) {
     let npc = trigger.target();
+    let Ok(stats) = stats.get(npc) else {
+        return;
+    };
     commands.spawn((
         Name::new("NPC Agent"),
-        Transform::from_translation(Vec3::new(0.0, -NPC_FLOAT_HEIGHT, 0.0)),
+        Transform::from_translation(Vec3::new(0.0, -stats.float_height(), 0.0)),
         Agent3dBundle {
             agent: default(),
             settings: AgentSettings {
-                radius: NPC_RADIUS,
-                desired_speed: 7.0,
-                max_speed: 8.0,
+                radius: stats.radius(),
+                desired_speed: stats.desired_speed,
+                max_speed: stats.max_speed,
             },
             archipelago_ref: ArchipelagoRef3d::new(*archipelago),
         },
-        TargetReachedCondition::Distance(Some(2.0)),
+        TargetReachedCondition::Distance(Some(1.5 * stats.size)),
         ChildOf(npc),
         AgentOf(npc),
         AgentTarget3d::default(),
@@ -108,10 +113,10 @@ pub(crate) struct Agent(Entity);
 /// Use the desired velocity as the agent's velocity.
 #[cfg_attr(feature = "hot_patch", hot)]
 fn set_controller_velocity(
-    mut agent_query: Query<(&mut TnuaController, &Agent, Option<&Attacking>)>,
+    mut agent_query: Query<(&mut TnuaController, &Agent, Option<&Attacking>, &NpcStats)>,
     desired_velocity_query: Query<&LandmassAgentDesiredVelocity>,
 ) {
-    for (mut controller, agent, attacking) in &mut agent_query {
+    for (mut controller, agent, attacking, stats) in &mut agent_query {
         let Ok(desired_velocity) = desired_velocity_query.get(**agent) else {
             continue;
         };
@@ -121,10 +126,11 @@ fn set_controller_velocity(
         } else {
             Dir3::try_from(velocity).ok()
         };
+
         controller.basis(TnuaBuiltinWalk {
             desired_velocity: velocity,
             desired_forward: forward,
-            float_height: NPC_FLOAT_HEIGHT,
+            float_height: stats.float_height(),
             spring_strength: 1500.0,
             max_slope: NPC_MAX_SLOPE,
             ..default()

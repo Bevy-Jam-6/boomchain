@@ -7,6 +7,7 @@ use crate::{
     PrePhysicsAppSystems,
     gameplay::{
         health::Health,
+        npc::stats::NpcStats,
         player::{Player, camera_shake::OnTrauma},
     },
     third_party::avian3d::CollisionLayer,
@@ -42,11 +43,17 @@ fn stop_attack(trigger: Trigger<OnRemove, Attacking>, mut commands: Commands) {
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn update_attack_phase(
-    mut query: Query<(Entity, &mut AttackPhase, &Attacking, &mut AttackStopwatch)>,
+    mut query: Query<(
+        Entity,
+        &mut AttackPhase,
+        &Attacking,
+        &mut AttackStopwatch,
+        &NpcStats,
+    )>,
     time: Res<Time>,
     mut commands: Commands,
 ) {
-    for (entity, mut phase, attacking, mut stopwatch) in query.iter_mut() {
+    for (entity, mut phase, attacking, mut stopwatch, stats) in query.iter_mut() {
         stopwatch.0.tick(time.delta());
         match *phase {
             AttackPhase::Windup => {
@@ -58,7 +65,7 @@ fn update_attack_phase(
                             ChildOf(entity),
                             Sensor,
                             Transform::from_xyz(0.0, 0.0, -1.5),
-                            Collider::cuboid(1.5, 1.5, 1.5),
+                            Collider::cuboid(1.5 * stats.size, 1.5 * stats.size, 1.5 * stats.size),
                             CollisionEventsEnabled,
                             CollisionLayers::new(CollisionLayer::Sensor, CollisionLayer::Player),
                         ))
@@ -115,6 +122,7 @@ pub(crate) struct Hitbox(Entity);
 #[reflect(Component)]
 pub(crate) struct Attacking {
     pub(crate) speed: f32,
+    pub(crate) damage: f32,
     pub(crate) dir: Option<Dir3>,
 }
 

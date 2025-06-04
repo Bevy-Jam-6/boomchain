@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_landmass::AgentState;
 use rand::Rng as _;
 
-use crate::gameplay::player::Player;
+use crate::gameplay::{npc::stats::NpcStats, player::Player};
 
 use super::{attack::Attacking, navigation::Agent};
 
@@ -20,12 +20,19 @@ pub(crate) enum AiState {
 }
 
 fn update_ai_state(
-    mut ai_state: Query<(Entity, &mut AiState, &Agent, &Transform, Has<Attacking>)>,
+    mut ai_state: Query<(
+        Entity,
+        &mut AiState,
+        &NpcStats,
+        &Agent,
+        &Transform,
+        Has<Attacking>,
+    )>,
     player: Single<&Transform, With<Player>>,
     agent_state: Query<&AgentState>,
     mut commands: Commands,
 ) {
-    for (entity, mut ai_state, agent, transform, attacking) in &mut ai_state {
+    for (entity, mut ai_state, stats, agent, transform, attacking) in &mut ai_state {
         let Ok(agent_state) = agent_state.get(**agent) else {
             continue;
         };
@@ -40,7 +47,8 @@ fn update_ai_state(
                     );
                     commands.entity(entity).insert(Attacking {
                         dir: Dir3::try_from(target - transform.translation).ok(),
-                        speed: rand::thread_rng().gen_range(1.2..=2.1),
+                        speed: rand::thread_rng().gen_range(stats.attack_speed_range.clone()),
+                        damage: stats.attack_damage,
                     });
                 }
             }

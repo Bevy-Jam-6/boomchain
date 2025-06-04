@@ -12,7 +12,7 @@ use crate::{
     despawn_after::DespawnAfter,
     gameplay::{
         health::OnDeath,
-        npc::{Npc, assets::NpcAssets},
+        npc::{assets::NpcAssets, stats::NpcStats},
     },
     third_party::avian3d::CollisionLayer,
 };
@@ -23,12 +23,12 @@ pub(super) fn plugin(app: &mut App) {
 
 fn on_enemy_death(
     trigger: Trigger<OnDeath>,
-    enemies: Query<&Transform, With<Npc>>,
+    enemies: Query<(&Transform, &NpcStats)>,
     npc_assets: Res<NpcAssets>,
     mut commands: Commands,
 ) {
     let entity = trigger.target();
-    let Some(transform) = enemies.get(entity).ok() else {
+    let Ok((transform, stats)) = enemies.get(entity) else {
         return;
     };
     let mut rng = rand::thread_rng();
@@ -58,7 +58,7 @@ fn on_enemy_death(
         commands
             .spawn((
                 SceneRoot(gib.clone()),
-                Transform::from_translation(position),
+                Transform::from_translation(position).with_scale(Vec3::splat(stats.size)),
                 RigidBody::Dynamic,
                 ColliderConstructorHierarchy::new(ColliderConstructor::ConvexHullFromMesh)
                     .with_default_layers(CollisionLayers::new(

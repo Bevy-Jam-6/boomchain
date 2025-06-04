@@ -7,7 +7,6 @@ use animation::{PlayerAnimationState, setup_player_animations};
 use avian3d::prelude::*;
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
-use bevy_landmass::{Character, prelude::*};
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
 use bevy_tnua::{TnuaAnimatingState, prelude::*};
@@ -78,11 +77,7 @@ const PLAYER_HALF_HEIGHT: f32 = PLAYER_HEIGHT / 2.0;
 const PLAYER_FLOAT_HEIGHT: f32 = PLAYER_HALF_HEIGHT + 0.5;
 
 #[cfg_attr(feature = "hot_patch", hot)]
-fn setup_player(
-    trigger: Trigger<OnAdd, Player>,
-    mut commands: Commands,
-    archipelago: Single<Entity, With<Archipelago3d>>,
-) {
+fn setup_player(trigger: Trigger<OnAdd, Player>, mut commands: Commands) {
     commands
         .entity(trigger.target())
         .insert((
@@ -114,13 +109,6 @@ fn setup_player(
             children![(
                 Name::new("Player Landmass Character"),
                 Transform::from_xyz(0.0, -PLAYER_FLOAT_HEIGHT, 0.0),
-                Character3dBundle {
-                    character: Character::default(),
-                    settings: CharacterSettings {
-                        radius: PLAYER_RADIUS,
-                    },
-                    archipelago_ref: ArchipelagoRef3d::new(*archipelago),
-                },
                 LastValidPlayerNavmeshPosition::default(),
             )],
         ))
