@@ -1,7 +1,11 @@
 use std::time::Duration;
 
-use avian3d::prelude::{ColliderConstructor, ColliderConstructorHierarchy, RigidBody};
-use bevy::prelude::*;
+use avian3d::prelude::*;
+use bevy::{
+    pbr::{NotShadowCaster, NotShadowReceiver},
+    prelude::*,
+    scene::SceneInstanceReady,
+};
 use bevy_shuffle_bag::ShuffleBag;
 
 use crate::{
@@ -10,6 +14,7 @@ use crate::{
         health::OnDeath,
         npc::{Npc, assets::NpcAssets},
     },
+    third_party::avian3d::CollisionLayer,
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -50,13 +55,35 @@ fn on_enemy_death(
         let offset_radius = 0.5;
         let offset = Sphere::new(offset_radius).sample_interior(&mut rng);
         let position = transform.translation + offset;
-        commands.spawn((
-            SceneRoot(gib.clone()),
-            Transform::from_translation(position),
-            RigidBody::Dynamic,
-            ColliderConstructorHierarchy::new(ColliderConstructor::ConvexHullFromMesh),
-            DespawnAfter::new(Duration::from_secs(3)),
-        ));
+        commands
+            .spawn((
+                SceneRoot(gib.clone()),
+                Transform::from_translation(position),
+                RigidBody::Dynamic,
+                ColliderConstructorHierarchy::new(ColliderConstructor::ConvexHullFromMesh)
+                    .with_default_layers(CollisionLayers::new(
+                        CollisionLayer::Gib,
+                        [CollisionLayer::Default],
+                    )),
+                DespawnAfter::new(Duration::from_secs(10)),
+            ))
+            .observe(remove_shadow_interactions);
     }
     commands.entity(entity).try_despawn();
+}
+
+fn remove_shadow_interactions(
+    trigger: Trigger<SceneInstanceReady>,
+    children: Query<&Children>,
+    mesh: Query<(), With<Mesh3d>>,
+    mut commands: Commands,
+) {
+    let entity = trigger.target();
+    for child in children.iter_descendants(entity) {
+        if mesh.contains(child) {
+            commands
+                .entity(child)
+                .insert((NotShadowCaster, NotShadowReceiver));
+        }
+    }
 }
