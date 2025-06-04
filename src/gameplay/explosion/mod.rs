@@ -6,11 +6,9 @@ use bevy::{
     ecs::{error::ignore, system::SystemParam},
     prelude::*,
 };
-use bevy_enhanced_input::events::Started;
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
 
-use super::player::{Player, camera::PlayerCamera, default_input::Shoot};
 use crate::{
     auto_timer::{AutoTimer, OnAutoTimerFinish},
     gameplay::{

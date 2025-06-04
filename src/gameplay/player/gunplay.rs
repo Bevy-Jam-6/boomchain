@@ -4,9 +4,7 @@ use crate::{
     RenderLayer,
     audio::sound_effect,
     despawn_after::DespawnAfter,
-    gameplay::{
-        crosshair::CrosshairState, health::Health, npc::Npc, player::camera_shake::OnTrauma,
-    },
+    gameplay::{crosshair::CrosshairState, health::Health, player::camera_shake::OnTrauma},
     third_party::avian3d::CollisionLayer,
 };
 
