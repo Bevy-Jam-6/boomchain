@@ -53,7 +53,7 @@ fn on_damage(trigger: Trigger<OnDamage>, mut health: Query<&mut Health>, mut com
     };
     health.damage(trigger.event().0);
     if health.is_dead() {
-        commands.entity(entity).trigger(OnDeath);
+        commands.entity(entity).remove::<Health>().trigger(OnDeath);
     }
 }
 
