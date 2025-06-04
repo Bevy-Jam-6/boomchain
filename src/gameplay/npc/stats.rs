@@ -21,6 +21,8 @@ pub(crate) struct NpcStats {
     pub(crate) attack_damage: f32,
     pub(crate) attack_speed_range: Range<f32>,
     pub(crate) size: f32,
+    pub(crate) stagger_chance: f32,
+    pub(crate) stagger_duration: Range<f32>,
 }
 
 impl NpcStats {
@@ -54,6 +56,8 @@ impl Default for NpcStats {
             attack_damage: 10.0,
             attack_speed_range: 1.2..2.1,
             size: 1.0,
+            stagger_chance: 0.1,
+            stagger_duration: 0.1..0.3,
         }
     }
 }

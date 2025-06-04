@@ -5,11 +5,7 @@ use bevy_simple_subsecond_system::hot;
 
 use crate::{
     PrePhysicsAppSystems,
-    gameplay::{
-        health::Health,
-        npc::stats::NpcStats,
-        player::{Player, camera_shake::OnTrauma},
-    },
+    gameplay::{health::OnDamage, npc::stats::NpcStats, player::Player},
     third_party::avian3d::CollisionLayer,
 };
 
@@ -91,7 +87,7 @@ fn update_attack_phase(
 #[cfg_attr(feature = "hot_patch", hot)]
 fn hit_player(
     trigger: Trigger<OnCollisionStart>,
-    mut player: Query<&mut Health, With<Player>>,
+    player: Query<(), With<Player>>,
     name: Query<NameOrEntity>,
     mut commands: Commands,
 ) {
@@ -99,13 +95,12 @@ fn hit_player(
         error!("Enemy hit collision without body");
         return;
     };
-    let Ok(mut health) = player.get_mut(body) else {
+    if !player.contains(body) {
         let name = name.get(body).unwrap();
         error!("Enemy hit non-player: {name}");
         return;
-    };
-    health.damage(10.0);
-    commands.trigger(OnTrauma(0.7));
+    }
+    commands.entity(body).trigger(OnDamage(10.0));
 }
 
 #[derive(Component, Deref, DerefMut, Debug, Reflect)]

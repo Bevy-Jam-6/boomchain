@@ -1,14 +1,23 @@
 use bevy::prelude::*;
 use bevy_landmass::AgentState;
+#[cfg(feature = "hot_patch")]
+use bevy_simple_subsecond_system::hot;
 use rand::Rng as _;
 
-use crate::gameplay::{npc::stats::NpcStats, player::Player};
+use crate::{
+    PostPhysicsAppSystems,
+    gameplay::{npc::stats::NpcStats, player::Player},
+};
 
 use super::{attack::Attacking, navigation::Agent};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<AiState>();
     app.add_systems(PreUpdate, update_ai_state);
+    app.add_systems(
+        Update,
+        update_stagger_timer.in_set(PostPhysicsAppSystems::TickTimers),
+    );
 }
 
 #[derive(Component, Debug, Default, Reflect, Clone)]
@@ -16,9 +25,11 @@ pub(super) fn plugin(app: &mut App) {
 pub(crate) enum AiState {
     #[default]
     Chase,
+    Stagger(Timer),
     Attack,
 }
 
+#[cfg_attr(feature = "hot_patch", hot)]
 fn update_ai_state(
     mut ai_state: Query<(
         Entity,
@@ -52,11 +63,28 @@ fn update_ai_state(
                     });
                 }
             }
+            AiState::Stagger(timer) => {
+                if timer.finished() {
+                    info!("stagger finishhed");
+                    *ai_state = AiState::Chase;
+                } else {
+                    info!("stagger not finished");
+                    info!("timer: {:?}", timer.elapsed());
+                }
+            }
             AiState::Attack => {
                 if !attacking {
                     *ai_state = AiState::Chase;
                 }
             }
+        }
+    }
+}
+
+fn update_stagger_timer(mut ai_state: Query<&mut AiState>, time: Res<Time>) {
+    for mut ai_state in &mut ai_state {
+        if let AiState::Stagger(ref mut timer) = *ai_state {
+            timer.tick(time.delta());
         }
     }
 }

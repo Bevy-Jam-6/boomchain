@@ -83,20 +83,24 @@ struct WantsToFollowPlayer;
 #[cfg_attr(feature = "hot_patch", hot)]
 fn update_agent_target(
     mut agents: Query<(&mut AgentTarget3d, &AgentOf), With<WantsToFollowPlayer>>,
-    ai_state: Query<&AiState>,
+    ai_state: Query<(&Transform, &AiState)>,
     player_position: Single<&LastValidPlayerNavmeshPosition>,
 ) {
     let Some(player_position) = player_position.0 else {
         return;
     };
     for (mut target, agent_of) in &mut agents {
-        let Ok(ai_state) = ai_state.get(agent_of.0) else {
+        let Ok((ai_transform, ai_state)) = ai_state.get(agent_of.0) else {
             continue;
         };
-        if !matches!(ai_state, AiState::Chase) {
-            continue;
+        match ai_state {
+            AiState::Chase => {
+                *target = AgentTarget3d::Point(player_position);
+            }
+            AiState::Stagger(..) | AiState::Attack => {
+                *target = AgentTarget3d::Point(ai_transform.translation);
+            }
         }
-        *target = AgentTarget3d::Point(player_position);
     }
 }
 
