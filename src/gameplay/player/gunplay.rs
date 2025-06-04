@@ -7,6 +7,7 @@ use crate::{
     gameplay::{
         crosshair::CrosshairState, health::Health, npc::Npc, player::camera_shake::OnTrauma,
     },
+    third_party::avian3d::CollisionLayer,
 };
 
 use super::{Player, assets::PlayerAssets, camera::PlayerCamera, default_input::Shoot};
@@ -26,6 +27,7 @@ pub(crate) struct Reloading;
 #[derive(Debug, Component, Reflect)]
 #[reflect(Component)]
 struct WeaponStats {
+    damage: f32,
     pellets: u32,
     spread_radius: f32,
 }
@@ -47,6 +49,7 @@ pub(super) fn plugin(app: &mut App) {
 
 fn setup_weapon_stats(trigger: Trigger<OnAdd, Player>, mut commands: Commands) {
     commands.entity(trigger.target()).insert(WeaponStats {
+        damage: 10.0,
         pellets: 8,
         spread_radius: 0.2,
     });
@@ -132,7 +135,8 @@ fn handle_hits(
     _trigger: Trigger<OnAdd, Shooting>,
     spatial_query: SpatialQuery,
     player_camera_parent: Single<&Transform, With<PlayerCamera>>,
-    mut npcs: Query<&mut Health, With<Npc>>,
+    mut targets: Query<&mut Health>,
+    collider_of: Query<&ColliderOf>,
     weapon_stats: Single<&WeaponStats, With<Player>>,
     player: Single<Entity, With<Player>>,
     bullet_impact: Res<BulletImpact>,
@@ -147,7 +151,7 @@ fn handle_hits(
     let right = player_camera_parent.right();
     let up = player_camera_parent.up();
 
-    for i in 1..=weapon_stats.pellets {
+    for _i in 1..=weapon_stats.pellets {
         // Sample random point within a circle for spread
         let point = Circle::new(weapon_stats.spread_radius).sample_interior(&mut rng);
 
@@ -158,7 +162,13 @@ fn handle_hits(
         // Configuration for the ray cast
         let max_distance = 300.0;
         let solid = true;
-        let filter = SpatialQueryFilter::default().with_excluded_entities([*player]);
+        let filter = SpatialQueryFilter::default()
+            .with_mask([
+                CollisionLayer::Npc,
+                CollisionLayer::Prop,
+                CollisionLayer::Default,
+            ])
+            .with_excluded_entities([*player]);
 
         // Cast ray with spread and handle first hit
         let Some(first_hit) =
@@ -176,14 +186,16 @@ fn handle_hits(
             ),
         ));
 
-        let Ok(mut health) = npcs.get_mut(first_hit.entity) else {
+        let Ok(ColliderOf { body }) = collider_of.get(first_hit.entity) else {
+            error!("Hit something without a rigid body");
             continue;
         };
 
-        info!("Hit {i}/8 did hit {:?}", first_hit.entity);
+        let Ok(mut health) = targets.get_mut(*body) else {
+            continue;
+        };
 
-        let gun_damage = 10.0;
-        health.damage(gun_damage);
+        health.damage(weapon_stats.damage);
     }
 }
 

@@ -72,8 +72,6 @@ fn advance_waves(
         return;
     }
     if waves.is_preparing() {
-        info!("Preparing wave {}", waves.current_wave);
-        info!("Prep time left: {} s", waves.prep_timer.remaining_secs());
     } else {
         let difficulties = waves.pop_difficulties_to_spawn();
         for difficulty in difficulties {
