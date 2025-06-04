@@ -12,16 +12,16 @@ use bevy_firework::{
 };
 use bevy_hanabi::{
     AccelModifier, Attribute, ColorBlendMask, ColorBlendMode, ColorOverLifetimeModifier,
-    EffectAsset, ExprWriter, Gradient, LinearDragModifier, ParticleEffect, ScalarType,
-    SetAttributeModifier, SetPositionSphereModifier, SetVelocitySphereModifier, ShapeDimension,
-    SpawnerSettings,
+    EffectAsset, EffectProperties, ExprWriter, Gradient, LinearDragModifier, ParticleEffect,
+    ScalarType, ScalarValue, SetAttributeModifier, SetPositionSphereModifier,
+    SetVelocitySphereModifier, ShapeDimension, SpawnerSettings, Value,
 };
 
 use super::{OnExplode, assets::ExplosionAssets};
 use crate::{
     audio::SoundEffect,
     despawn_after::DespawnAfter,
-    gameplay::{explosion::ExplodeOnDeath, health::OnDeath},
+    gameplay::{explosion::ExplodeOnDeath, health::OnDeath, npc::stats::NpcStats},
     platform_support::is_webgpu_or_native,
 };
 
@@ -83,17 +83,22 @@ fn on_explode_prop(
 
 fn on_enemy_death(
     trigger: Trigger<OnDeath>,
-    query: Query<&GlobalTransform, With<ExplodeOnDeath>>,
+    query: Query<(&GlobalTransform, Option<&NpcStats>), With<ExplodeOnDeath>>,
     explosion_assets: ResMut<ExplosionAssets>,
     mut commands: Commands,
 ) {
-    let Ok(transform) = query.get(trigger.target()) else {
+    let Ok((transform, stats)) = query.get(trigger.target()) else {
         return;
     };
 
+    let properties = EffectProperties::default().with_properties([(
+        "scale".to_string(),
+        Value::Scalar(ScalarValue::Float(stats.map_or(1.0, |s| s.size))),
+    )]);
     commands.spawn((
-        transform.compute_transform(),
         ParticleEffect::new(explosion_assets.enemy_explosion_vfx.clone()),
+        properties,
+        transform.compute_transform(),
         DespawnAfter::new(Duration::from_secs(2)),
     ));
 }
@@ -203,25 +208,28 @@ pub(super) fn hanabi_enemy_explosion(world: &mut World) -> EffectAsset {
     gradient.add_key(1.0, Vec4::new(0.6, 0.0, 0.0, 0.0));
 
     let writer = ExprWriter::new();
+    let scale = writer.add_property("scale", ScalarValue::Float(1.0).into());
 
     // On spawn, randomly initialize the position of the particle
     // to be over the surface of a sphere of radius 1 units.
     let init_pos = SetPositionSphereModifier {
         center: writer.lit(Vec3::ZERO).expr(),
-        radius: writer.lit(1.0).expr(),
+        radius: (writer.prop(scale) * writer.lit(1.0)).expr(),
         dimension: ShapeDimension::Volume,
     };
 
     // Initialize a radial initial velocity.
     let init_vel = SetVelocitySphereModifier {
         center: writer.lit(Vec3::ZERO).expr(),
-        speed: (writer.rand(ScalarType::Float) * writer.lit(5.0)).expr(),
+        speed: (writer.prop(scale) * writer.rand(ScalarType::Float) * writer.lit(5.0)).expr(),
     };
 
     // Initialize the size of the particle.
     let init_size = SetAttributeModifier::new(
         Attribute::SIZE,
-        (writer.rand(ScalarType::Float) * writer.lit(0.15) + writer.lit(0.01)).expr(),
+        (writer.prop(scale)
+            * (writer.rand(ScalarType::Float) * writer.lit(0.1) + writer.lit(0.01)))
+        .expr(),
     );
 
     // Initialize the total lifetime of the particle.
