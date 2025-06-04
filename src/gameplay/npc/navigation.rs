@@ -16,14 +16,11 @@ use bevy_tnua::prelude::*;
 
 use crate::{
     PrePhysicsAppSystems,
-    gameplay::{
-        npc::{NPC_CAPSULE_LENGTH, stats::NpcStats},
-        player::navmesh_position::LastValidPlayerNavmeshPosition,
-    },
+    gameplay::{npc::stats::NpcStats, player::navmesh_position::LastValidPlayerNavmeshPosition},
     screens::Screen,
 };
 
-use super::{NPC_RADIUS, ai_state::AiState, attack::Attacking};
+use super::{ai_state::AiState, attack::Attacking};
 
 pub(crate) const NPC_MAX_SLOPE: f32 = TAU / 6.0;
 
