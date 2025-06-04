@@ -6,14 +6,15 @@ use bevy::{
     ecs::{error::ignore, system::SystemParam},
     prelude::*,
 };
-use bevy_enhanced_input::events::Started;
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
 
-use super::player::{Player, camera::PlayerCamera, default_input::Shoot};
 use crate::{
     auto_timer::{AutoTimer, OnAutoTimerFinish},
-    gameplay::{health::Health, npc::Npc},
+    gameplay::{
+        health::{Health, OnDeath},
+        npc::Npc,
+    },
     third_party::avian3d::CollisionLayer,
 };
 
@@ -114,38 +115,14 @@ impl Default for ExplodeOnContact {
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn on_shoot_explosive(
-    _trigger: Trigger<Started<Shoot>>,
-    player_camera: Single<&GlobalTransform, With<PlayerCamera>>,
-    player_collider: Single<Entity, With<Player>>,
-    collider_of_query: Query<&ColliderOf>,
+    trigger: Trigger<OnDeath>,
     explosive_query: Query<&ExplodeOnShoot>,
-    spatial_query: SpatialQuery,
     mut commands: Commands,
 ) {
-    let camera_transform = player_camera.compute_transform();
-
-    // Cast a ray from the camera to check for explosives.
-    if let Some(hit) = spatial_query.cast_ray(
-        camera_transform.translation,
-        camera_transform.forward(),
-        f32::MAX,
-        true,
-        &SpatialQueryFilter::from_excluded_entities([*player_collider]),
-    ) {
-        let Ok(&ColliderOf { body }) = collider_of_query.get(hit.entity) else {
-            return;
-        };
-
-        let Ok(explosive) = explosive_query.get(body) else {
-            return;
-        };
-
-        if hit.distance > explosive.max_distance {
-            return;
-        }
-
+    let entity = trigger.target();
+    if let Ok(_explosive) = explosive_query.get(entity) {
         // Trigger the explosion.
-        commands.entity(body).trigger(OnExplode);
+        commands.entity(entity).trigger(OnExplode);
     }
 }
 

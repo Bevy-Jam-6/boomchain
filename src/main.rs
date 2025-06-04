@@ -5,6 +5,7 @@ mod asset_processing;
 mod asset_tracking;
 mod audio;
 mod auto_timer;
+mod despawn_after;
 #[cfg(feature = "dev")]
 mod dev_tools;
 mod fixed_update_inspection;
@@ -75,12 +76,15 @@ fn main() -> AppExit {
             PostPhysicsAppSystems::PlaySounds,
             PostPhysicsAppSystems::PlayAnimations,
             PostPhysicsAppSystems::Update,
+            PostPhysicsAppSystems::TriggerDeath,
+            PostPhysicsAppSystems::DespawnAfter,
         )
             .chain(),
     );
     app.configure_sets(
         RunFixedMainLoop,
         (
+            PrePhysicsAppSystems::SpawnWave,
             PrePhysicsAppSystems::UpdateNavmeshPositions,
             PrePhysicsAppSystems::UpdateNavmeshTargets,
             OxidizedNavigation::RemovedComponent,
@@ -112,6 +116,7 @@ fn main() -> AppExit {
         audio::plugin,
         auto_timer::plugin,
         fixed_update_inspection::plugin,
+        despawn_after::plugin,
     ));
 
     // Add plugins that proload levels. These have to come later than the other plugins
@@ -151,6 +156,8 @@ enum PostPhysicsAppSystems {
     Update,
     /// Trigger death.
     TriggerDeath,
+    /// Despawn after a timer.
+    DespawnAfter,
 }
 
 /// This enum is converted to an `isize` to be used as a camera's order.

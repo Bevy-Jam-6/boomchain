@@ -1,4 +1,7 @@
-use crate::gameplay::explosion::{ExplodeOnShoot, effects::PropExplosionVfx};
+use crate::gameplay::{
+    explosion::{ExplodeOnShoot, effects::PropExplosionVfx},
+    health::Health,
+};
 
 use super::setup::*;
 use bevy::prelude::*;
@@ -9,14 +12,14 @@ pub(super) fn plugin(app: &mut App) {
         .add_observer(setup_static_prop_with_convex_decomposition::<Table>)
         .add_observer(setup_static_prop_with_convex_hull::<Bookshelf>)
         .add_observer(setup_static_prop_with_convex_hull::<Generator2>)
-        .add_observer(setup_static_prop_with_convex_hull::<BarrelLargeClosed>)
         .add_observer(setup_static_prop_with_convex_hull::<Barrel01>)
         .add_observer(setup_static_prop_with_convex_hull::<CrateSquare>)
         .add_observer(setup_static_prop_with_convex_hull::<FenceBarsDecorativeSingle>)
         .add_observer(setup_static_prop_with_convex_hull::<DoorStainedGlass>);
 
     app.add_observer(setup_dynamic_prop_with_convex_hull::<PackageMedium>)
-        .add_observer(setup_dynamic_prop_with_convex_hull::<PackageSmall>);
+        .add_observer(setup_dynamic_prop_with_convex_hull::<PackageSmall>)
+        .add_observer(setup_dynamic_prop_with_convex_hull::<BarrelLargeClosed>);
 
     app.add_observer(setup_nonphysical_prop::<IvyPart8>)
         .add_observer(setup_nonphysical_prop::<SmallDoorSign1>);
@@ -87,7 +90,7 @@ pub(crate) struct Generator2;
 #[base(Transform, Visibility)]
 #[model("models/darkmod/containers/barrel_large_closed.gltf")]
 #[spawn_hooks(SpawnHooks::new().preload_model::<Self>())]
-#[require(ExplodeOnShoot, PropExplosionVfx)]
+#[require(ExplodeOnShoot, PropExplosionVfx, Health = Health::new(10.0))]
 pub(crate) struct BarrelLargeClosed;
 
 #[derive(PointClass, Component, Debug, Reflect)]

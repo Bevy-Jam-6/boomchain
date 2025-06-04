@@ -20,6 +20,20 @@ pub(crate) struct NpcAssets {
     #[dependency]
     pub(crate) _model: Handle<Scene>,
     #[dependency]
+    pub(crate) gib_head: Handle<Scene>,
+    #[dependency]
+    pub(crate) gib_torso: Handle<Scene>,
+    #[dependency]
+    pub(crate) gib_arm_1: Handle<Scene>,
+    #[dependency]
+    pub(crate) gib_arm_2: Handle<Scene>,
+    #[dependency]
+    pub(crate) gib_leg: Handle<Scene>,
+    #[dependency]
+    pub(crate) gib_foot: Handle<Scene>,
+    #[dependency]
+    pub(crate) gib_pelvis: Handle<Scene>,
+    #[dependency]
     pub(crate) idle_animation: Handle<AnimationClip>,
     #[dependency]
     pub(crate) walk_animation: Handle<AnimationClip>,
@@ -34,6 +48,13 @@ impl FromWorld for NpcAssets {
         let assets = world.resource::<AssetServer>();
         let rng = &mut rand::thread_rng();
         Self {
+            gib_head: assets.load("models/zombie_3/gib_head.gltf#Scene0"),
+            gib_torso: assets.load("models/zombie_3/gib_torso.gltf#Scene0"),
+            gib_arm_1: assets.load("models/zombie_3/gib_arm_1.gltf#Scene0"),
+            gib_arm_2: assets.load("models/zombie_3/gib_arm_2.gltf#Scene0"),
+            gib_leg: assets.load("models/zombie_3/gib_leg.gltf#Scene0"),
+            gib_foot: assets.load("models/zombie_3/gib_foot.gltf#Scene0"),
+            gib_pelvis: assets.load("models/zombie_3/gib_pelvis.gltf#Scene0"),
             _model: assets.load(Npc::scene_path()),
             attack_animation: assets.load(Npc::animation_path(0)),
             idle_animation: assets.load(Npc::animation_path(1)),
