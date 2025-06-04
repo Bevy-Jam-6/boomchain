@@ -7,7 +7,7 @@ use crate::asset_tracking::LoadResource;
 use crate::gameplay::health::{Health, OnDeath};
 use crate::gameplay::npc::Npc;
 use crate::gameplay::player::Player;
-use crate::gameplay::waves::{WaveAdvanced, Waves};
+use crate::gameplay::waves::{WaveAdvanced, WaveFinishedPreparing, WaveStartedPreparing, Waves};
 use crate::screens::Screen;
 
 pub(super) fn plugin(app: &mut App) {
@@ -16,12 +16,17 @@ pub(super) fn plugin(app: &mut App) {
         OnEnter(Screen::Gameplay),
         (spawn_health_bar, spawn_wave_hud),
     );
-    app.add_systems(Update, (update_health_bar, update_wave_text));
+    app.add_systems(
+        Update,
+        (update_health_bar, update_prep_time_text, update_wave_text),
+    );
     app.register_type::<HealthBar>();
     app.register_type::<WaveText>();
     app.add_observer(add_angry_icon);
     app.add_observer(add_dead_icon);
     app.add_observer(flush_on_wave_advanced);
+    app.add_observer(spawn_prep_icon);
+    app.add_observer(flush_on_prep_time_finished);
 }
 
 #[derive(Resource, Asset, Clone, Reflect)]
@@ -83,6 +88,10 @@ pub(crate) struct WaveInProgressIcon;
 #[derive(Component, Reflect)]
 #[reflect(Component)]
 pub(crate) struct DeadIcon;
+
+#[derive(Component, Reflect)]
+#[reflect(Component)]
+pub(crate) struct PrepTimeText;
 
 fn spawn_wave_hud(mut commands: Commands) {
     commands.spawn((
@@ -193,6 +202,39 @@ fn update_wave_text(waves: Single<&Waves>, mut wave_text: Single<&mut Text, With
         waves.current_wave_index() + 1,
         waves.total_waves()
     );
+}
+
+fn spawn_prep_icon(
+    _trigger: Trigger<WaveStartedPreparing>,
+    container: Single<Entity, With<WaveIconParent>>,
+    mut commands: Commands,
+) {
+    commands.entity(*container).with_child((
+        Node {
+            margin: UiRect::horizontal(Px(10.0)),
+            ..default()
+        },
+        Text::new(""),
+        PrepTimeText,
+    ));
+}
+
+fn update_prep_time_text(
+    waves: Single<&Waves>,
+    mut prep_time_text: Single<&mut Text, With<PrepTimeText>>,
+) {
+    ***prep_time_text = format!(
+        "Get Ready! {} s",
+        waves.prep_time_left().as_secs_f32().ceil() as u32
+    );
+}
+
+fn flush_on_prep_time_finished(
+    _trigger: Trigger<WaveFinishedPreparing>,
+    container: Single<Entity, With<WaveIconParent>>,
+    mut commands: Commands,
+) {
+    commands.entity(*container).despawn_related::<Children>();
 }
 
 #[cfg_attr(feature = "hot_patch", hot(rerun_on_hot_patch = true))]

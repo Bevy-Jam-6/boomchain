@@ -241,6 +241,10 @@ impl Waves {
         self.total_waves
     }
 
+    pub(crate) fn prep_time_left(&self) -> Duration {
+        self.prep_timer.remaining()
+    }
+
     fn try_advance(&mut self, delta: Duration, has_enemies: bool) -> WaveAdvancement {
         let mut advancement = WaveAdvancement::Ongoing;
         if !self.is_finished()
