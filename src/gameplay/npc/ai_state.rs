@@ -65,11 +65,7 @@ fn update_ai_state(
             }
             AiState::Stagger(timer) => {
                 if timer.finished() {
-                    info!("stagger finishhed");
                     *ai_state = AiState::Chase;
-                } else {
-                    info!("stagger not finished");
-                    info!("timer: {:?}", timer.elapsed());
                 }
             }
             AiState::Attack => {
