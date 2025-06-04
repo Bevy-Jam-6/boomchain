@@ -56,14 +56,27 @@ const NPC_HALF_HEIGHT: f32 = NPC_HEIGHT / 2.0;
 const NPC_FLOAT_HEIGHT: f32 = NPC_HALF_HEIGHT + 0.5;
 
 #[cfg_attr(feature = "hot_patch", hot)]
-fn on_add(trigger: Trigger<OnAdd, Npc>, mut commands: Commands, assets: Res<AssetServer>) {
+fn on_add(
+    trigger: Trigger<OnAdd, NpcStats>,
+    stats: Query<&NpcStats>,
+    mut commands: Commands,
+    assets: Res<AssetServer>,
+) {
+    let Ok(stats) = stats.get(trigger.target()) else {
+        return;
+    };
+    let radius = NPC_RADIUS * stats.size;
+    let capsule_length = NPC_CAPSULE_LENGTH * stats.size;
+    let npc_height = capsule_length + 2.0 * radius;
+    let npc_half_height = npc_height / 2.0;
+    let npc_float_height = npc_half_height + 0.5;
     commands
         .entity(trigger.target())
         .insert((
             Npc,
-            Collider::capsule(NPC_RADIUS, NPC_CAPSULE_LENGTH),
+            Collider::capsule(radius, capsule_length),
             TnuaController::default(),
-            TnuaAvian3dSensorShape(Collider::cylinder(NPC_RADIUS - 0.01, 0.0)),
+            TnuaAvian3dSensorShape(Collider::cylinder(radius - 0.01, 0.0)),
             ColliderDensity(2_000.0),
             RigidBody::Dynamic,
             LockedAxes::ROTATION_LOCKED.unlock_rotation_y(),
@@ -79,7 +92,7 @@ fn on_add(trigger: Trigger<OnAdd, Npc>, mut commands: Commands, assets: Res<Asse
         .with_child((
             Name::new("Npc Model"),
             SceneRoot(assets.load_trenchbroom_model::<Npc>()),
-            Transform::from_xyz(0.0, -NPC_FLOAT_HEIGHT, 0.0),
+            Transform::from_xyz(0.0, -npc_float_height, 0.0).with_scale(Vec3::splat(stats.size)),
         ))
         .observe(setup_npc_animations);
 }

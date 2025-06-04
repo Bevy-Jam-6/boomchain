@@ -114,8 +114,8 @@ fn advance_waves(
                         Npc,
                         NpcStats {
                             health: 100.0,
-                            desired_speed: 10.0,
-                            max_speed: 10.0,
+                            desired_speed: 7.0,
+                            max_speed: 8.0,
                             attack_damage: 10.0,
                             attack_speed_range: 1.2..2.1,
                             size: 1.0,
@@ -131,7 +131,7 @@ fn advance_waves(
                             desired_speed: 5.0,
                             max_speed: 5.0,
                             attack_damage: 20.0,
-                            attack_speed_range: 0.6..1.2,
+                            attack_speed_range: 0.9..1.4,
                             size: 2.0,
                         },
                     ));

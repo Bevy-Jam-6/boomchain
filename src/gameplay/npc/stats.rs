@@ -42,6 +42,5 @@ fn apply_initial_stats(
     let Ok((stats, mut transform)) = npc.get_mut(entity) else {
         return;
     };
-    transform.scale = Vec3::splat(stats.size);
     commands.entity(entity).insert(Health::new(stats.health));
 }

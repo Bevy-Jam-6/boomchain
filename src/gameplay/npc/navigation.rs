@@ -16,7 +16,10 @@ use bevy_tnua::prelude::*;
 
 use crate::{
     PrePhysicsAppSystems,
-    gameplay::{npc::stats::NpcStats, player::navmesh_position::LastValidPlayerNavmeshPosition},
+    gameplay::{
+        npc::{NPC_CAPSULE_LENGTH, stats::NpcStats},
+        player::navmesh_position::LastValidPlayerNavmeshPosition,
+    },
     screens::Screen,
 };
 
@@ -56,19 +59,24 @@ fn setup_npc_agent(
     let Ok(stats) = stats.get(npc) else {
         return;
     };
+    let radius = NPC_RADIUS * stats.size;
+    let capsule_length = NPC_CAPSULE_LENGTH * stats.size;
+    let npc_height = capsule_length + 2.0 * radius;
+    let npc_half_height = npc_height / 2.0;
+    let npc_float_height = npc_half_height + 0.5;
     commands.spawn((
         Name::new("NPC Agent"),
-        Transform::from_translation(Vec3::new(0.0, -NPC_FLOAT_HEIGHT, 0.0)),
+        Transform::from_translation(Vec3::new(0.0, -npc_float_height, 0.0)),
         Agent3dBundle {
             agent: default(),
             settings: AgentSettings {
-                radius: NPC_RADIUS * stats.size,
+                radius,
                 desired_speed: stats.desired_speed,
                 max_speed: stats.max_speed,
             },
             archipelago_ref: ArchipelagoRef3d::new(*archipelago),
         },
-        TargetReachedCondition::Distance(Some(1.5)),
+        TargetReachedCondition::Distance(Some(1.5 * stats.size)),
         ChildOf(npc),
         AgentOf(npc),
         AgentTarget3d::default(),
@@ -113,10 +121,10 @@ pub(crate) struct Agent(Entity);
 /// Use the desired velocity as the agent's velocity.
 #[cfg_attr(feature = "hot_patch", hot)]
 fn set_controller_velocity(
-    mut agent_query: Query<(&mut TnuaController, &Agent, Option<&Attacking>)>,
+    mut agent_query: Query<(&mut TnuaController, &Agent, Option<&Attacking>, &NpcStats)>,
     desired_velocity_query: Query<&LandmassAgentDesiredVelocity>,
 ) {
-    for (mut controller, agent, attacking) in &mut agent_query {
+    for (mut controller, agent, attacking, stats) in &mut agent_query {
         let Ok(desired_velocity) = desired_velocity_query.get(**agent) else {
             continue;
         };
@@ -126,10 +134,15 @@ fn set_controller_velocity(
         } else {
             Dir3::try_from(velocity).ok()
         };
+        let radius = NPC_RADIUS * stats.size;
+        let capsule_length = NPC_CAPSULE_LENGTH * stats.size;
+        let npc_height = capsule_length + 2.0 * radius;
+        let npc_half_height = npc_height / 2.0;
+        let npc_float_height = npc_half_height + 0.5;
         controller.basis(TnuaBuiltinWalk {
             desired_velocity: velocity,
             desired_forward: forward,
-            float_height: NPC_FLOAT_HEIGHT,
+            float_height: npc_float_height,
             spring_strength: 1500.0,
             max_slope: NPC_MAX_SLOPE,
             ..default()
