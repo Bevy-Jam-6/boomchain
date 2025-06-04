@@ -209,6 +209,7 @@ pub(crate) struct Waves {
     current_packets: Vec<SpawnPacket>,
     wave_stopwatch: Stopwatch,
     current_wave: usize,
+    total_waves: usize,
     prep_timer: Timer,
 }
 
@@ -220,13 +221,24 @@ enum WaveAdvancement {
 
 impl Waves {
     fn new(waves: impl Into<Vec<Wave>>) -> Self {
+        let waves = waves.into();
+        let len = waves.len();
         Self {
-            waves: waves.into(),
+            waves,
             current_packets: Vec::new(),
             wave_stopwatch: Stopwatch::default(),
             current_wave: 0,
+            total_waves: len,
             prep_timer: Timer::from_seconds(0.0, TimerMode::Once),
         }
+    }
+
+    pub(crate) fn current_wave_index(&self) -> usize {
+        self.current_wave
+    }
+
+    pub(crate) fn total_waves(&self) -> usize {
+        self.total_waves
     }
 
     fn try_advance(&mut self, delta: Duration, has_enemies: bool) -> WaveAdvancement {

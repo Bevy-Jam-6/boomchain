@@ -7,7 +7,7 @@ use crate::asset_tracking::LoadResource;
 use crate::gameplay::health::{Health, OnDeath};
 use crate::gameplay::npc::Npc;
 use crate::gameplay::player::Player;
-use crate::gameplay::waves::WaveAdvanced;
+use crate::gameplay::waves::{WaveAdvanced, Waves};
 use crate::screens::Screen;
 
 pub(super) fn plugin(app: &mut App) {
@@ -16,7 +16,7 @@ pub(super) fn plugin(app: &mut App) {
         OnEnter(Screen::Gameplay),
         (spawn_health_bar, spawn_wave_hud),
     );
-    app.add_systems(Update, update_health_bar);
+    app.add_systems(Update, (update_health_bar, update_wave_text));
     app.register_type::<HealthBar>();
     app.register_type::<WaveText>();
     app.add_observer(add_angry_icon);
@@ -185,6 +185,14 @@ fn flush_on_wave_advanced(
     mut commands: Commands,
 ) {
     commands.entity(*container).despawn_related::<Children>();
+}
+
+fn update_wave_text(waves: Single<&Waves>, mut wave_text: Single<&mut Text, With<WaveText>>) {
+    ***wave_text = format!(
+        "Wave {}/{}",
+        waves.current_wave_index() + 1,
+        waves.total_waves()
+    );
 }
 
 #[cfg_attr(feature = "hot_patch", hot(rerun_on_hot_patch = true))]
