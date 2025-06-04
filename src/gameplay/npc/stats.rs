@@ -14,33 +14,33 @@ pub(super) fn plugin(app: &mut App) {
 
 #[derive(Component, Reflect)]
 #[reflect(Component)]
-pub struct NpcStats {
-    pub health: f32,
-    pub desired_speed: f32,
-    pub max_speed: f32,
-    pub attack_damage: f32,
-    pub attack_speed_range: Range<f32>,
-    pub size: f32,
+pub(crate) struct NpcStats {
+    pub(crate) health: f32,
+    pub(crate) desired_speed: f32,
+    pub(crate) max_speed: f32,
+    pub(crate) attack_damage: f32,
+    pub(crate) attack_speed_range: Range<f32>,
+    pub(crate) size: f32,
 }
 
 impl NpcStats {
-    pub fn radius(&self) -> f32 {
+    pub(crate) fn radius(&self) -> f32 {
         NPC_RADIUS * self.size
     }
 
-    pub fn capsule_length(&self) -> f32 {
+    pub(crate) fn capsule_length(&self) -> f32 {
         NPC_CAPSULE_LENGTH * self.size
     }
 
-    pub fn height(&self) -> f32 {
+    pub(crate) fn height(&self) -> f32 {
         self.capsule_length() + 2.0 * self.radius()
     }
 
-    pub fn half_height(&self) -> f32 {
+    pub(crate) fn half_height(&self) -> f32 {
         self.height() / 2.0
     }
 
-    pub fn float_height(&self) -> f32 {
+    pub(crate) fn float_height(&self) -> f32 {
         self.half_height() + 0.5
     }
 }

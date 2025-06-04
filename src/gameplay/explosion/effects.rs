@@ -26,7 +26,7 @@ pub(super) fn plugin(app: &mut App) {
 
 #[derive(Component, Debug, Default, Reflect)]
 #[reflect(Component, Debug, Default)]
-pub struct PropExplosionVfx;
+pub(crate) struct PropExplosionVfx;
 
 fn on_explode_prop(
     trigger: Trigger<OnExplode>,
