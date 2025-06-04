@@ -4,7 +4,7 @@ use crate::{
     RenderLayer,
     audio::sound_effect,
     despawn_after::DespawnAfter,
-    gameplay::{crosshair::CrosshairState, health::Health, player::camera_shake::OnTrauma},
+    gameplay::{crosshair::CrosshairState, health::OnDamage, player::camera_shake::OnTrauma},
     third_party::avian3d::CollisionLayer,
 };
 
@@ -133,7 +133,6 @@ fn handle_hits(
     _trigger: Trigger<OnAdd, Shooting>,
     spatial_query: SpatialQuery,
     player_camera_parent: Single<&Transform, With<PlayerCamera>>,
-    mut targets: Query<&mut Health>,
     collider_of: Query<&ColliderOf>,
     weapon_stats: Single<&WeaponStats, With<Player>>,
     player: Single<Entity, With<Player>>,
@@ -189,11 +188,9 @@ fn handle_hits(
             continue;
         };
 
-        let Ok(mut health) = targets.get_mut(*body) else {
-            continue;
-        };
-
-        health.damage(weapon_stats.damage);
+        commands
+            .entity(*body)
+            .trigger(OnDamage(weapon_stats.damage));
     }
 }
 

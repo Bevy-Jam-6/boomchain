@@ -9,7 +9,7 @@ use bevy::{
 use bevy_shuffle_bag::ShuffleBag;
 
 use crate::{
-    despawn_after::DespawnAfter,
+    despawn_after::{Despawn, DespawnAfter},
     gameplay::{
         health::OnDeath,
         npc::{assets::NpcAssets, stats::NpcStats},
@@ -69,7 +69,7 @@ fn on_enemy_death(
             ))
             .observe(remove_shadow_interactions);
     }
-    commands.entity(entity).try_despawn();
+    commands.entity(entity).insert(Despawn);
 }
 
 fn remove_shadow_interactions(

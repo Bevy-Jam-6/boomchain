@@ -11,8 +11,9 @@ use bevy_simple_subsecond_system::hot;
 
 use crate::{
     auto_timer::{AutoTimer, OnAutoTimerFinish},
+    despawn_after::Despawn,
     gameplay::{
-        health::{Health, OnDeath},
+        health::{OnDamage, OnDeath},
         npc::Npc,
     },
     third_party::avian3d::CollisionLayer,
@@ -190,7 +191,7 @@ fn on_explode(
     explosion_helper.apply_explosion(explosive, explosive_global_com);
 
     // Despawn the explosive entity after the explosion.
-    explosion_helper.commands.entity(entity).try_despawn();
+    explosion_helper.commands.entity(entity).insert(Despawn);
 }
 
 /// A [`SystemParam`] for applying explosions in the world.
@@ -211,7 +212,7 @@ pub(crate) struct ExplosionHelper<'w, 's> {
             &'static RigidBodyColliders,
         ),
     >,
-    npc_health_query: Query<'w, 's, &'static mut Health, With<Npc>>,
+    npc_query: Query<'w, 's, (), With<Npc>>,
     spatial_query: SpatialQuery<'w, 's>,
     commands: Commands<'w, 's>,
 }
@@ -242,9 +243,11 @@ impl ExplosionHelper<'_, '_> {
 
         // Apply the explosion impulse to each hit body.
         for body in hit_bodies {
-            if let Ok(mut health) = self.npc_health_query.get_mut(body) {
+            if self.npc_query.contains(body) {
                 // If the body is an NPC, apply damage.
-                health.damage(explosive.damage);
+                self.commands
+                    .entity(body)
+                    .trigger(OnDamage(explosive.damage));
             }
 
             // Get the body's transform, velocity, center of mass, and attached colliders.

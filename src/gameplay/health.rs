@@ -7,10 +7,9 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<Health>();
     app.add_systems(
         Update,
-        (kill_out_of_bounds, trigger_death)
-            .chain()
-            .in_set(PostPhysicsAppSystems::TriggerDeath),
+        kill_out_of_bounds.in_set(PostPhysicsAppSystems::TriggerDeath),
     );
+    app.add_observer(on_damage);
 }
 
 #[derive(Component, Debug, Reflect)]
@@ -25,13 +24,9 @@ impl Health {
         Self { current: max, max }
     }
 
-    pub(crate) fn damage(&mut self, amount: f32) {
+    fn damage(&mut self, amount: f32) {
         self.current -= amount;
         self.current = self.current.max(0.0);
-    }
-
-    pub(crate) fn kill(&mut self) {
-        self.current = 0.0;
     }
 
     pub(crate) fn is_dead(&self) -> bool {
@@ -68,21 +63,27 @@ fn spawn_health_hud(mut commands: Commands) {
     ));
 }
 
-fn trigger_death(health: Query<(Entity, &Health), Changed<Health>>, mut commands: Commands) {
-    for (entity, health) in health.iter() {
-        if health.is_dead() {
-            commands.entity(entity).trigger(OnDeath);
-        }
+fn on_damage(trigger: Trigger<OnDamage>, mut health: Query<&mut Health>, mut commands: Commands) {
+    let entity = trigger.target();
+    let Ok(mut health) = health.get_mut(entity) else {
+        return;
+    };
+    health.damage(trigger.event().0);
+    if health.is_dead() {
+        commands.entity(entity).trigger(OnDeath);
     }
 }
 
 #[derive(Debug, Event)]
+pub(crate) struct OnDamage(pub(crate) f32);
+
+#[derive(Debug, Event)]
 pub(crate) struct OnDeath;
 
-fn kill_out_of_bounds(mut health: Query<(&mut Health, &Transform)>) {
-    for (mut health, transform) in health.iter_mut() {
+fn kill_out_of_bounds(health: Query<(Entity, &Transform)>, mut commands: Commands) {
+    for (entity, transform) in health.iter() {
         if transform.translation.y < -300.0 {
-            health.kill();
+            commands.entity(entity).trigger(OnDeath);
         }
     }
 }
