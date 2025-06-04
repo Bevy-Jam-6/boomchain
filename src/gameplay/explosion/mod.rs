@@ -165,14 +165,32 @@ fn on_touch_explosive(
 fn on_enemy_death(
     trigger: Trigger<OnDeath>,
     mut commands: Commands,
-    explosive_query: Query<(), With<ExplodeOnDeath>>,
+    explosive_query: Query<(&GlobalTransform, &Explosive), With<ExplodeOnDeath>>,
 ) {
     let entity = trigger.target();
 
-    // Check if the entity has the `ExplodeOnDeath` component.
-    if explosive_query.contains(entity) {
-        // Trigger the explosion.
-        commands.entity(entity).trigger(OnExplode);
+    // Get the explosive properties and transform of the entity.
+    if let Ok((transform, explosive)) = explosive_query.get(entity) {
+        // Trigger the explosion. We use a separate entity with a timer
+        // to delay the explosion until the dismembered body parts of enemies
+        // are ready for physics.
+        // Hacky, but this is a game jam :D could be cleaned up though
+        commands
+            .spawn((
+                RigidBody::Static,
+                AutoTimer(Timer::from_seconds(0.1, TimerMode::Once)),
+                // Just copy the transform and explosive properties to the temporary entity.
+                transform.compute_transform(),
+                *explosive,
+            ))
+            .observe(
+                |trigger: Trigger<OnAutoTimerFinish>, mut commands: Commands| {
+                    commands
+                        .entity(trigger.target())
+                        .trigger(OnExplode)
+                        .despawn();
+                },
+            );
     }
 }
 
