@@ -12,6 +12,7 @@ use rand::Rng;
 use crate::{
     despawn_after::{Despawn, DespawnAfter},
     gameplay::{
+        explosion::{ExplodeOnDeath, OnExplode},
         health::{OnDamage, OnDeath},
         npc::{ai_state::AiState, assets::NpcAssets, stats::NpcStats},
     },
@@ -25,12 +26,12 @@ pub(super) fn plugin(app: &mut App) {
 
 fn on_enemy_death(
     trigger: Trigger<OnDeath>,
-    enemies: Query<(&Transform, &NpcStats)>,
+    enemies: Query<(&Transform, &NpcStats, Has<ExplodeOnDeath>)>,
     npc_assets: Res<NpcAssets>,
     mut commands: Commands,
 ) {
     let entity = trigger.target();
-    let Ok((transform, stats)) = enemies.get(entity) else {
+    let Ok((transform, stats, explode_on_death)) = enemies.get(entity) else {
         return;
     };
     let mut rng = rand::thread_rng();
@@ -71,7 +72,12 @@ fn on_enemy_death(
             ))
             .observe(remove_shadow_interactions);
     }
+
     commands.entity(entity).insert(Despawn);
+
+    if explode_on_death {
+        commands.entity(entity).trigger(OnExplode);
+    }
 }
 
 fn remove_shadow_interactions(

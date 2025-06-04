@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use bevy_hanabi::EffectAsset;
 use bevy_shuffle_bag::ShuffleBag;
 
-use super::effects::hanabi_prop_explosion;
+use super::effects::{hanabi_enemy_explosion, hanabi_prop_explosion};
 use crate::asset_tracking::LoadResource;
 
 pub(super) fn plugin(app: &mut App) {
@@ -18,6 +18,7 @@ pub(crate) struct ExplosionAssets {
     #[dependency]
     pub(crate) prop_explosion_sfx: ShuffleBag<Handle<AudioSource>>,
     pub(crate) prop_explosion_vfx: Handle<EffectAsset>,
+    pub(crate) enemy_explosion_vfx: Handle<EffectAsset>,
 }
 
 impl FromWorld for ExplosionAssets {
@@ -36,12 +37,13 @@ impl FromWorld for ExplosionAssets {
         )
         .unwrap();
 
-        let effect = hanabi_prop_explosion(world);
-        let effect_asset = world.add_asset(effect);
+        let prop_explosion_vfx = hanabi_prop_explosion(world);
+        let enemy_explosion_vfx = hanabi_enemy_explosion(world);
 
         Self {
             prop_explosion_sfx,
-            prop_explosion_vfx: effect_asset,
+            prop_explosion_vfx: world.add_asset(prop_explosion_vfx),
+            enemy_explosion_vfx: world.add_asset(enemy_explosion_vfx),
         }
     }
 }

@@ -11,7 +11,10 @@ use bevy_tnua_avian3d::TnuaAvian3dSensorShape;
 use bevy_trenchbroom::prelude::*;
 
 use crate::{
-    gameplay::npc::stats::NpcStats,
+    gameplay::{
+        explosion::{ExplodeOnDeath, Explosive},
+        npc::stats::NpcStats,
+    },
     third_party::{avian3d::CollisionLayer, bevy_trenchbroom::LoadTrenchbroomModel as _},
 };
 
@@ -84,6 +87,12 @@ fn on_add(
             ),
             Health::new(100.0),
             AiState::default(),
+            ExplodeOnDeath,
+            Explosive {
+                radius: 2.5,
+                impulse_strength: 10.0,
+                damage: 50.0,
+            },
         ))
         .with_child((
             Name::new("Npc Model"),
