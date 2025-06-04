@@ -5,11 +5,7 @@ use bevy_simple_subsecond_system::hot;
 
 use crate::{
     PrePhysicsAppSystems,
-    gameplay::{
-        health::OnDamage,
-        npc::stats::NpcStats,
-        player::{Player, camera_shake::OnTrauma},
-    },
+    gameplay::{health::OnDamage, npc::stats::NpcStats, player::Player},
     third_party::avian3d::CollisionLayer,
 };
 
@@ -105,7 +101,6 @@ fn hit_player(
         return;
     }
     commands.entity(body).trigger(OnDamage(10.0));
-    commands.trigger(OnTrauma(0.7));
 }
 
 #[derive(Component, Deref, DerefMut, Debug, Reflect)]
