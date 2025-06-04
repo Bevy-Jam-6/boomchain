@@ -7,6 +7,7 @@ use crate::asset_tracking::LoadResource;
 use crate::gameplay::health::{Health, OnDeath};
 use crate::gameplay::npc::Npc;
 use crate::gameplay::player::Player;
+use crate::gameplay::waves::WaveAdvanced;
 use crate::screens::Screen;
 
 pub(super) fn plugin(app: &mut App) {
@@ -20,6 +21,7 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<WaveText>();
     app.add_observer(add_angry_icon);
     app.add_observer(add_dead_icon);
+    app.add_observer(flush_on_wave_advanced);
 }
 
 #[derive(Resource, Asset, Clone, Reflect)]
@@ -72,7 +74,11 @@ pub(crate) struct WaveIconParent;
 
 #[derive(Component, Reflect)]
 #[reflect(Component)]
-pub(crate) struct AngryIcon;
+pub(crate) struct AngryIcon(Entity);
+
+#[derive(Component, Reflect)]
+#[reflect(Component)]
+pub(crate) struct WaveInProgressIcon;
 
 #[derive(Component, Reflect)]
 #[reflect(Component)]
@@ -111,19 +117,31 @@ fn spawn_wave_hud(mut commands: Commands) {
 }
 
 fn add_angry_icon(
-    _trigger: Trigger<OnAdd, Npc>,
-    container: Single<Entity, With<WaveIconParent>>,
+    trigger: Trigger<OnAdd, Npc>,
+    container: Single<(Entity, Option<&Children>), With<WaveIconParent>>,
     mut commands: Commands,
     hud_assets: Res<HudAssets>,
+    angry_icons: Query<&AngryIcon>,
 ) {
-    commands.entity(*container).with_child((
+    let enemy = trigger.target();
+    let (container, children) = container.into_inner();
+    if children.is_some_and(|children| {
+        children
+            .iter()
+            .any(|child| angry_icons.get(child).is_ok_and(|icon| icon.0 == enemy))
+    }) {
+        warn!("Angry icon already exists for enemy {enemy}");
+        return;
+    }
+    info!("Adding angry icon for enemy {enemy}");
+    commands.entity(container).with_child((
         Node {
             width: Px(32.0),
             height: Px(32.0),
             ..default()
         },
         ImageNode::new(hud_assets.angry.clone()).with_color(Color::BLACK),
-        AngryIcon,
+        AngryIcon(enemy),
     ));
 }
 
@@ -133,7 +151,7 @@ fn add_dead_icon(
     container: Single<Entity, With<WaveIconParent>>,
     mut commands: Commands,
     children: Query<&Children>,
-    angry_icon: Query<Entity, With<AngryIcon>>,
+    angry_icon: Query<&AngryIcon>,
     hud_assets: Res<HudAssets>,
 ) {
     let entity = trigger.target();
@@ -141,19 +159,32 @@ fn add_dead_icon(
         return;
     }
     let Ok(icons) = children.get(*container) else {
+        error!("No children found for container");
         return;
     };
-    let Some(first_angry_icon) = angry_icon.iter().find(|icon| icons.contains(icon)) else {
+    let Some(angry_icon) = icons
+        .iter()
+        .find(|child| angry_icon.get(*child).is_ok_and(|icon| icon.0 == entity))
+    else {
+        error!("No angry icon found for entity {entity}");
         return;
     };
 
     commands
-        .entity(first_angry_icon)
+        .entity(angry_icon)
         .remove::<AngryIcon>()
         .insert(DeadIcon)
         .with_child((
             ImageNode::new(hud_assets.dead.clone()).with_color(Color::srgba(1.0, 0.0, 0.0, 1.0)),
         ));
+}
+
+fn flush_on_wave_advanced(
+    _trigger: Trigger<WaveAdvanced>,
+    container: Single<Entity, With<WaveIconParent>>,
+    mut commands: Commands,
+) {
+    commands.entity(*container).despawn_related::<Children>();
 }
 
 #[cfg_attr(feature = "hot_patch", hot(rerun_on_hot_patch = true))]
