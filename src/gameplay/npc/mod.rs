@@ -89,8 +89,8 @@ fn on_add(
             AiState::default(),
             ExplodeOnDeath,
             Explosive {
-                radius: 2.5,
-                impulse_strength: 10.0,
+                radius: stats.size * 2.5,
+                impulse_strength: 2.0,
                 damage: 50.0,
             },
         ))
