@@ -67,7 +67,7 @@ fn advance_waves(
     spawners: Query<(&Transform, &Spawner)>,
     mut commands: Commands,
 ) {
-    waves.tick(time.delta());
+    waves.tick(time.delta(), !enemies.is_empty());
     if waves.is_finished() {
         if enemies.is_empty() {
             info_once!("Game finished");
@@ -186,12 +186,13 @@ impl Waves {
         }
     }
 
-    fn tick(&mut self, delta: Duration) {
+    fn tick(&mut self, delta: Duration, has_enemies: bool) {
         if !self.is_finished()
             && self
                 .current_wave()
                 .map(|wave| wave.packet_kinds.is_empty())
                 .unwrap_or(false)
+            && !has_enemies
         {
             self.advance_wave();
         }
