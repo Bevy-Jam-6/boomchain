@@ -1,10 +1,15 @@
+use std::time::Duration;
+
 use avian3d::prelude::{ColliderConstructor, ColliderConstructorHierarchy, RigidBody};
 use bevy::prelude::*;
 use bevy_shuffle_bag::ShuffleBag;
 
-use crate::gameplay::{
-    health::OnDeath,
-    npc::{Npc, assets::NpcAssets},
+use crate::{
+    despawn_after::DespawnAfter,
+    gameplay::{
+        health::OnDeath,
+        npc::{Npc, assets::NpcAssets},
+    },
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -50,6 +55,7 @@ fn on_enemy_death(
             Transform::from_translation(position),
             RigidBody::Dynamic,
             ColliderConstructorHierarchy::new(ColliderConstructor::ConvexHullFromMesh),
+            DespawnAfter::new(Duration::from_secs(3)),
         ));
     }
     commands.entity(entity).try_despawn();

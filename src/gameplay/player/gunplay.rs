@@ -3,6 +3,7 @@ use std::time::Duration;
 use crate::{
     RenderLayer,
     audio::sound_effect,
+    despawn_after::DespawnAfter,
     gameplay::{
         crosshair::CrosshairState, health::Health, npc::Npc, player::camera_shake::OnTrauma,
     },
@@ -167,6 +168,8 @@ fn handle_hits(
         };
         let bias = 0.1;
         commands.spawn((
+            Name::new("bullet impact particles"),
+            DespawnAfter::new(Duration::from_secs(2)),
             particle_bundle(&bullet_impact),
             Transform::from_translation(
                 origin + spread_direction * (first_hit.distance - bias).max(0.0),
