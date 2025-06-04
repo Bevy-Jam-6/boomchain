@@ -50,10 +50,8 @@ pub(super) fn plugin(app: &mut App) {
 pub(crate) struct Npc;
 
 pub(crate) const NPC_RADIUS: f32 = 0.4;
-const NPC_CAPSULE_LENGTH: f32 = 0.6;
+pub(crate) const NPC_CAPSULE_LENGTH: f32 = 0.6;
 pub(crate) const NPC_HEIGHT: f32 = NPC_CAPSULE_LENGTH + 2.0 * NPC_RADIUS;
-const NPC_HALF_HEIGHT: f32 = NPC_HEIGHT / 2.0;
-const NPC_FLOAT_HEIGHT: f32 = NPC_HALF_HEIGHT + 0.5;
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn on_add(
@@ -65,11 +63,9 @@ fn on_add(
     let Ok(stats) = stats.get(trigger.target()) else {
         return;
     };
-    let radius = NPC_RADIUS * stats.size;
-    let capsule_length = NPC_CAPSULE_LENGTH * stats.size;
-    let npc_height = capsule_length + 2.0 * radius;
-    let npc_half_height = npc_height / 2.0;
-    let npc_float_height = npc_half_height + 0.5;
+    let radius = stats.radius();
+    let capsule_length = stats.capsule_length();
+    let npc_float_height = stats.float_height();
     commands
         .entity(trigger.target())
         .insert((
