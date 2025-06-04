@@ -12,7 +12,7 @@ use crate::{
     despawn_after::DespawnAfter,
     gameplay::{
         health::OnDeath,
-        npc::{Npc, assets::NpcAssets, stats::NpcStats},
+        npc::{assets::NpcAssets, stats::NpcStats},
     },
     third_party::avian3d::CollisionLayer,
 };

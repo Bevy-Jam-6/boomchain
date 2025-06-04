@@ -39,7 +39,7 @@ fn apply_initial_stats(
     mut commands: Commands,
 ) {
     let entity = trigger.target();
-    let Ok((stats, mut transform)) = npc.get_mut(entity) else {
+    let Ok((stats, transform)) = npc.get_mut(entity) else {
         return;
     };
     commands.entity(entity).insert(Health::new(stats.health));

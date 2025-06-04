@@ -23,7 +23,7 @@ use crate::{
     screens::Screen,
 };
 
-use super::{NPC_FLOAT_HEIGHT, NPC_RADIUS, ai_state::AiState, attack::Attacking};
+use super::{NPC_RADIUS, ai_state::AiState, attack::Attacking};
 
 pub(crate) const NPC_MAX_SLOPE: f32 = TAU / 6.0;
 

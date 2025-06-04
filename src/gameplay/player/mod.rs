@@ -7,7 +7,7 @@ use animation::{PlayerAnimationState, setup_player_animations};
 use avian3d::prelude::*;
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
-use bevy_landmass::{Character, prelude::*};
+use bevy_landmass::prelude::*;
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
 use bevy_tnua::{TnuaAnimatingState, prelude::*};
