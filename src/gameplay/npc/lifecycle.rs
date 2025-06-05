@@ -1,11 +1,7 @@
 use std::time::Duration;
 
 use avian3d::prelude::*;
-use bevy::{
-    pbr::{NotShadowCaster, NotShadowReceiver},
-    prelude::*,
-    scene::SceneInstanceReady,
-};
+use bevy::{pbr::NotShadowCaster, prelude::*, scene::SceneInstanceReady};
 use bevy_shuffle_bag::ShuffleBag;
 use rand::Rng;
 
@@ -77,7 +73,7 @@ fn on_enemy_death(
                 DespawnAfter::new(Duration::from_secs(10)),
                 StateScoped(Screen::Gameplay),
             ))
-            .observe(remove_shadow_interactions);
+            .observe(remove_shadow_caster);
     }
 
     commands.entity(entity).insert(Despawn);
@@ -87,7 +83,7 @@ fn on_enemy_death(
     }
 }
 
-fn remove_shadow_interactions(
+fn remove_shadow_caster(
     trigger: Trigger<SceneInstanceReady>,
     children: Query<&Children>,
     mesh: Query<(), With<Mesh3d>>,
@@ -96,9 +92,7 @@ fn remove_shadow_interactions(
     let entity = trigger.target();
     for child in children.iter_descendants(entity) {
         if mesh.contains(child) {
-            commands
-                .entity(child)
-                .insert((NotShadowCaster, NotShadowReceiver));
+            commands.entity(child).insert(NotShadowCaster);
         }
     }
 }
