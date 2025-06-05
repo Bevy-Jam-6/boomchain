@@ -11,7 +11,7 @@ use crate::{
     PostPhysicsAppSystems,
     audio::SoundEffect,
     gameplay::{
-        npc::{assets::NpcAssets, lifecycle::enemy_sound_effect, stats::NpcStats},
+        npc::{assets::NpcAssets, stats::NpcStats},
         player::Player,
     },
 };

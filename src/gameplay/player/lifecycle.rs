@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::{
     audio::sound_effect,
     gameplay::{
-        health::{Health, OnDamage, OnDeath},
+        health::{Health, OnDamage},
         player::{Player, assets::PlayerAssets, camera_shake::OnTrauma},
     },
 };

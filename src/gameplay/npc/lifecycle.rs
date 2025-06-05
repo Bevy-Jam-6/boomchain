@@ -13,7 +13,7 @@ use bevy_simple_subsecond_system::hot;
 use rand::Rng;
 
 use crate::{
-    audio::{SoundEffect, sound_effect},
+    audio::SoundEffect,
     despawn_after::{Despawn, DespawnAfter},
     gameplay::{
         explosion::{ExplodeOnDeath, OnExplode},
