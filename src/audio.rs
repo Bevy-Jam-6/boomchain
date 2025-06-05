@@ -4,6 +4,7 @@ use crate::{
     gameplay::{
         health::{Health, OnDamage, OnDeath},
         player::Player,
+        waves::{WaveFinishedPreparing, WaveStartedPreparing},
     },
     menus::Menu,
 };
@@ -22,6 +23,9 @@ pub(super) fn plugin(app: &mut App) {
 
     app.add_observer(adjust_music_to_health);
     app.add_observer(on_death);
+
+    app.add_observer(on_wave_started);
+    app.add_observer(on_wave_ended);
 
     app.add_systems(
         Update,
@@ -104,6 +108,28 @@ fn suppress_soundtrack(
         // There is no built in pitch shifting, so halving the speed at least maintains the key of the music
         let speed_variation = 0.5;
         sink.set_speed(speed_variation);
+    }
+}
+
+fn on_wave_ended(
+    _trigger: Trigger<WaveStartedPreparing>,
+    mut audio_query: Query<(&PlaybackSettings, &mut AudioSink), With<Music>>,
+    global_volume: Res<GlobalVolume>,
+) {
+    for (playback, mut sink) in &mut audio_query {
+        sink.set_speed(0.9);
+        sink.set_volume(global_volume.volume * playback.volume * Volume::Linear(0.9));
+    }
+}
+
+fn on_wave_started(
+    _trigger: Trigger<WaveFinishedPreparing>,
+    mut audio_query: Query<(&PlaybackSettings, &mut AudioSink), With<Music>>,
+    global_volume: Res<GlobalVolume>,
+) {
+    for (playback, mut sink) in &mut audio_query {
+        sink.set_speed(1.0);
+        sink.set_volume(global_volume.volume * playback.volume / Volume::Linear(0.9));
     }
 }
 
