@@ -27,8 +27,8 @@ struct LampPlain {
 impl Default for LampPlain {
     fn default() -> Self {
         Self {
-            color: Color::srgb_u8(170, 210, 255),
-            intensity: 20_000.0,
+            color: Color::srgb_u8(180, 210, 255),
+            intensity: 25_000.0,
         }
     }
 }
@@ -52,10 +52,8 @@ fn setup_lamp_wall_electric(
                 color: lamp.color,
                 intensity: lamp.intensity,
                 radius: 0.1,
-                range: 50.0,
-                shadows_enabled: true,
-                #[cfg(feature = "native")]
-                soft_shadows_enabled: true,
+                range: 80.0,
+                shadows_enabled: false,
                 ..default()
             },
         ))
