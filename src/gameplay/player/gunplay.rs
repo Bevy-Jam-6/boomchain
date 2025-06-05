@@ -148,9 +148,7 @@ fn spawn_muzzle_flash(
             DespawnAfter::new(Duration::from_millis(200)),
             PointLight {
                 intensity: 7000.0,
-                shadows_enabled: true,
-                #[cfg(feature = "native")]
-                soft_shadows_enabled: true,
+                shadows_enabled: false,
                 ..default()
             },
             RenderLayers::from(RenderLayer::VIEW_MODEL),
