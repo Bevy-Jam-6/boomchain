@@ -47,9 +47,9 @@ pub(super) fn plugin(app: &mut App) {
 
 fn setup_weapon_stats(trigger: Trigger<OnAdd, Player>, mut commands: Commands) {
     commands.entity(trigger.target()).insert(WeaponStats {
-        damage: 10.0,
-        pellets: 8,
-        spread_radius: 0.2,
+        damage: 5.0,
+        pellets: 16,
+        spread_radius: 0.15,
     });
 }
 
@@ -210,6 +210,7 @@ fn particle_bundle(effect: &BulletImpact) -> impl Bundle {
         RenderLayers::from(RenderLayer::PARTICLES),
     )
 }
+
 fn create_bullet_impact_asset() -> EffectAsset {
     let writer = ExprWriter::new();
 
@@ -235,7 +236,7 @@ fn create_bullet_impact_asset() -> EffectAsset {
     let init_vel = SetAttributeModifier::new(Attribute::VELOCITY, vel);
 
     // update
-    let update_accel = AccelModifier::new(writer.lit(Vec3::Y * -0.2).expr());
+    let update_accel = AccelModifier::new(writer.lit(Vec3::Y * -1.0).expr());
 
     // render
     let mut module = writer.finish();
