@@ -25,6 +25,10 @@ pub(super) fn plugin(app: &mut App) {
     app.add_observer(stagger_on_hit);
 }
 
+#[derive(Component, Clone, Copy, Debug, Default, Reflect)]
+#[reflect(Component)]
+pub struct Gib;
+
 fn on_enemy_death(
     trigger: Trigger<OnDeath>,
     enemies: Query<(&Transform, &NpcStats, Has<ExplodeOnDeath>)>,
@@ -61,6 +65,7 @@ fn on_enemy_death(
         let position = transform.translation + offset;
         commands
             .spawn((
+                Gib,
                 SceneRoot(gib.clone()),
                 Transform::from_translation(position).with_scale(Vec3::splat(stats.size)),
                 RigidBody::Dynamic,

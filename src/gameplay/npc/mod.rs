@@ -23,7 +23,7 @@ mod ai_state;
 mod animation;
 mod assets;
 mod attack;
-mod lifecycle;
+pub(crate) mod lifecycle;
 pub(crate) mod navigation;
 mod sound;
 pub(crate) mod stats;

@@ -1365,6 +1365,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_mesh_decal"
+version = "0.2.0"
+source = "git+https://github.com/Jondolf/bevy_mesh_decal?branch=bevy-jam-6#1ccf384cfe8cee692cd426daa299486ab9f1a614"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "bevy_mikktspace"
 version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2149,6 +2157,7 @@ dependencies = [
  "bevy_framepace",
  "bevy_hanabi",
  "bevy_landmass",
+ "bevy_mesh_decal",
  "bevy_mod_skinned_aabb",
  "bevy_shuffle_bag",
  "bevy_simple_subsecond_system",

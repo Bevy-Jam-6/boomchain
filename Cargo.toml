@@ -39,6 +39,7 @@ bevy_firework = { version = "0.7" }
 bevy_hanabi = { version = "0.16.0", default-features = false, features = [
     "3d",
 ] }
+bevy_mesh_decal = { version = "0.2" }
 
 # navigation
 bevy_landmass = { version = "0.9.0" }
@@ -180,5 +181,6 @@ oxidized_navigation = { git = "https://github.com/janhohenheim/oxidized_navigati
 landmass_oxidized_navigation = { git = "https://github.com/janhohenheim/landmass", branch = "bevy-0.16-oxidized" }
 landmass = { git = "https://github.com/janhohenheim/landmass", branch = "bevy-0.16-oxidized" }
 bevy_landmass = { git = "https://github.com/janhohenheim/landmass", branch = "bevy-0.16-oxidized" }
+bevy_mesh_decal = { git = "https://github.com/Jondolf/bevy_mesh_decal", branch = "bevy-jam-6" }
 # This rev includes massive performance improvements due to collider caching
 avian3d = { git = "https://github.com/Jondolf/avian" }

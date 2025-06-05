@@ -16,6 +16,7 @@ use bevy_hanabi::{
     ScalarType, ScalarValue, SetAttributeModifier, SetPositionSphereModifier,
     SetVelocitySphereModifier, ShapeDimension, SpawnerSettings, Value,
 };
+use bevy_mesh_decal::spray_decal;
 
 use super::{OnExplode, assets::ExplosionAssets};
 use crate::{
@@ -84,23 +85,42 @@ fn on_explode_prop(
 fn on_enemy_death(
     trigger: Trigger<OnDeath>,
     query: Query<(&GlobalTransform, Option<&NpcStats>), With<ExplodeOnDeath>>,
-    explosion_assets: ResMut<ExplosionAssets>,
+    mut explosion_assets: ResMut<ExplosionAssets>,
     mut commands: Commands,
 ) {
     let Ok((transform, stats)) = query.get(trigger.target()) else {
         return;
     };
+    let transform = transform.compute_transform();
+    let scale = stats.map_or(1.0, |s| s.size);
 
+    // Spawn the explosion particle effect.
     let properties = EffectProperties::default().with_properties([(
         "scale".to_string(),
-        Value::Scalar(ScalarValue::Float(stats.map_or(1.0, |s| s.size))),
+        Value::Scalar(ScalarValue::Float(scale)),
     )]);
     commands.spawn((
         ParticleEffect::new(explosion_assets.enemy_explosion_vfx.clone()),
         properties,
-        transform.compute_transform(),
+        transform,
         DespawnAfter::new(Duration::from_secs(2)),
     ));
+
+    // Spray some blood splatter decals.
+    let blood_decal_texture = explosion_assets
+        .blood_splatter
+        .pick(&mut rand::thread_rng())
+        .clone();
+
+    // Generate a somewhat randomized rotation for the spray decal.
+    let mut rotation = Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2);
+    rotation = Quat::from_rotation_y(rand::random::<f32>() * std::f32::consts::TAU) * rotation;
+    rotation = Quat::from_rotation_z(rand::random::<f32>() * 10f32.to_radians()) * rotation;
+
+    let spray_transform = transform
+        .with_scale(Vec3::new(scale * 2.0, scale * 2.0, scale * 2.0))
+        .with_rotation(rotation);
+    spray_decal(&mut commands, blood_decal_texture, spray_transform);
 }
 
 fn bevy_firework_prop_explosion() -> ParticleSpawner {
