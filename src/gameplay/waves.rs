@@ -78,6 +78,9 @@ pub(crate) struct WaveStartedPreparing;
 #[derive(Event)]
 pub(crate) struct WaveFinishedPreparing;
 
+#[derive(Event)]
+pub(crate) struct GameWon;
+
 fn advance_waves(
     mut waves: Single<&mut Waves>,
     packets: Res<SpawnPackets>,
@@ -111,7 +114,7 @@ fn advance_waves(
 
     if waves.is_finished() {
         if enemies.is_empty() {
-            info_once!("Game finished");
+            commands.trigger(GameWon);
         } else {
             info_once!("Game finished, but there are still enemies");
         }
@@ -152,7 +155,7 @@ fn advance_waves(
             let spawn_position = if let Some(hit) =
                 spatial_query.cast_ray(spawner_transform, dir, 100.0, true, &filter)
             {
-                spawner_transform + dir * (hit.distance - 0.2)
+                spawner_transform + dir * (hit.distance - 1.0).max(0.0)
             } else {
                 try_spawn_position
             };

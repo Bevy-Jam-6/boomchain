@@ -2,6 +2,7 @@
 
 mod credits;
 mod game_over;
+mod game_won;
 mod main;
 mod pause;
 mod settings;
@@ -17,6 +18,7 @@ pub(super) fn plugin(app: &mut App) {
         settings::plugin,
         pause::plugin,
         game_over::plugin,
+        game_won::plugin,
     ));
 }
 
