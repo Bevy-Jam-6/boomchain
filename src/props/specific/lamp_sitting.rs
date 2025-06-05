@@ -40,7 +40,7 @@ fn setup_lamp_sitting(
             Transform::from_xyz(0.0, 0.2, 0.0),
             PointLight {
                 color: Color::srgb(1.0, 0.7, 0.4),
-                intensity: 40_000.0,
+                intensity: 30_000.0,
                 radius: 0.05,
                 shadows_enabled: true,
                 #[cfg(feature = "native")]
