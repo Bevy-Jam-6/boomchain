@@ -2,9 +2,11 @@ use std::time::Duration;
 
 use crate::{
     RenderLayer,
-    audio::sound_effect,
+    audio::{sound_effect, sped_up_sound_effect},
     despawn_after::DespawnAfter,
-    gameplay::{crosshair::CrosshairState, health::OnDamage, player::camera_shake::OnTrauma},
+    gameplay::{
+        crosshair::CrosshairState, health::OnDamage, npc::Npc, player::camera_shake::OnTrauma,
+    },
     third_party::avian3d::CollisionLayer,
 };
 
@@ -138,6 +140,8 @@ fn handle_hits(
     player: Single<Entity, With<Player>>,
     bullet_impact: Res<BulletImpact>,
     mut commands: Commands,
+    npcs: Query<(), With<Npc>>,
+    mut player_assets: ResMut<PlayerAssets>,
 ) {
     let mut rng = &mut rand::thread_rng();
 
@@ -182,6 +186,17 @@ fn handle_hits(
                 origin + spread_direction * (first_hit.distance - bias).max(0.0),
             ),
         ));
+
+        if npcs.contains(first_hit.entity) {
+            // play jump sound sped up, sound like flesh impact
+            let rng = &mut rand::thread_rng();
+            let sound = player_assets.jump_start_sounds.pick(rng).clone();
+            commands.spawn(sped_up_sound_effect(sound.clone()));
+        } else {
+            // play throw sound sped up, sounds like wall impact
+            let sound = player_assets.throw_sound.clone();
+            commands.spawn(sped_up_sound_effect(sound.clone()));
+        }
 
         let Ok(ColliderOf { body }) = collider_of.get(first_hit.entity) else {
             error!("Hit something without a rigid body");
