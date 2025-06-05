@@ -87,6 +87,12 @@ fn on_enemy_death(
     }
 
     commands.entity(entity).insert(Despawn);
+    commands.entity(entity).queue_handled(
+        |mut entity: EntityWorldMut| {
+            entity.despawn_related::<Vocal>();
+        },
+        bevy::ecs::error::ignore,
+    );
 
     if explode_on_death {
         commands.entity(entity).trigger(OnExplode);
