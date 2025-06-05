@@ -115,8 +115,17 @@ impl FromWorld for NpcAssets {
                 rng,
             )
             .unwrap(),
-            attack_sound: ShuffleBag::try_new([assets.load("audio/sound_effects/throw.ogg")], rng)
-                .unwrap(),
+            attack_sound: ShuffleBag::try_new(
+                [
+                    assets.load("audio/sound_effects/zombie/whoosh-1.ogg"),
+                    assets.load("audio/sound_effects/zombie/whoosh-2.ogg"),
+                    assets.load("audio/sound_effects/zombie/whoosh-3.ogg"),
+                    assets.load("audio/sound_effects/zombie/whoosh-4.ogg"),
+                    assets.load("audio/sound_effects/zombie/whoosh-5.ogg"),
+                ],
+                rng,
+            )
+            .unwrap(),
         }
     }
 }

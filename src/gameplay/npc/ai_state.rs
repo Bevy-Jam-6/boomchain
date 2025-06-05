@@ -1,4 +1,7 @@
-use bevy::prelude::*;
+use bevy::{
+    audio::{SpatialScale, Volume},
+    prelude::*,
+};
 use bevy_landmass::AgentState;
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
@@ -6,6 +9,7 @@ use rand::Rng as _;
 
 use crate::{
     PostPhysicsAppSystems,
+    audio::SoundEffect,
     gameplay::{
         npc::{assets::NpcAssets, lifecycle::enemy_sound_effect, stats::NpcStats},
         player::Player,
@@ -69,7 +73,17 @@ fn update_ai_state(
                         .attack_sound
                         .pick(&mut rand::thread_rng())
                         .clone();
-                    commands.spawn(enemy_sound_effect(handle, *transform, stats));
+                    let speed_mod = rand::thread_rng().gen_range(0.9..1.1);
+                    commands.spawn((
+                        *transform,
+                        AudioPlayer(handle),
+                        PlaybackSettings::DESPAWN
+                            .with_spatial(true)
+                            .with_volume(Volume::Linear(1.1))
+                            .with_speed(1.0 / stats.size * speed_mod)
+                            .with_spatial_scale(SpatialScale::new(1.0 / 7.5)),
+                        SoundEffect,
+                    ));
                 }
             }
             AiState::Stagger(timer) => {
