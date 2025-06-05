@@ -25,7 +25,10 @@ use crate::{
     RenderLayer,
     audio::SoundEffect,
     despawn_after::DespawnAfter,
-    gameplay::{explosion::ExplodeOnDeath, health::OnDeath, npc::stats::NpcStats},
+    gameplay::{
+        explosion::ExplodeOnDeath, health::OnDeath, npc::stats::NpcStats,
+        player::camera::CustomRenderLayer,
+    },
     platform_support::is_webgpu_or_native,
 };
 
@@ -73,15 +76,15 @@ fn on_explode_prop(
             Transform::from_translation(transform.translation()),
             DespawnAfter::new(Duration::from_secs(1)),
             ParticleEffect::new(explosion_assets.prop_explosion_vfx.clone()),
-            PointLight {
+            RenderLayers::from(RenderLayer::PARTICLES),
+            children![PointLight {
                 intensity: EXPLOSION_LIGHT_INTENSITY,
                 range: 10.0,
                 radius: 0.25,
                 shadows_enabled: false,
                 color: ORANGE.into(),
                 ..default()
-            },
-            RenderLayers::from(RenderLayer::PARTICLES),
+            }],
         ));
     } else {
         commands.spawn((
