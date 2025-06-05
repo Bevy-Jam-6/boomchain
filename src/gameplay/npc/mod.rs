@@ -90,7 +90,7 @@ fn on_add(
             ExplodeOnDeath,
             Explosive {
                 radius: stats.size * 2.5,
-                impulse_strength: 3.0,
+                impulse_strength: 5.0,
                 // Scale the damage based on the NPC size
                 // so that killing a larger NPC is more impactful.
                 damage: stats.size * 75.0,
