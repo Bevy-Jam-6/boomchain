@@ -1,4 +1,7 @@
-use bevy::{audio::Volume, prelude::*};
+use bevy::{
+    audio::{SpatialScale, Volume},
+    prelude::*,
+};
 
 use crate::{
     gameplay::{

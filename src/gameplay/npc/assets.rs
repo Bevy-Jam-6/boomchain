@@ -43,6 +43,10 @@ pub(crate) struct NpcAssets {
     pub(crate) steps: ShuffleBag<Handle<AudioSource>>,
     #[dependency]
     pub(crate) death_sound: ShuffleBag<Handle<AudioSource>>,
+    #[dependency]
+    pub(crate) idle_sound: ShuffleBag<Handle<AudioSource>>,
+    #[dependency]
+    pub(crate) stagger_sound: ShuffleBag<Handle<AudioSource>>,
 }
 
 impl FromWorld for NpcAssets {
@@ -82,6 +86,29 @@ impl FromWorld for NpcAssets {
                     assets.load("audio/sound_effects/impact/Impact02.ogg"),
                     assets.load("audio/sound_effects/impact/Impact04.ogg"),
                     assets.load("audio/sound_effects/impact/Impact08.ogg"),
+                ],
+                rng,
+            )
+            .unwrap(),
+            idle_sound: ShuffleBag::try_new(
+                [
+                    assets.load("audio/sound_effects/zombie/01-intimidating-breathing.wav"),
+                    assets.load("audio/sound_effects/zombie/02-pained-exhale.wav"),
+                    assets.load("audio/sound_effects/zombie/04-shriek.wav"),
+                    assets.load("audio/sound_effects/zombie/05-idle-breathing.wav"),
+                    assets.load("audio/sound_effects/zombie/08-roar.wav"),
+                    //assets.load("audio/sound_effects/zombie/09-tantrum.wav"),
+                    assets.load("audio/sound_effects/zombie/10-conversational.wav"),
+                    assets.load("audio/sound_effects/zombie/11-weak-defiance.wav"),
+                ],
+                rng,
+            )
+            .unwrap(),
+            stagger_sound: ShuffleBag::try_new(
+                [
+                    assets.load("audio/sound_effects/zombie/03-lunging-snarl.wav"),
+                    assets.load("audio/sound_effects/zombie/07-grunt.wav"),
+                    //assets.load("audio/sound_effects/zombie/06-growl.wav"),
                 ],
                 rng,
             )
