@@ -94,23 +94,23 @@ impl FromWorld for NpcAssets {
             .unwrap(),
             idle_sound: ShuffleBag::try_new(
                 [
-                    assets.load("audio/sound_effects/zombie/01-intimidating-breathing.wav"),
-                    assets.load("audio/sound_effects/zombie/02-pained-exhale.wav"),
-                    assets.load("audio/sound_effects/zombie/04-shriek.wav"),
-                    assets.load("audio/sound_effects/zombie/05-idle-breathing.wav"),
-                    assets.load("audio/sound_effects/zombie/08-roar.wav"),
-                    //assets.load("audio/sound_effects/zombie/09-tantrum.wav"),
-                    assets.load("audio/sound_effects/zombie/10-conversational.wav"),
-                    assets.load("audio/sound_effects/zombie/11-weak-defiance.wav"),
+                    assets.load("audio/sound_effects/zombie/01-intimidating-breathing.ogg"),
+                    assets.load("audio/sound_effects/zombie/02-pained-exhale.ogg"),
+                    assets.load("audio/sound_effects/zombie/04-shriek.ogg"),
+                    assets.load("audio/sound_effects/zombie/05-idle-breathing.ogg"),
+                    assets.load("audio/sound_effects/zombie/08-roar.ogg"),
+                    //assets.load("audio/sound_effects/zombie/09-tantrum.ogg"),
+                    assets.load("audio/sound_effects/zombie/10-conversational.ogg"),
+                    assets.load("audio/sound_effects/zombie/11-weak-defiance.ogg"),
                 ],
                 rng,
             )
             .unwrap(),
             stagger_sound: ShuffleBag::try_new(
                 [
-                    assets.load("audio/sound_effects/zombie/03-lunging-snarl.wav"),
-                    assets.load("audio/sound_effects/zombie/07-grunt.wav"),
-                    //assets.load("audio/sound_effects/zombie/06-growl.wav"),
+                    assets.load("audio/sound_effects/zombie/03-lunging-snarl.ogg"),
+                    assets.load("audio/sound_effects/zombie/07-grunt.ogg"),
+                    //assets.load("audio/sound_effects/zombie/06-growl.ogg"),
                 ],
                 rng,
             )

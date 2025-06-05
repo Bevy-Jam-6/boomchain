@@ -114,10 +114,10 @@ impl FromWorld for PlayerAssets {
             reload_sound: assets.load("audio/sound_effects/shoot/Shotgun_Pump.ogg"),
             hurt_sounds: ShuffleBag::try_new(
                 [
-                    assets.load("audio/sound_effects/hurt/damage_1_meghan.wav"),
-                    assets.load("audio/sound_effects/hurt/damage_2_meghan.wav"),
-                    assets.load("audio/sound_effects/hurt/damage_4_meghan.wav"),
-                    assets.load("audio/sound_effects/hurt/damage_7_meghan.wav"),
+                    assets.load("audio/sound_effects/hurt/damage_1_meghan.ogg"),
+                    assets.load("audio/sound_effects/hurt/damage_2_meghan.ogg"),
+                    assets.load("audio/sound_effects/hurt/damage_4_meghan.ogg"),
+                    assets.load("audio/sound_effects/hurt/damage_7_meghan.ogg"),
                 ],
                 rng,
             )
