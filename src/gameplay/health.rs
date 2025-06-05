@@ -1,9 +1,8 @@
-use bevy::{prelude::*, ui::Val::*};
+use bevy::prelude::*;
 
-use crate::{PostPhysicsAppSystems, screens::Screen, theme::widget};
+use crate::PostPhysicsAppSystems;
 
 pub(super) fn plugin(app: &mut App) {
-    app.add_systems(OnEnter(Screen::Gameplay), spawn_health_hud);
     app.register_type::<Health>();
     app.add_systems(
         Update,
@@ -22,6 +21,10 @@ pub(crate) struct Health {
 impl Health {
     pub(crate) fn new(max: f32) -> Self {
         Self { current: max, max }
+    }
+
+    pub(crate) fn fraction(&self) -> f32 {
+        self.current / self.max
     }
 
     fn damage(&mut self, amount: f32) {
@@ -43,26 +46,6 @@ impl Default for Health {
     }
 }
 
-fn spawn_health_hud(mut commands: Commands) {
-    commands.spawn((
-        Name::new("Health HUD"),
-        GlobalZIndex(2),
-        StateScoped(Screen::Gameplay),
-        Node {
-            position_type: PositionType::Absolute,
-            width: Percent(100.0),
-            height: Percent(100.0),
-            align_items: AlignItems::End,
-            justify_content: JustifyContent::Center,
-            bottom: Px(20.0),
-            ..default()
-        },
-        // Don't block picking events for other UI roots.
-        Pickable::IGNORE,
-        children![widget::label("Health")],
-    ));
-}
-
 fn on_damage(trigger: Trigger<OnDamage>, mut health: Query<&mut Health>, mut commands: Commands) {
     let entity = trigger.target();
     let Ok(mut health) = health.get_mut(entity) else {
@@ -70,7 +53,7 @@ fn on_damage(trigger: Trigger<OnDamage>, mut health: Query<&mut Health>, mut com
     };
     health.damage(trigger.event().0);
     if health.is_dead() {
-        commands.entity(entity).trigger(OnDeath);
+        commands.entity(entity).remove::<Health>().trigger(OnDeath);
     }
 }
 

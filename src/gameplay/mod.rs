@@ -9,6 +9,7 @@ mod animation;
 pub(crate) mod crosshair;
 pub(crate) mod explosion;
 pub(crate) mod health;
+pub(crate) mod hud;
 pub(crate) mod level;
 pub(crate) mod npc;
 pub(crate) mod player;
@@ -22,6 +23,7 @@ pub(super) fn plugin(app: &mut App) {
         npc::plugin,
         player::plugin,
         health::plugin,
+        hud::plugin,
         waves::plugin,
         // This plugin preloads the level,
         // so make sure to add it last.
