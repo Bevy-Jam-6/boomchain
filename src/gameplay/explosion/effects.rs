@@ -3,6 +3,7 @@ use std::time::Duration;
 use bevy::{
     audio::{SpatialScale, Volume},
     prelude::*,
+    render::view::RenderLayers,
 };
 use bevy_firework::{
     bevy_utilitarian::prelude::RandF32,
@@ -20,6 +21,7 @@ use bevy_mesh_decal::spray_decal;
 
 use super::{OnExplode, assets::ExplosionAssets};
 use crate::{
+    RenderLayer,
     audio::SoundEffect,
     despawn_after::DespawnAfter,
     gameplay::{explosion::ExplodeOnDeath, health::OnDeath, npc::stats::NpcStats},
@@ -65,8 +67,9 @@ fn on_explode_prop(
 
     // Use Hanabi if supported, otherwise use `bevy_firework` as a fallback.
     if is_webgpu_or_native() {
-        commands.entity(entity).insert(ParticleEffect::new(
-            explosion_assets.prop_explosion_vfx.clone(),
+        commands.entity(entity).insert((
+            ParticleEffect::new(explosion_assets.prop_explosion_vfx.clone()),
+            RenderLayers::from(RenderLayer::PARTICLES),
         ));
     } else {
         commands
@@ -104,6 +107,7 @@ fn on_enemy_death(
         properties,
         transform,
         DespawnAfter::new(Duration::from_secs(2)),
+        RenderLayers::from(RenderLayer::PARTICLES),
     ));
 
     // Spray some blood splatter decals.
