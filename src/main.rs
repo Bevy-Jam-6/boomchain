@@ -10,6 +10,7 @@ mod despawn_after;
 mod dev_tools;
 mod directional_light;
 mod fixed_update_inspection;
+mod font;
 mod gameplay;
 mod hdr;
 mod menus;
@@ -109,6 +110,7 @@ fn main() -> AppExit {
         #[cfg(feature = "dev")]
         dev_tools::plugin,
         directional_light::plugin,
+        font::plugin,
         screens::plugin,
         menus::plugin,
         props::plugin,

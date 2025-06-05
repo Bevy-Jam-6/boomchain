@@ -2,12 +2,13 @@ use std::time::Duration;
 
 use bevy::{
     audio::{SpatialScale, Volume},
+    color::palettes::css::ORANGE,
     prelude::*,
     render::view::RenderLayers,
 };
 use bevy_firework::{
     bevy_utilitarian::prelude::RandF32,
-    core::{BlendMode, ParticleSpawner, ParticleSpawnerFinished, SpawnTransformMode},
+    core::{BlendMode, ParticleSpawner, SpawnTransformMode},
     curve::FireworkGradient,
     emission_shape::EmissionShape,
 };
@@ -28,11 +29,14 @@ use crate::{
     platform_support::is_webgpu_or_native,
 };
 
+const EXPLOSION_LIGHT_INTENSITY: f32 = 50_000.0;
+
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<PropExplosionVfx>();
 
     app.add_observer(on_explode_prop);
     app.add_observer(on_enemy_death);
+    app.add_systems(Update, fade_out_despawned_point_light);
 }
 
 #[derive(Component, Debug, Default, Reflect)]
@@ -52,36 +56,47 @@ fn on_explode_prop(
     let rng = &mut rand::thread_rng();
     let sound_effect = explosion_assets.prop_explosion_sfx.pick(rng).clone();
 
-    let entity = commands
-        .spawn((
-            transform.compute_transform(),
-            AudioPlayer(sound_effect),
-            PlaybackSettings::DESPAWN
-                .with_spatial(true)
-                .with_speed(0.9)
-                .with_volume(Volume::Linear(3.5))
-                .with_spatial_scale(SpatialScale::new(1.0 / 10.0)),
-            SoundEffect,
-        ))
-        .id();
+    commands.spawn((
+        transform.compute_transform(),
+        AudioPlayer(sound_effect),
+        PlaybackSettings::DESPAWN
+            .with_spatial(true)
+            .with_speed(0.9)
+            .with_volume(Volume::Linear(3.5))
+            .with_spatial_scale(SpatialScale::new(1.0 / 10.0)),
+        SoundEffect,
+    ));
 
     // Use Hanabi if supported, otherwise use `bevy_firework` as a fallback.
     if is_webgpu_or_native() {
-        commands.entity(entity).insert((
+        commands.spawn((
+            Transform::from_translation(transform.translation()),
+            DespawnAfter::new(Duration::from_secs(1)),
             ParticleEffect::new(explosion_assets.prop_explosion_vfx.clone()),
+            PointLight {
+                intensity: EXPLOSION_LIGHT_INTENSITY,
+                range: 10.0,
+                radius: 0.25,
+                shadows_enabled: false,
+                color: ORANGE.into(),
+                ..default()
+            },
             RenderLayers::from(RenderLayer::PARTICLES),
         ));
     } else {
-        commands
-            .spawn((
-                bevy_firework_prop_explosion(),
-                Transform::from_translation(transform.translation() + Vec3::Y),
-            ))
-            .observe(
-                |trigger: Trigger<ParticleSpawnerFinished>, mut commands: Commands| {
-                    commands.entity(trigger.target()).despawn();
-                },
-            );
+        commands.spawn((
+            bevy_firework_prop_explosion(),
+            Transform::from_translation(transform.translation()),
+            DespawnAfter::new(Duration::from_secs(1)),
+            PointLight {
+                intensity: EXPLOSION_LIGHT_INTENSITY,
+                range: 10.0,
+                radius: 0.25,
+                shadows_enabled: false,
+                color: ORANGE.into(),
+                ..default()
+            },
+        ));
     }
 }
 
@@ -106,7 +121,7 @@ fn on_enemy_death(
         ParticleEffect::new(explosion_assets.enemy_explosion_vfx.clone()),
         properties,
         transform,
-        DespawnAfter::new(Duration::from_secs(2)),
+        DespawnAfter::new(Duration::from_secs(1)),
         RenderLayers::from(RenderLayer::PARTICLES),
     ));
 
@@ -285,4 +300,10 @@ pub(super) fn hanabi_enemy_explosion(world: &mut World) -> EffectAsset {
             mask: ColorBlendMask::RGBA,
         })
         .mesh(unit_sphere)
+}
+
+fn fade_out_despawned_point_light(mut query: Query<(&mut PointLight, &DespawnAfter)>) {
+    for (mut light, despawn_timer) in query.iter_mut() {
+        light.intensity = EXPLOSION_LIGHT_INTENSITY.lerp(0.0, despawn_timer.0.fraction());
+    }
 }
