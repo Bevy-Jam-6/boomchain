@@ -53,7 +53,7 @@ impl FromWorld for LevelAssets {
 
         Self {
             level: assets.load("maps/main/main.map#Scene"),
-            music: assets.load("audio/music/Ambiance_Rain_Calm_Loop_Stereo.ogg"),
+            music: assets.load("audio/music/boomchain.ogg"),
             env_map_specular: assets.load("cubemaps/NightSkyHDRI001_4K-HDR_specular.ktx2"),
             env_map_diffuse: assets.load("cubemaps/NightSkyHDRI001_4K-HDR_diffuse.ktx2"),
         }

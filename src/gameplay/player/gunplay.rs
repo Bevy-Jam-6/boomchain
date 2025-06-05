@@ -2,9 +2,11 @@ use std::time::Duration;
 
 use crate::{
     RenderLayer,
-    audio::sound_effect,
+    audio::{sound_effect, sped_up_sound_effect},
     despawn_after::DespawnAfter,
-    gameplay::{crosshair::CrosshairState, health::OnDamage, player::camera_shake::OnTrauma},
+    gameplay::{
+        crosshair::CrosshairState, health::OnDamage, npc::Npc, player::camera_shake::OnTrauma,
+    },
     third_party::avian3d::CollisionLayer,
 };
 
@@ -47,9 +49,9 @@ pub(super) fn plugin(app: &mut App) {
 
 fn setup_weapon_stats(trigger: Trigger<OnAdd, Player>, mut commands: Commands) {
     commands.entity(trigger.target()).insert(WeaponStats {
-        damage: 10.0,
-        pellets: 8,
-        spread_radius: 0.2,
+        damage: 5.0,
+        pellets: 16,
+        spread_radius: 0.15,
     });
 }
 
@@ -138,6 +140,8 @@ fn handle_hits(
     player: Single<Entity, With<Player>>,
     bullet_impact: Res<BulletImpact>,
     mut commands: Commands,
+    npcs: Query<(), With<Npc>>,
+    mut player_assets: ResMut<PlayerAssets>,
 ) {
     let mut rng = &mut rand::thread_rng();
 
@@ -183,6 +187,17 @@ fn handle_hits(
             ),
         ));
 
+        if npcs.contains(first_hit.entity) {
+            // play jump sound sped up, sound like flesh impact
+            let rng = &mut rand::thread_rng();
+            let sound = player_assets.jump_start_sounds.pick(rng).clone();
+            commands.spawn(sped_up_sound_effect(sound.clone()));
+        } else {
+            // play throw sound sped up, sounds like wall impact
+            let sound = player_assets.throw_sound.clone();
+            commands.spawn(sped_up_sound_effect(sound.clone()));
+        }
+
         let Ok(ColliderOf { body }) = collider_of.get(first_hit.entity) else {
             error!("Hit something without a rigid body");
             continue;
@@ -210,6 +225,7 @@ fn particle_bundle(effect: &BulletImpact) -> impl Bundle {
         RenderLayers::from(RenderLayer::PARTICLES),
     )
 }
+
 fn create_bullet_impact_asset() -> EffectAsset {
     let writer = ExprWriter::new();
 
@@ -235,7 +251,7 @@ fn create_bullet_impact_asset() -> EffectAsset {
     let init_vel = SetAttributeModifier::new(Attribute::VELOCITY, vel);
 
     // update
-    let update_accel = AccelModifier::new(writer.lit(Vec3::Y * -0.2).expr());
+    let update_accel = AccelModifier::new(writer.lit(Vec3::Y * -1.0).expr());
 
     // render
     let mut module = writer.finish();
