@@ -25,9 +25,7 @@ use crate::{
     RenderLayer,
     audio::SoundEffect,
     despawn_after::DespawnAfter,
-    gameplay::{
-        explosion::ExplodeOnDeath, health::OnDeath, npc::stats::NpcStats,
-    },
+    gameplay::{explosion::ExplodeOnDeath, health::OnDeath, npc::stats::NpcStats},
     platform_support::is_webgpu_or_native,
 };
 
