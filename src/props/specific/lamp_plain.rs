@@ -1,10 +1,12 @@
-use avian3d::prelude::*;
 use bevy::prelude::*;
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
 use bevy_trenchbroom::prelude::*;
 
-use crate::props::{effects::disable_shadow_casting_on_instance_ready, setup::static_bundle};
+use crate::{
+    props::effects::disable_shadow_casting_on_instance_ready,
+    third_party::bevy_trenchbroom::LoadTrenchbroomModel as _,
+};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_observer(setup_lamp_wall_electric);
@@ -39,10 +41,11 @@ fn setup_lamp_wall_electric(
     mut commands: Commands,
 ) {
     let lamp = lamp.get(trigger.target()).unwrap();
-    let bundle = static_bundle::<LampPlain>(&asset_server, ColliderConstructor::ConvexHullFromMesh);
+
+    let model = asset_server.load_trenchbroom_model::<LampPlain>();
     commands
         .entity(trigger.target())
-        .insert(bundle)
+        .insert(SceneRoot(model))
         .with_child((
             Transform::from_xyz(0.0, -0.08, 0.0),
             PointLight {

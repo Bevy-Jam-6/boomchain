@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use avian3d::prelude::*;
 use bevy::{platform::collections::HashMap, prelude::*, time::Stopwatch};
 use bevy_trenchbroom::prelude::*;
 use rand::seq::SliceRandom as _;
@@ -11,6 +12,7 @@ use crate::{
         npc::{Npc, stats::NpcStats},
     },
     props::generic::BarrelLargeClosed,
+    third_party::avian3d::CollisionLayer,
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -82,6 +84,7 @@ fn advance_waves(
     time: Res<Time>,
     enemies: Query<(), With<Npc>>,
     spawners: Query<(&Transform, &Spawner)>,
+    spatial_query: SpatialQuery,
     mut commands: Commands,
 ) {
     let is_preparing_before = waves.is_preparing();
@@ -140,7 +143,19 @@ fn advance_waves(
             let spawner_radius = spawner.radius;
             let pos2 = Circle::new(spawner_radius).sample_interior(&mut rand::thread_rng());
             let pos3 = Vec3::new(pos2.x, 0.0, pos2.y);
-            let spawn_position = spawner_transform + pos3;
+            let try_spawn_position = spawner_transform + pos3;
+            let Ok(dir) = Dir3::try_from(try_spawn_position - spawner_transform) else {
+                error!("Invalid direction, skipping spawn");
+                continue;
+            };
+            let filter = SpatialQueryFilter::default().with_mask([CollisionLayer::Default]);
+            let spawn_position = if let Some(hit) =
+                spatial_query.cast_ray(spawner_transform, dir, 100.0, true, &filter)
+            {
+                spawner_transform + dir * (hit.distance - 0.2)
+            } else {
+                try_spawn_position
+            };
             let mut spawn_commands = commands.spawn((
                 Visibility::Inherited,
                 Transform::from_translation(spawn_position),
@@ -183,7 +198,7 @@ fn advance_waves(
                         Name::new("Small Enemy"),
                         Npc,
                         NpcStats {
-                            health: 50.0,
+                            health: 30.0,
                             desired_speed: 13.0,
                             max_speed: 13.0,
                             attack_damage: 10.0,
