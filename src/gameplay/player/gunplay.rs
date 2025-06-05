@@ -77,7 +77,7 @@ fn remove_shooting(
     mut timer: Local<Option<Timer>>,
     mut commands: Commands,
 ) {
-    let reload_time = 410;
+    let reload_time = 375;
     let timer = timer.get_or_insert_with(|| {
         Timer::new(Duration::from_millis(reload_time), TimerMode::Repeating)
     });
