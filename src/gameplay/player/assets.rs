@@ -41,6 +41,8 @@ pub(crate) struct PlayerAssets {
     pub(crate) walk_animation: Handle<AnimationClip>,
     #[dependency]
     pub(crate) shoot_animation: Handle<AnimationClip>,
+    #[dependency]
+    pub(crate) hurt_sounds: ShuffleBag<Handle<AudioSource>>,
 }
 
 impl FromWorld for PlayerAssets {
@@ -110,6 +112,16 @@ impl FromWorld for PlayerAssets {
             )
             .unwrap(),
             reload_sound: assets.load("audio/sound_effects/shoot/Shotgun_Pump.ogg"),
+            hurt_sounds: ShuffleBag::try_new(
+                [
+                    assets.load("audio/sound_effects/hurt/damage_1_meghan.ogg"),
+                    assets.load("audio/sound_effects/hurt/damage_2_meghan.ogg"),
+                    assets.load("audio/sound_effects/hurt/damage_4_meghan.ogg"),
+                    assets.load("audio/sound_effects/hurt/damage_7_meghan.ogg"),
+                ],
+                rng,
+            )
+            .unwrap(),
             hidden_animation: assets.load(Player::animation_path(0)),
             idle_animation: assets.load(Player::animation_path(1)),
             shoot_animation: assets.load(Player::animation_path(2)),

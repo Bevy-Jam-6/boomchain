@@ -1,4 +1,7 @@
-use bevy::prelude::*;
+use bevy::{
+    audio::{SpatialScale, Volume},
+    prelude::*,
+};
 use bevy_landmass::AgentState;
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
@@ -6,7 +9,11 @@ use rand::Rng as _;
 
 use crate::{
     PostPhysicsAppSystems,
-    gameplay::{npc::stats::NpcStats, player::Player},
+    audio::SoundEffect,
+    gameplay::{
+        npc::{assets::NpcAssets, stats::NpcStats},
+        player::Player,
+    },
 };
 
 use super::{attack::Attacking, navigation::Agent};
@@ -41,6 +48,7 @@ fn update_ai_state(
     )>,
     player: Single<&Transform, With<Player>>,
     agent_state: Query<&AgentState>,
+    mut npc_assets: ResMut<NpcAssets>,
     mut commands: Commands,
 ) {
     for (entity, mut ai_state, stats, agent, transform, attacking) in &mut ai_state {
@@ -61,6 +69,21 @@ fn update_ai_state(
                         speed: rand::thread_rng().gen_range(stats.attack_speed_range.clone()),
                         damage: stats.attack_damage,
                     });
+                    let handle = npc_assets
+                        .attack_sound
+                        .pick(&mut rand::thread_rng())
+                        .clone();
+                    let speed_mod = rand::thread_rng().gen_range(0.9..1.1);
+                    commands.spawn((
+                        *transform,
+                        AudioPlayer(handle),
+                        PlaybackSettings::DESPAWN
+                            .with_spatial(true)
+                            .with_volume(Volume::Linear(1.1))
+                            .with_speed(1.0 / stats.size * speed_mod)
+                            .with_spatial_scale(SpatialScale::new(1.0 / 7.5)),
+                        SoundEffect,
+                    ));
                 }
             }
             AiState::Stagger(timer) => {

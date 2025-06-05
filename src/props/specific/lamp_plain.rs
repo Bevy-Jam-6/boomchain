@@ -25,8 +25,8 @@ struct LampPlain {
 impl Default for LampPlain {
     fn default() -> Self {
         Self {
-            color: Color::srgb_u8(180, 180, 232),
-            intensity: 13_000.0,
+            color: Color::srgb_u8(170, 210, 255),
+            intensity: 20_000.0,
         }
     }
 }
@@ -44,12 +44,12 @@ fn setup_lamp_wall_electric(
         .entity(trigger.target())
         .insert(bundle)
         .with_child((
-            Transform::from_xyz(0.0, -0.08, -0.35),
+            Transform::from_xyz(0.0, -0.08, 0.0),
             PointLight {
                 color: lamp.color,
                 intensity: lamp.intensity,
-                radius: 0.05,
-                range: 20.0,
+                radius: 0.1,
+                range: 50.0,
                 shadows_enabled: true,
                 #[cfg(feature = "native")]
                 soft_shadows_enabled: true,

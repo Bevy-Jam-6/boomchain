@@ -1,8 +1,11 @@
 use bevy::prelude::*;
 
-use crate::gameplay::{
-    health::OnDamage,
-    player::{Player, camera_shake::OnTrauma},
+use crate::{
+    audio::sound_effect,
+    gameplay::{
+        health::{Health, OnDamage},
+        player::{Player, assets::PlayerAssets, camera_shake::OnTrauma},
+    },
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -11,15 +14,23 @@ pub(super) fn plugin(app: &mut App) {
 
 fn shake_on_hit(
     trigger: Trigger<OnDamage>,
-    player: Query<(), With<Player>>,
+    player: Query<&Health, With<Player>>,
     mut commands: Commands,
+    mut player_assets: ResMut<PlayerAssets>,
 ) {
-    if !player.contains(trigger.target()) {
+    let Ok(health) = player.get(trigger.target()) else {
         return;
-    }
+    };
+
     let base_trauma = 0.7 / 10.0;
     let dmg = trigger.event().0;
-    commands
-        .entity(trigger.target())
-        .trigger(OnTrauma(base_trauma * dmg));
+    commands.trigger(OnTrauma(base_trauma * dmg));
+
+    if !health.is_dead() {
+        let handle = player_assets
+            .hurt_sounds
+            .pick(&mut rand::thread_rng())
+            .clone();
+        commands.spawn(sound_effect(handle));
+    }
 }

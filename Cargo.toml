@@ -20,6 +20,7 @@ bevy = { version = "0.16", features = [
     "png",
     "wayland",
     "webgpu",
+    "wav",
     # Due to some Bevy bug, we SOMETIMES need to enable the UI debug plugin even in non-dev builds,
     # otherwise we only render the view model and the skybox.
     # "bevy_ui_debug",
