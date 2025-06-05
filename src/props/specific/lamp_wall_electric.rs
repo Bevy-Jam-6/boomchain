@@ -1,11 +1,10 @@
-use avian3d::prelude::*;
 use bevy::prelude::*;
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
 use bevy_trenchbroom::prelude::*;
 
 use crate::{
-    props::{effects::disable_shadow_casting_on_instance_ready, setup::static_bundle},
+    props::effects::disable_shadow_casting_on_instance_ready,
     third_party::bevy_trenchbroom::LoadTrenchbroomModel as _,
 };
 
