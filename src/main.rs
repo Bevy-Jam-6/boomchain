@@ -8,6 +8,7 @@ mod auto_timer;
 mod despawn_after;
 #[cfg(feature = "dev")]
 mod dev_tools;
+mod directional_light;
 mod fixed_update_inspection;
 mod gameplay;
 mod hdr;
@@ -107,6 +108,7 @@ fn main() -> AppExit {
         asset_tracking::plugin,
         #[cfg(feature = "dev")]
         dev_tools::plugin,
+        directional_light::plugin,
         screens::plugin,
         menus::plugin,
         props::plugin,

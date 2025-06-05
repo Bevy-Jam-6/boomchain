@@ -88,7 +88,7 @@ fn spawn_view_model(
     let env_map = EnvironmentMapLight {
         diffuse_map: level_assets.env_map_diffuse.clone(),
         specular_map: level_assets.env_map_specular.clone(),
-        intensity: 1000.0,
+        intensity: 500.0,
         ..default()
     };
     commands
