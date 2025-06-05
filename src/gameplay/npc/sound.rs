@@ -1,7 +1,9 @@
 //! NPC sound handling. The only sound is a step sound that plays when the NPC is walking.
 
 use super::{Npc, assets::NpcAssets};
-use crate::{PostPhysicsAppSystems, audio::SoundEffect, screens::Screen};
+use crate::{
+    PostPhysicsAppSystems, audio::SoundEffect, gameplay::health::OnDeath, screens::Screen,
+};
 use avian3d::prelude::LinearVelocity;
 use bevy::{
     audio::{SpatialScale, Volume},
@@ -19,6 +21,7 @@ pub(super) fn plugin(app: &mut App) {
             .run_if(in_state(Screen::Gameplay))
             .in_set(PostPhysicsAppSystems::PlaySounds),
     );
+    app.add_observer(on_death);
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
@@ -61,6 +64,34 @@ fn play_step_sound(
             .with_speed(1.5)
             .with_volume(Volume::Linear(1.6))
             .with_spatial_scale(SpatialScale::new(1.0 / 3.6)),
+        SoundEffect,
+    ));
+}
+
+#[cfg_attr(feature = "hot_patch", hot)]
+fn on_death(
+    trigger: Trigger<OnDeath>,
+    npc: Query<&GlobalTransform, With<Npc>>,
+    mut npc_assets: ResMut<NpcAssets>,
+    mut commands: Commands,
+) {
+    let entity = trigger.target();
+
+    let Ok(transform) = npc.get(entity) else {
+        return;
+    };
+
+    let rng = &mut rand::thread_rng();
+    let death_sound = npc_assets.death_sound.pick(rng).clone();
+
+    commands.spawn((
+        transform.compute_transform(),
+        AudioPlayer(death_sound),
+        PlaybackSettings::DESPAWN
+            .with_spatial(true)
+            .with_speed(1.0)
+            .with_volume(Volume::Linear(4.0))
+            .with_spatial_scale(SpatialScale::new(1.0 / 10.0)),
         SoundEffect,
     ));
 }
