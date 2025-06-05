@@ -134,7 +134,7 @@ fn grunt_passively(
 
         commands.entity(entity).insert(Grunting);
         let handle = npc_assets.idle_sound.pick(&mut rand::thread_rng()).clone();
-        commands.spawn(spatial_sound_effect(handle, *transform, stats));
+        commands.spawn(enemy_sound_effect(handle, *transform, stats));
     }
 }
 
@@ -161,11 +161,11 @@ fn stagger_on_hit(
             .pick(&mut rand::thread_rng())
             .clone();
 
-        commands.spawn(spatial_sound_effect(handle, *transform, stats));
+        commands.spawn(enemy_sound_effect(handle, *transform, stats));
     }
 }
 
-fn spatial_sound_effect(
+pub(crate) fn enemy_sound_effect(
     handle: Handle<AudioSource>,
     transform: Transform,
     stats: &NpcStats,

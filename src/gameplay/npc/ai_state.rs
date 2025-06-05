@@ -6,7 +6,10 @@ use rand::Rng as _;
 
 use crate::{
     PostPhysicsAppSystems,
-    gameplay::{npc::stats::NpcStats, player::Player},
+    gameplay::{
+        npc::{assets::NpcAssets, lifecycle::enemy_sound_effect, stats::NpcStats},
+        player::Player,
+    },
 };
 
 use super::{attack::Attacking, navigation::Agent};
@@ -41,6 +44,7 @@ fn update_ai_state(
     )>,
     player: Single<&Transform, With<Player>>,
     agent_state: Query<&AgentState>,
+    mut npc_assets: ResMut<NpcAssets>,
     mut commands: Commands,
 ) {
     for (entity, mut ai_state, stats, agent, transform, attacking) in &mut ai_state {
@@ -61,6 +65,11 @@ fn update_ai_state(
                         speed: rand::thread_rng().gen_range(stats.attack_speed_range.clone()),
                         damage: stats.attack_damage,
                     });
+                    let handle = npc_assets
+                        .attack_sound
+                        .pick(&mut rand::thread_rng())
+                        .clone();
+                    commands.spawn(enemy_sound_effect(handle, *transform, stats));
                 }
             }
             AiState::Stagger(timer) => {

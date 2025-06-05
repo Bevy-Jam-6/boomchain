@@ -47,6 +47,8 @@ pub(crate) struct NpcAssets {
     pub(crate) idle_sound: ShuffleBag<Handle<AudioSource>>,
     #[dependency]
     pub(crate) stagger_sound: ShuffleBag<Handle<AudioSource>>,
+    #[dependency]
+    pub(crate) attack_sound: ShuffleBag<Handle<AudioSource>>,
 }
 
 impl FromWorld for NpcAssets {
@@ -113,6 +115,8 @@ impl FromWorld for NpcAssets {
                 rng,
             )
             .unwrap(),
+            attack_sound: ShuffleBag::try_new([assets.load("audio/sound_effects/throw.ogg")], rng)
+                .unwrap(),
         }
     }
 }
