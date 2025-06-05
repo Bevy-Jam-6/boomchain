@@ -1,5 +1,5 @@
 [package]
-name = "boomchain"
+name = "chainboom"
 description = "A 3D reference project and tech demo for the Bevy Engine."
 license = "MIT OR Apache-2.0 OR CC0-1.0"
 authors = ["Jan Hohenheim <jan@hohenheim.ch>"]
@@ -8,9 +8,9 @@ edition = "2024"
 exclude = ["assets"]
 readme = "readme.md"
 keywords = ["bevy", "demo", "3d", "game"]
-repository = "https://github.com/Bevy-Jam-6/boomchain"
+repository = "https://github.com/Bevy-Jam-6/chainboom"
 categories = ["game-development"]
-homepage = "https://janhohenheim.itch.io/boomchain"
+homepage = "https://janhohenheim.itch.io/chainboom"
 
 [dependencies]
 bevy = { version = "0.16", features = [

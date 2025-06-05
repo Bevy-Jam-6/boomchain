@@ -46,7 +46,7 @@ fn main() -> AppExit {
             })
             .set(WindowPlugin {
                 primary_window: Window {
-                    title: "Boomchain".to_string(),
+                    title: "Chainboom".to_string(),
                     fit_canvas_to_parent: true,
                     ..default()
                 }
