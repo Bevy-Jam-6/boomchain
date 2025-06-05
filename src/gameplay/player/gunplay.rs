@@ -9,7 +9,7 @@ use crate::{
         crosshair::CrosshairState,
         health::OnDamage,
         npc::Npc,
-        player::{camera::CustomRenderLayer, camera_shake::OnTrauma},
+        player::{PLAYER_FLOAT_HEIGHT, camera::CustomRenderLayer, camera_shake::OnTrauma},
     },
     third_party::avian3d::CollisionLayer,
 };
@@ -45,6 +45,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_observer(handle_hits);
     app.add_observer(shooting_sounds_reload);
     app.add_observer(spawn_muzzle_flash);
+    app.add_observer(shot_pushback);
 
     // Only until the animations work again.
     app.add_systems(Update, remove_shooting);
@@ -168,6 +169,39 @@ fn spawn_muzzle_flash(
             CustomRenderLayer,
         ));
     });
+}
+
+fn shot_pushback(
+    trigger: Trigger<OnAdd, Shooting>,
+    mut player: Query<(&mut LinearVelocity, &Collider), With<Player>>,
+    player_camera_parent: Single<&Transform, With<PlayerCamera>>,
+    spatial_query: SpatialQuery,
+) {
+    let Ok((mut lin_vel, collider)) = player.get_mut(trigger.target()) else {
+        return;
+    };
+    let back = player_camera_parent.back();
+    let pushback = 15.0;
+
+    // Cast the player's collider downwards to check if it's grounded.
+    // This seems to work better here than tnua's `is_airborne` check.
+    let max_distance = PLAYER_FLOAT_HEIGHT;
+    let filter = SpatialQueryFilter::default()
+        .with_mask([CollisionLayer::Default, CollisionLayer::Prop])
+        .with_excluded_entities([trigger.target()]);
+    let hit = spatial_query.cast_shape(
+        collider,
+        player_camera_parent.translation,
+        Quat::IDENTITY,
+        Dir3::NEG_Y,
+        &ShapeCastConfig::from_max_distance(max_distance),
+        &filter,
+    );
+
+    if hit.is_none() {
+        // Apply pushback
+        lin_vel.0 += back * pushback;
+    }
 }
 
 fn handle_hits(
