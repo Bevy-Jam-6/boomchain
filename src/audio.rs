@@ -72,8 +72,8 @@ fn sped_up_sound_effect_setup(
     mut audio_query: Query<(&PlaybackSettings, &mut AudioSink), With<SpedUpSoundEffect>>,
 ) {
     for (playback, mut sink) in &mut audio_query {
-        sink.set_speed(3.0);
-        sink.set_volume(playback.volume * global_volume.volume * Volume::Linear(0.4));
+        sink.set_speed(2.0);
+        sink.set_volume(playback.volume * global_volume.volume * Volume::Linear(2.0));
     }
 }
 
