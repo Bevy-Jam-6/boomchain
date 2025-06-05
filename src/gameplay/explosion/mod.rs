@@ -16,6 +16,8 @@ use crate::{
     third_party::avian3d::CollisionLayer,
 };
 
+pub const EXPLOSION_PLAYER_DAMAGE_SCALE: f32 = 0.1;
+
 pub(super) fn plugin(app: &mut App) {
     app.add_plugins((assets::plugin, effects::plugin));
 
@@ -58,6 +60,8 @@ pub(crate) struct Explosive {
     pub(crate) impulse_strength: f32,
     /// The damage dealt by the explosion.
     pub(crate) damage: f32,
+    /// Whether the explosion damages the player.
+    pub(crate) damages_player: bool,
 }
 
 impl Default for Explosive {
@@ -66,6 +70,7 @@ impl Default for Explosive {
             radius: 3.5,
             impulse_strength: 25.0,
             damage: 100.0,
+            damages_player: true,
         }
     }
 }
@@ -248,7 +253,7 @@ pub(crate) struct ExplosionHelper<'w, 's> {
             &'static RigidBodyColliders,
         ),
     >,
-    damageable_query: Query<'w, 's, (), (With<Health>, Without<Player>)>,
+    damageable_query: Query<'w, 's, Has<Player>, With<Health>>,
     spatial_query: SpatialQuery<'w, 's>,
     commands: Commands<'w, 's>,
 }
@@ -288,10 +293,19 @@ impl ExplosionHelper<'_, '_> {
             let global_com = transform.translation() + transform.rotation() * local_com.0;
 
             // If the entity has health, we apply damage to it.
-            if self.damageable_query.contains(body) {
+            if let Ok(is_player) = self.damageable_query.get(body) {
+                let mut damage = explosive.damage;
+
+                if is_player && !explosive.damages_player {
+                    continue;
+                }
+
+                if is_player {
+                    damage *= EXPLOSION_PLAYER_DAMAGE_SCALE;
+                }
+
                 // Use a small delay.
                 let delay = 0.2;
-                let damage = explosive.damage;
                 self.commands
                     .entity(body)
                     .try_insert_if_new(AutoTimer(Timer::from_seconds(delay, TimerMode::Once)))

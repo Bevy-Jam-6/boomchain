@@ -94,6 +94,7 @@ fn on_add(
                 // Scale the damage based on the NPC size
                 // so that killing a larger NPC is more impactful.
                 damage: stats.size * 75.0,
+                damages_player: false,
             },
         ))
         .with_child((

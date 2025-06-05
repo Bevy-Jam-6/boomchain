@@ -21,6 +21,9 @@ fn auto_tick(mut commands: Commands, time: Res<Time>, mut query: Query<(&mut Aut
             timer.tick(time.delta());
             if timer.just_finished() {
                 commands.trigger_targets(OnAutoTimerFinish, e);
+
+                // Remove the timer after it finishes.
+                commands.entity(e).try_remove::<AutoTimer>();
             }
         }
     }
