@@ -34,6 +34,7 @@ struct WeaponStats {
     damage: f32,
     pellets: u32,
     spread_radius: f32,
+    pushback: f32,
 }
 
 pub(super) fn plugin(app: &mut App) {
@@ -58,6 +59,7 @@ fn setup_weapon_stats(trigger: Trigger<OnAdd, Player>, mut commands: Commands) {
         damage: 5.0,
         pellets: 16,
         spread_radius: 0.15,
+        pushback: 12.0,
     });
 }
 
@@ -173,15 +175,14 @@ fn spawn_muzzle_flash(
 
 fn shot_pushback(
     trigger: Trigger<OnAdd, Shooting>,
-    mut player: Query<(&mut LinearVelocity, &Collider), With<Player>>,
+    mut player: Query<(&mut LinearVelocity, &Collider, &WeaponStats), With<Player>>,
     player_camera_parent: Single<&Transform, With<PlayerCamera>>,
     spatial_query: SpatialQuery,
 ) {
-    let Ok((mut lin_vel, collider)) = player.get_mut(trigger.target()) else {
+    let Ok((mut lin_vel, collider, weapon_stats)) = player.get_mut(trigger.target()) else {
         return;
     };
     let back = player_camera_parent.back();
-    let pushback = 15.0;
 
     // Cast the player's collider downwards to check if it's grounded.
     // This seems to work better here than tnua's `is_airborne` check.
@@ -200,7 +201,7 @@ fn shot_pushback(
 
     if hit.is_none() {
         // Apply pushback
-        lin_vel.0 += back * pushback;
+        lin_vel.0 += back * weapon_stats.pushback;
     }
 }
 
