@@ -59,12 +59,12 @@
 }
 // brush 6
 {
-( 80 -208 240 ) ( 80 -512 240 ) ( 80 -512 32 ) darkmod/stone/brick/red_worn_dirty_trim [ 0 -1 0 0 ] [ 0 0 -1 0 ] 0 0.1 0.1
-( 80 -512 240 ) ( 96 -512 240 ) ( 96 -512 32 ) darkmod/stone/brick/red_worn_dirty_trim [ 1 0 0 0 ] [ 0 0 -1 0 ] 180 0.1 0.1
-( 96 -512 32 ) ( 96 -208 32 ) ( 80 -208 32 ) darkmod/stone/brick/red_worn_dirty_trim [ -1 0 0 0 ] [ 0 -1 0 0 ] 0 0.1 0.1
-( 80 -208 240 ) ( 96 -208 240 ) ( 96 -512 240 ) darkmod/stone/brick/red_worn_dirty_trim [ 1 0 0 0 ] [ 0 -1 0 0 ] 90 0.1 0.1
-( 96 -208 32 ) ( 96 -208 240 ) ( 80 -208 240 ) darkmod/stone/brick/red_worn_dirty_trim [ -1 0 0 0 ] [ 0 0 -1 0 ] 0 0.1 0.1
-( 96 -512 240 ) ( 96 -208 240 ) ( 96 -208 32 ) darkmod/stone/brick/red_worn_dirty_trim [ 0 1 0 0 ] [ 0 0 -1 0 ] 0 0.1 0.1
+( 64 -208 240 ) ( 64 -512 240 ) ( 64 -512 32 ) darkmod/stone/brick/red_worn_dirty_trim [ 0 -1 0 0 ] [ 0 0 -1 0 ] 270 0.1 0.1
+( 64 -512 240 ) ( 80 -512 240 ) ( 80 -512 32 ) darkmod/stone/brick/red_worn_dirty_trim [ 1 0 0 160 ] [ 0 0 -1 0 ] 90 0.1 0.1
+( 80 -512 32 ) ( 80 -208 32 ) ( 64 -208 32 ) darkmod/stone/brick/red_worn_dirty_trim [ -1 0 0 -160 ] [ 0 -1 0 0 ] 270 0.1 0.1
+( 64 -208 272 ) ( 80 -208 272 ) ( 80 -512 272 ) darkmod/stone/brick/red_worn_dirty_trim [ 1 0 0 160 ] [ 0 -1 0 0 ] 270 0.1 0.1
+( 80 -208 32 ) ( 80 -208 240 ) ( 64 -208 240 ) darkmod/stone/brick/red_worn_dirty_trim [ -1 0 0 -160 ] [ 0 0 -1 0 ] 270 0.1 0.1
+( 80 -512 240 ) ( 80 -208 240 ) ( 80 -208 32 ) darkmod/stone/brick/red_worn_dirty_trim [ 0 1 0 0 ] [ 0 0 -1 0 ] 270 0.1 0.1
 }
 // brush 7
 {
@@ -776,7 +776,7 @@
 }
 // brush 86
 {
-( 96 -448 80 ) ( 96 -512 80 ) ( 96 -512 32 ) darkmod/stone/brick/rough_big_blocks02_cornerstone_dark [ 0 -1 0 0 ] [ 0 0 -1 0 ] 270 0.1 0.1
+( 80 -448 80 ) ( 80 -512 80 ) ( 80 -512 32 ) darkmod/stone/brick/rough_big_blocks02_cornerstone_dark [ 0 -1 0 0 ] [ 0 0 -1 0 ] 180 0.1 0.1
 ( 96 -512 80 ) ( 432 -512 80 ) ( 432 -512 32 ) darkmod/stone/brick/rough_big_blocks02_cornerstone_dark [ 1 0 0 0 ] [ 0 0 -1 0 ] 0 0.1 0.1
 ( 432 -512 32 ) ( 432 -448 32 ) ( 96 -448 32 ) darkmod/stone/brick/rough_big_blocks02_cornerstone_dark [ -1 0 0 0 ] [ 0 -1 0 0 ] 0 0.1 0.1
 ( 96 -448 80 ) ( 432 -448 80 ) ( 432 -512 80 ) darkmod/stone/brick/rough_big_blocks02_cornerstone_dark [ 1 0 0 0 ] [ 0 -1 0 0 ] 180 0.1 0.1
@@ -915,7 +915,7 @@
 }
 // brush 101
 {
-( 96 -432 80 ) ( 96 -432 64 ) ( 96 -352 32 ) darkmod/stone/brick/rough_big_blocks02_cornerstone_dark [ 0 -1 0 160.00024 ] [ 0 0 -1 0 ] 270 0.1 0.1
+( 80 -432 80 ) ( 80 -432 64 ) ( 80 -352 32 ) darkmod/stone/brick/rough_big_blocks02_cornerstone_dark [ 0 -1 0 160.00024 ] [ 0 0 -1 0 ] 180 0.1 0.1
 ( 96 -432 80 ) ( 176 -432 80 ) ( 176 -432 64 ) darkmod/stone/brick/rough_big_blocks02_cornerstone_dark [ 1 0 0 0 ] [ 0 0 -1 0 ] 270 0.1 0.1
 ( 176 -432 64 ) ( 176 -352 32 ) ( 96 -352 32 ) darkmod/stone/brick/rough_big_blocks02_cornerstone_dark [ -1 0 0 0 ] [ 0 -1 0 160 ] 270 0.1 0.1
 ( 96 -352 32 ) ( 176 -352 32 ) ( 176 -432 80 ) darkmod/stone/brick/rough_big_blocks02_cornerstone_dark [ 1 0 0 0 ] [ 0 -1 0 160 ] 270 0.1 0.1
@@ -2798,16 +2798,16 @@
 }
 // brush 303
 {
-( 80 -512 240 ) ( 80 -528 240 ) ( 80 -528 32 ) darkmod/stone/brick/red_worn_dirty_trim [ 0 -1 0 -160 ] [ 0 0 -1 0 ] 270 0.1 0.1
-( 80 -528 240 ) ( 96 -528 240 ) ( 96 -528 32 ) darkmod/stone/brick/red_worn_dirty_trim [ 1 0 0 0 ] [ 0 0 -1 0 ] 180 0.1 0.1
-( 96 -528 32 ) ( 96 -512 32 ) ( 80 -512 32 ) darkmod/stone/brick/red_worn_dirty_trim [ -1 0 0 0 ] [ 0 -1 0 -160 ] 270 0.1 0.1
-( 80 -512 240 ) ( 96 -512 240 ) ( 96 -528 240 ) darkmod/stone/brick/red_worn_dirty_trim [ 1 0 0 0 ] [ 0 -1 0 -160 ] 0 0.1 0.1
-( 96 -512 32 ) ( 96 -512 240 ) ( 80 -512 240 ) darkmod/stone/brick/red_worn_dirty_trim [ -1 0 0 0 ] [ 0 0 -1 0 ] 270 0.1 0.1
-( 96 -528 240 ) ( 96 -512 240 ) ( 96 -512 32 ) darkmod/stone/brick/red_worn_dirty_trim [ 0 1 0 160 ] [ 0 0 -1 0 ] 0 0.1 0.1
+( 64 -512 240 ) ( 64 -528 240 ) ( 64 -528 32 ) darkmod/stone/brick/red_worn_dirty_trim [ 0 -1 0 -160 ] [ 0 0 -1 0 ] 180 0.1 0.1
+( 64 -528 240 ) ( 80 -528 240 ) ( 80 -528 32 ) darkmod/stone/brick/red_worn_dirty_trim [ 1 0 0 160 ] [ 0 0 -1 0 ] 90 0.1 0.1
+( 80 -528 32 ) ( 80 -512 32 ) ( 64 -512 32 ) darkmod/stone/brick/red_worn_dirty_trim [ -1 0 0 -160 ] [ 0 -1 0 -160 ] 180 0.1 0.1
+( 64 -512 272 ) ( 80 -512 272 ) ( 80 -528 272 ) darkmod/stone/brick/red_worn_dirty_trim [ 1 0 0 160 ] [ 0 -1 0 -160 ] 180 0.1 0.1
+( 80 -512 32 ) ( 80 -512 240 ) ( 64 -512 240 ) darkmod/stone/brick/red_worn_dirty_trim [ -1 0 0 -160 ] [ 0 0 -1 0 ] 180 0.1 0.1
+( 80 -528 240 ) ( 80 -512 240 ) ( 80 -512 32 ) darkmod/stone/brick/red_worn_dirty_trim [ 0 1 0 160 ] [ 0 0 -1 0 ] 270 0.1 0.1
 }
 // brush 304
 {
-( 208 -512 240 ) ( 208 -528 240 ) ( 208 -528 32 ) darkmod/stone/brick/red_worn_dirty_trim [ 0 -1 0 -160 ] [ 0 0 -1 0 ] 270 0.1 0.1
+( 224 -512 240 ) ( 224 -528 240 ) ( 224 -528 32 ) darkmod/stone/brick/red_worn_dirty_trim [ 0 -1 0 -160 ] [ 0 0 -1 0 ] 180 0.1 0.1
 ( 208 -528 240 ) ( 432 -528 240 ) ( 432 -528 32 ) darkmod/stone/brick/red_worn_dirty_trim [ 1 0 0 0 ] [ 0 0 -1 0 ] 180 0.1 0.1
 ( 432 -528 32 ) ( 432 -512 32 ) ( 208 -512 32 ) darkmod/stone/brick/red_worn_dirty_trim [ -1 0 0 0 ] [ 0 -1 0 -160 ] 270 0.1 0.1
 ( 208 -512 240 ) ( 432 -512 240 ) ( 432 -528 240 ) darkmod/stone/brick/red_worn_dirty_trim [ 1 0 0 0 ] [ 0 -1 0 -160 ] 0 0.1 0.1
@@ -2816,8 +2816,8 @@
 }
 // brush 305
 {
-( 96 -208 256 ) ( 96 -496 256 ) ( 96 -496 240 ) darkmod/stone/cobblestones/blocks_smoky_large [ 0 -1 0 0 ] [ 0 0 -1 320 ] 180 0.1 0.1
-( 96 -496 256 ) ( 480 -496 256 ) ( 480 -496 240 ) darkmod/stone/cobblestones/blocks_smoky_large [ 1 0 0 0 ] [ 0 0 -1 320 ] 90 0.1 0.1
+( 80 -208 256 ) ( 80 -496 256 ) ( 80 -496 240 ) darkmod/stone/cobblestones/blocks_smoky_large [ 0 -1 0 0 ] [ 0 0 -1 320 ] 90 0.1 0.1
+( 96 -464 256 ) ( 480 -464 256 ) ( 480 -464 240 ) darkmod/stone/cobblestones/blocks_smoky_large [ 1 0 0 0 ] [ 0 0 -1 320 ] 0 0.1 0.1
 ( 480 -496 240 ) ( 480 -208 240 ) ( 96 -208 240 ) darkmod/stone/cobblestones/blocks_smoky_large [ -1 0 0 0 ] [ 0 -1 0 0 ] 180 0.1 0.1
 ( 96 -208 256 ) ( 480 -208 256 ) ( 480 -496 256 ) darkmod/stone/cobblestones/blocks_smoky_large [ 1 0 0 0 ] [ 0 -1 0 0 ] 180 0.1 0.1
 ( 480 -208 240 ) ( 480 -208 256 ) ( 96 -208 256 ) darkmod/stone/cobblestones/blocks_smoky_large [ -1 0 0 0 ] [ 0 0 -1 320 ] 180 0.1 0.1
@@ -2825,11 +2825,11 @@
 }
 // brush 306
 {
-( 208 -496 256 ) ( 208 -512 256 ) ( 208 -512 240 ) darkmod/stone/cobblestones/blocks_smoky_large [ 0 -1 0 0 ] [ 0 0 -1 320 ] 180 0.1 0.1
-( 208 -512 256 ) ( 480 -512 256 ) ( 480 -512 240 ) darkmod/stone/cobblestones/blocks_smoky_large [ 1 0 0 0 ] [ 0 0 -1 320 ] 90 0.1 0.1
+( 224 -496 256 ) ( 224 -512 256 ) ( 224 -512 240 ) darkmod/stone/cobblestones/blocks_smoky_large [ 0 -1 0 0 ] [ 0 0 -1 320 ] 90 0.1 0.1
+( 208 -528 256 ) ( 480 -528 256 ) ( 480 -528 240 ) darkmod/stone/cobblestones/blocks_smoky_large [ 1 0 0 0 ] [ 0 0 -1 320 ] 0 0.1 0.1
 ( 480 -512 240 ) ( 480 -496 240 ) ( 208 -496 240 ) darkmod/stone/cobblestones/blocks_smoky_large [ -1 0 0 0 ] [ 0 -1 0 0 ] 180 0.1 0.1
-( 208 -496 256 ) ( 480 -496 256 ) ( 480 -512 256 ) darkmod/stone/cobblestones/blocks_smoky_large [ 1 0 0 0 ] [ 0 -1 0 0 ] 180 0.1 0.1
-( 480 -496 240 ) ( 480 -496 256 ) ( 208 -496 256 ) darkmod/stone/cobblestones/blocks_smoky_large [ -1 0 0 0 ] [ 0 0 -1 320 ] 180 0.1 0.1
+( 208 -496 304 ) ( 480 -496 304 ) ( 480 -512 304 ) darkmod/stone/cobblestones/blocks_smoky_large [ 1 0 0 0 ] [ 0 -1 0 0 ] 90 0.1 0.1
+( 480 -464 240 ) ( 480 -464 256 ) ( 208 -464 256 ) darkmod/stone/cobblestones/blocks_smoky_large [ -1 0 0 0 ] [ 0 0 -1 320 ] 0 0.1 0.1
 ( 480 -512 256 ) ( 480 -496 256 ) ( 480 -496 240 ) darkmod/stone/cobblestones/blocks_smoky_large [ 0 1 0 0 ] [ 0 0 -1 320 ] 180 0.1 0.1
 }
 // brush 307
@@ -2843,12 +2843,12 @@
 }
 // brush 308
 {
-( 96 -512 80 ) ( 96 -528 85 ) ( 96 -528 69 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 0 -1 0 0 ] [ 0 0.020833333333484916 -1 106.666664 ] 271.19348 0.1 0.1
+( 80 -512 80 ) ( 80 -528 85 ) ( 80 -528 69 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 0 -1 0 0 ] [ 0 0.020833333333484916 -1 106.66669 ] 180 0.1 0.1
 ( 96 -528 85 ) ( 208 -528 85 ) ( 208 -528 69 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 1 0 0 0 ] [ 0 0 -0.9999999999998472 -3.3333333 ] 180 0.1 0.1
 ( 208 -528 69 ) ( 208 -512 64 ) ( 96 -512 64 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -1 0 0 0 ] [ 0 -1.0053548632078566 -0.017135562265141235 -16.450134 ] 270 0.1 0.1
 ( 96 -512 80 ) ( 208 -512 80 ) ( 208 -528 85 ) darkmod/stone/brick/rough_big_blocks02_cornerstone_dark [ 1 0 0 0 ] [ 0 -1 0 0 ] 180 0.1 0.1
 ( 208 -512 64 ) ( 208 -512 80 ) ( 96 -512 80 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -1 0 0 0 ] [ 0 0 -1 0 ] 0 0.1 0.1
-( 208 -528 85 ) ( 208 -512 80 ) ( 208 -512 64 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 0 1 0 0 ] [ 0 0.02083333333333215 -1 106.666664 ] 268.80652 0.1 0.1
+( 224 -528 85 ) ( 224 -512 80 ) ( 224 -512 64 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 0 1 0 0 ] [ 0 0.02083333333333215 -1 106.66669 ] 180 0.1 0.1
 }
 // brush 309
 {
@@ -2857,7 +2857,7 @@
 ( -152 -1344 385.1249999999981 ) ( 256 -1344 385.12499999999807 ) ( 256 -1344 369.1250000000054 ) darkmod/stone/brick/rough_big_blocks02_cornerstone_dark [ 1 0 0 0 ] [ 0 0 -1 0 ] 180 0.1 0.1
 ( 208 -528 69 ) ( 208 -528 85 ) ( 80 -528 85 ) darkmod/stone/brick/rough_big_blocks02_cornerstone_dark [ -1 0 0 0 ] [ 0 0 -1.0000000000000746 -3.3333333 ] 270 0.1 0.1
 ( 208 -528 85 ) ( 256 -1344 385.12499999999807 ) ( -152 -1344 385.1249999999981 ) darkmod/stone/brick/rough_big_blocks02_cornerstone_dark [ 1 0 0 0 ] [ 0 -1 0 0 ] 180 0.1 0.1
-( 256 -1344 369.1250000000054 ) ( 256 -1344 385.12499999999807 ) ( 208 -528 85 ) darkmod/stone/brick/rough_big_blocks02_cornerstone_dark [ 0 1 0 0 ] [ 0 -0.0026041666666666297 -1 -17.083334 ] 270.1492 0.1 0.1
+( 271.9448275862069 -1343.062068965517 369.1250000000054 ) ( 271.9448275862069 -1343.062068965517 385.12499999999807 ) ( 223.94482758620688 -527.0620689655171 85 ) darkmod/stone/brick/rough_big_blocks02_cornerstone_dark [ 0 1 0 -9.379883 ] [ 0 -0.0026041666666666297 -1 -17.058838 ] 180 0.1 0.1
 }
 // brush 310
 {
@@ -3653,12 +3653,12 @@
 }
 // brush 391
 {
-( 208 -528 544 ) ( 208 -656 592 ) ( 208 -656 128 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -0.4856429311786322 0.874157276121538 0 165.85938 ] [ 0 0 -1.0000000000000002 -352 ] 90 0.1 0.1
-( 208 -656 592 ) ( 224 -656 592 ) ( 224 -656 128 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 1 0 0 -128 ] [ 0 0 -1 -352 ] 0 0.1 0.1
-( 224 -656 128 ) ( 224 -528 80 ) ( 208 -528 80 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -1 0 0 128 ] [ 0 -1 0 0 ] 90 0.1 0.1
-( 224 -656 592 ) ( 208 -656 592 ) ( 208 -528 544 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 1 0 0 -128 ] [ 0 -1 0 333.8081 ] 180 0.1 0.1
-( 224 -528 80 ) ( 224 -528 544 ) ( 208 -528 544 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -1 0 0 128 ] [ 0 0 -1 -352 ] 90 0.1 0.1
-( 224 -656 592 ) ( 224 -528 544 ) ( 224 -528 80 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 0 1 0 -67.924805 ] [ 0 0 -1 -352 ] 0 0.1 0.1
+( 224 -528 544 ) ( 224 -656 592 ) ( 224 -656 128 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -0.4856429311786322 0.874157276121538 0 243.56201 ] [ 0 0 -1.0000000000000002 -352 ] 180 0.1 0.1
+( 224 -656 592 ) ( 240 -656 592 ) ( 240 -656 128 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 1 0 0 -288 ] [ 0 0 -1 -352 ] 270 0.1 0.1
+( 240 -656 128 ) ( 240 -528 80 ) ( 224 -528 80 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -1 0 0 288 ] [ 0 -1 0 0 ] 0 0.1 0.1
+( 240 -656 592 ) ( 224 -656 592 ) ( 224 -528 544 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 1 0 0 -288 ] [ 0 -1 0 333.8081 ] 90 0.1 0.1
+( 240 -528 80 ) ( 240 -528 544 ) ( 224 -528 544 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -1 0 0 288 ] [ 0 0 -1 -352 ] 0 0.1 0.1
+( 240 -656 592 ) ( 240 -528 544 ) ( 240 -528 80 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 0 1 0 -67.924805 ] [ 0 0 -1 -352 ] 270 0.1 0.1
 }
 // brush 392
 {
@@ -3725,12 +3725,12 @@
 }
 // brush 399
 {
-( 88 -512 480 ) ( 80 -528 485 ) ( 80 -528 240 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -0.447213595499958 -0.894427190999916 0 0 ] [ 0.008163265306137792 0.016326530612274383 -1.0013605442176896 498.93878 ] 271.0443 0.1 0.1
-( 80 -528 485 ) ( 208 -528 485 ) ( 208 -528 240 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 1 0 0 0 ] [ 0 0 -1.001360544217687 419.26532 ] 270 0.1 0.1
-( 208 -528 240 ) ( 208 -512 235 ) ( 88 -512 235 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -0.9999999999999999 0 0 0 ] [ 0 -1.0053548635689273 -0.017135541078763042 -163.14835 ] 0 0.1 0.1
-( 88 -512 480 ) ( 208 -512 480 ) ( 208 -528 485 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 1 0 0 0 ] [ -1.1890184854086075e-19 -1.0053548632078229 -0.017135562265033075 54.8338 ] 0 0.1 0.1
-( 208 -512 235 ) ( 208 -512 480 ) ( 88 -512 480 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -1 0 0 0 ] [ 0 0 -1.0013605442176896 422.53088 ] 270 0.1 0.1
-( 208 -528 485 ) ( 208 -512 480 ) ( 208 -512 235 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 0 1 0 0 ] [ 0 0.020408163265304962 -1.001360544217687 15.020386 ] 358.83246 0.1 0.1
+( 72 -512 480 ) ( 64 -528 485 ) ( 64 -528 288 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -0.447213595499958 -0.894427190999916 0 0 ] [ 0.008163265306137792 0.016326530612274383 -1.0013605442176896 498.93872 ] 180 0.1 0.1
+( 64 -528 485 ) ( 224 -528 485 ) ( 224 -528 288 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 1 0 0 0 ] [ 0 0 -1.001360544217687 419.26532 ] 270 0.1 0.1
+( 224 -531.1316725978647 277.97864768683274 ) ( 224 -515.1316725978647 272.97864768683274 ) ( 72 -515.1316725978647 272.97864768683274 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -0.9999999999999999 0 0 0 ] [ 0 -1.0053548635689273 -0.017135541078763042 -99.76318 ] 90 0.1 0.1
+( 72 -512 480 ) ( 224 -512 480 ) ( 224 -528 485 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 1 0 0 0 ] [ -1.1890184854086075e-19 -1.0053548632078229 -0.017135562265033075 54.8338 ] 0 0.1 0.1
+( 224 -512 283 ) ( 224 -512 480 ) ( 72 -512 480 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -1 0 0 0 ] [ 0 0 -1.0013605442176896 422.53088 ] 270 0.1 0.1
+( 224 -528 485 ) ( 224 -512 480 ) ( 224 -512 283 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 0 1 0 0 ] [ 0 0.020408163265304962 -1.001360544217687 15.020264 ] 270 0.1 0.1
 }
 // brush 400
 {
@@ -3743,12 +3743,12 @@
 }
 // brush 401
 {
-( 96 -496 256 ) ( 96 -512 256 ) ( 96 -512 240 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 0 -1 0 16 ] [ 0 0 -1 16 ] 180 1 1
-( 96 -512 256 ) ( 208 -512 256 ) ( 208 -512 240 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 1 0 0 0 ] [ 0 0 -1 16 ] 180 1 1
-( 208 -512 240 ) ( 208 -496 240 ) ( 96 -496 240 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -1 0 0 0 ] [ 0 -1 0 16 ] 180 1 1
-( 96 -496 256 ) ( 208 -496 256 ) ( 208 -512 256 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 1 0 0 0 ] [ 0 -1 0 16 ] 180 1 1
-( 208 -496 240 ) ( 208 -496 256 ) ( 96 -496 256 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -1 0 0 0 ] [ 0 0 -1 16 ] 180 1 1
-( 208 -512 256 ) ( 208 -496 256 ) ( 208 -496 240 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 0 1 0 -16 ] [ 0 0 -1 16 ] 180 1 1
+( 80 -464 256 ) ( 80 -512 288 ) ( 80 -512 272 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 0 -1 0 16 ] [ 0 0 -1 16 ] 90 1 1
+( 80 -512 288 ) ( 224 -512 288 ) ( 224 -512 272 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 1 0 0 0 ] [ 0 0 -1 16 ] 180 1 1
+( 224 -512 272 ) ( 224 -464 240 ) ( 80 -464 240 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -1 0 0 0 ] [ 0 1 -2.7755575615628914e-16 480 ] 180 1 1
+( 80 -464 256 ) ( 224 -464 256 ) ( 224 -512 288 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 1 0 0 0 ] [ 0 1 -2.7755575615628914e-16 480 ] 180 1 1
+( 224 -464 240 ) ( 224 -464 256 ) ( 80 -464 256 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ -1 0 0 0 ] [ 0 0 -1 16 ] 180 1 1
+( 224 -512 288 ) ( 224 -464 256 ) ( 224 -464 240 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 0 1 0 -16 ] [ 0 0 -1 16 ] 90 1 1
 }
 // brush 402
 {
@@ -5138,6 +5138,15 @@
 ( 64 -912 256 ) ( 64 -911 256 ) ( 65 -912 256 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 0.8741572761215379 0.4856429311786321 -2.7755575615628914e-17 -133.6062 ] [ -0.48564293117863216 0.8741572761215378 -1.6653345369377348e-16 279.26172 ] 270 0.1 0.1
 ( 64 -912 240 ) ( 65 -912 240 ) ( 64 -912 241 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 0.8741572761215379 0.48564293117863216 0 -133.6062 ] [ 0 0 -1.0000000000000002 -96 ] 270 0.1 0.1
 ( 64 -912 240 ) ( 64 -912 241 ) ( 64 -911 240 ) darkmod/stone/brick/old_blocks_wornsmooth_dark [ 0.4856429311786322 -0.8741572761215377 0 -410.99902 ] [ 0 0 -1 -96 ] 270 0.1 0.1
+}
+// brush 557
+{
+( 928 -3488 352 ) ( 928 -3487 352 ) ( 928 -3488 353 ) __TB_empty [ 0 -1 0 0 ] [ 0 0 -1 0 ] 0 1 1
+( 928 -3488 352 ) ( 928 -3488 353 ) ( 929 -3488 352 ) __TB_empty [ 1 0 0 0 ] [ 0 0 -1 0 ] 0 1 1
+( 928 -3488 352 ) ( 929 -3488 352 ) ( 928 -3487 352 ) __TB_empty [ -1 0 0 0 ] [ 0 -1 0 0 ] 0 1 1
+( 1296 -3472 512 ) ( 1296 -3471 512 ) ( 1297 -3472 512 ) __TB_empty [ 1 0 0 0 ] [ 0 -1 0 0 ] 270 1 1
+( 1296 -3472 368 ) ( 1297 -3472 368 ) ( 1296 -3472 369 ) __TB_empty [ -1 0 0 0 ] [ 0 0 -1 0 ] 0 1 1
+( 1296 -3472 368 ) ( 1296 -3472 369 ) ( 1296 -3471 368 ) __TB_empty [ 0 1 0 0 ] [ 0 0 -1 0 ] 0 1 1
 }
 }
 // entity 1
