@@ -110,13 +110,19 @@ fn remove_shadow_interactions(
     }
 }
 
-#[derive(Component, Debug, Default, Reflect)]
+#[derive(Component, Deref, DerefMut, Debug, Reflect)]
 #[reflect(Component)]
-struct Grunting;
+#[relationship(relationship_target = Vocal)]
+pub(crate) struct VocalOf(pub(crate) Entity);
+
+#[derive(Component, Deref, DerefMut, Debug, Reflect)]
+#[reflect(Component)]
+#[relationship_target(relationship = VocalOf)]
+pub(crate) struct Vocal(Entity);
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn grunt_passively(
-    mut enemy: Query<(&AiState, &NpcStats, &Transform, Entity), Without<Grunting>>,
+    mut enemy: Query<(&AiState, &NpcStats, &Transform, Entity), Without<Vocal>>,
     mut commands: Commands,
     time: Res<Time>,
     mut npc_assets: ResMut<NpcAssets>,
@@ -132,9 +138,10 @@ fn grunt_passively(
             continue;
         }
 
-        commands.entity(entity).insert(Grunting);
         let handle = npc_assets.idle_sound.pick(&mut rand::thread_rng()).clone();
-        commands.spawn(enemy_sound_effect(handle, *transform, stats));
+        commands
+            .spawn(enemy_sound_effect(handle, *transform, stats))
+            .insert(VocalOf(entity));
     }
 }
 
@@ -160,8 +167,16 @@ fn stagger_on_hit(
             .stagger_sound
             .pick(&mut rand::thread_rng())
             .clone();
+        commands.entity(entity).queue_handled(
+            |mut entity: EntityWorldMut| {
+                entity.despawn_related::<Vocal>();
+            },
+            bevy::ecs::error::ignore,
+        );
 
-        commands.spawn(enemy_sound_effect(handle, *transform, stats));
+        commands
+            .spawn(enemy_sound_effect(handle, *transform, stats))
+            .insert(VocalOf(entity));
     }
 }
 
