@@ -96,7 +96,6 @@ pub(crate) struct PrepTimeText;
 fn spawn_wave_hud(mut commands: Commands) {
     commands.spawn((
         Name::new("Health HUD"),
-        GlobalZIndex(2),
         Node {
             flex_direction: FlexDirection::Column,
             margin: UiRect::horizontal(Auto),
@@ -243,7 +242,6 @@ fn spawn_health_bar(health: Single<&Health, With<Player>>, mut commands: Command
     commands.spawn((
         Name::new("Health HUD"),
         StateScoped(Screen::Gameplay),
-        GlobalZIndex(2),
         Node {
             position_type: PositionType::Absolute,
             width: Percent(100.0),
