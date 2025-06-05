@@ -41,6 +41,8 @@ pub(crate) struct NpcAssets {
     pub(crate) attack_animation: Handle<AnimationClip>,
     #[dependency]
     pub(crate) steps: ShuffleBag<Handle<AudioSource>>,
+    #[dependency]
+    pub(crate) death_sound: ShuffleBag<Handle<AudioSource>>,
 }
 
 impl FromWorld for NpcAssets {
@@ -71,6 +73,15 @@ impl FromWorld for NpcAssets {
                     assets.load("audio/sound_effects/run/Footsteps_Rock_Run_08.ogg"),
                     assets.load("audio/sound_effects/run/Footsteps_Rock_Run_09.ogg"),
                     assets.load("audio/sound_effects/run/Footsteps_Rock_Run_10.ogg"),
+                ],
+                rng,
+            )
+            .unwrap(),
+            death_sound: ShuffleBag::try_new(
+                [
+                    assets.load("audio/sound_effects/impact/Impact02.ogg"),
+                    assets.load("audio/sound_effects/impact/Impact04.ogg"),
+                    assets.load("audio/sound_effects/impact/Impact08.ogg"),
                 ],
                 rng,
             )
