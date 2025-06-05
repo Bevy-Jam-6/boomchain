@@ -9,11 +9,11 @@ pub(super) fn plugin(app: &mut App) {
 /// and triggers the [`OnAutoTimerFinish`] event when it finishes.
 #[derive(Component, Debug, Default, Deref, DerefMut, Reflect)]
 #[reflect(Component, Debug, Default)]
-pub struct AutoTimer(pub Timer);
+pub(crate) struct AutoTimer(pub(crate) Timer);
 
 /// An event that is triggered when an [`AutoTimer`] finishes ticking.
 #[derive(Event)]
-pub struct OnAutoTimerFinish;
+pub(crate) struct OnAutoTimerFinish;
 
 fn auto_tick(mut commands: Commands, time: Res<Time>, mut query: Query<(&mut AutoTimer, Entity)>) {
     for (mut timer, e) in query.iter_mut() {

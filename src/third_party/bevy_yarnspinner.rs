@@ -59,7 +59,7 @@ pub(crate) struct YarnNode {
 }
 
 impl YarnNode {
-    pub(crate) fn new(yarn_node: impl Into<String>) -> Self {
+    pub(crate) fn _new(yarn_node: impl Into<String>) -> Self {
         Self {
             yarn_node: yarn_node.into(),
             ..default()

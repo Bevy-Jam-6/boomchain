@@ -7,28 +7,36 @@ use bevy::{
     scene::SceneInstanceReady,
 };
 use bevy_shuffle_bag::ShuffleBag;
+use rand::Rng;
 
 use crate::{
-    despawn_after::DespawnAfter,
+    despawn_after::{Despawn, DespawnAfter},
     gameplay::{
-        health::OnDeath,
-        npc::{Npc, assets::NpcAssets},
+        explosion::{ExplodeOnDeath, OnExplode},
+        health::{OnDamage, OnDeath},
+        npc::{ai_state::AiState, assets::NpcAssets, stats::NpcStats},
     },
+    screens::Screen,
     third_party::avian3d::CollisionLayer,
 };
 
 pub(super) fn plugin(app: &mut App) {
     app.add_observer(on_enemy_death);
+    app.add_observer(stagger_on_hit);
 }
+
+#[derive(Component, Clone, Copy, Debug, Default, Reflect)]
+#[reflect(Component)]
+pub struct Gib;
 
 fn on_enemy_death(
     trigger: Trigger<OnDeath>,
-    enemies: Query<&Transform, With<Npc>>,
+    enemies: Query<(&Transform, &NpcStats, Has<ExplodeOnDeath>)>,
     npc_assets: Res<NpcAssets>,
     mut commands: Commands,
 ) {
     let entity = trigger.target();
-    let Some(transform) = enemies.get(entity).ok() else {
+    let Ok((transform, stats, explode_on_death)) = enemies.get(entity) else {
         return;
     };
     let mut rng = rand::thread_rng();
@@ -57,8 +65,9 @@ fn on_enemy_death(
         let position = transform.translation + offset;
         commands
             .spawn((
+                Gib,
                 SceneRoot(gib.clone()),
-                Transform::from_translation(position),
+                Transform::from_translation(position).with_scale(Vec3::splat(stats.size)),
                 RigidBody::Dynamic,
                 ColliderConstructorHierarchy::new(ColliderConstructor::ConvexHullFromMesh)
                     .with_default_layers(CollisionLayers::new(
@@ -66,10 +75,16 @@ fn on_enemy_death(
                         [CollisionLayer::Default],
                     )),
                 DespawnAfter::new(Duration::from_secs(10)),
+                StateScoped(Screen::Gameplay),
             ))
             .observe(remove_shadow_interactions);
     }
-    commands.entity(entity).try_despawn();
+
+    commands.entity(entity).insert(Despawn);
+
+    if explode_on_death {
+        commands.entity(entity).trigger(OnExplode);
+    }
 }
 
 fn remove_shadow_interactions(
@@ -85,5 +100,20 @@ fn remove_shadow_interactions(
                 .entity(child)
                 .insert((NotShadowCaster, NotShadowReceiver));
         }
+    }
+}
+
+fn stagger_on_hit(trigger: Trigger<OnDamage>, mut enemies: Query<(&mut AiState, &NpcStats)>) {
+    let entity = trigger.target();
+    let Ok((mut ai_state, stats)) = enemies.get_mut(entity) else {
+        return;
+    };
+    if !matches!(*ai_state, AiState::Chase) {
+        return;
+    }
+
+    if rand::thread_rng().gen_bool(stats.stagger_chance as f64) {
+        let duration = rand::thread_rng().gen_range(stats.stagger_duration.clone());
+        *ai_state = AiState::Stagger(Timer::from_seconds(duration, TimerMode::Once));
     }
 }

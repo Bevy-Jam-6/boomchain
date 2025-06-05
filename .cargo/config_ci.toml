@@ -9,7 +9,7 @@ codegen-backend = "cranelift"
 
 # Consider using llvm for this setting if you use tests that `#[should_panic]`,
 # as cranelift only supports `panic = abort`.
-# Since Boomchain does not use `#[should_panic]` so far, we can use cranelift for speed increases.
+# Since Chainboom does not use `#[should_panic]` so far, we can use cranelift for speed increases.
 [profile.dev.package."*"]
 codegen-backend = "cranelift"
 

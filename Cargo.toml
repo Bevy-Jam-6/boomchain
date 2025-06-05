@@ -1,5 +1,5 @@
 [package]
-name = "boomchain"
+name = "chainboom"
 description = "A 3D reference project and tech demo for the Bevy Engine."
 license = "MIT OR Apache-2.0 OR CC0-1.0"
 authors = ["Jan Hohenheim <jan@hohenheim.ch>"]
@@ -8,9 +8,9 @@ edition = "2024"
 exclude = ["assets"]
 readme = "readme.md"
 keywords = ["bevy", "demo", "3d", "game"]
-repository = "https://github.com/Bevy-Jam-6/boomchain"
+repository = "https://github.com/Bevy-Jam-6/chainboom"
 categories = ["game-development"]
-homepage = "https://janhohenheim.itch.io/boomchain"
+homepage = "https://janhohenheim.itch.io/chainboom"
 
 [dependencies]
 bevy = { version = "0.16", features = [
@@ -20,9 +20,9 @@ bevy = { version = "0.16", features = [
     "png",
     "wayland",
     "webgpu",
-    # Due to some Bevy bug, we need to enable the UI debug plugin even in non-dev builds,
+    # Due to some Bevy bug, we SOMETIMES need to enable the UI debug plugin even in non-dev builds,
     # otherwise we only render the view model and the skybox.
-    "bevy_ui_debug",
+    # "bevy_ui_debug",
 ] }
 bevy_enhanced_input = "0.11"
 
@@ -39,6 +39,7 @@ bevy_firework = { version = "0.7" }
 bevy_hanabi = { version = "0.16.0", default-features = false, features = [
     "3d",
 ] }
+bevy_mesh_decal = { version = "0.2" }
 
 # navigation
 bevy_landmass = { version = "0.9.0" }
@@ -125,7 +126,12 @@ features = ["native"]
 features = ["dev_native"]
 
 [package.metadata.bevy_cli.web]
-rustflags = ["--cfg", "getrandom_backend=\"wasm_js\""]
+rustflags = [
+    "--cfg",
+    "getrandom_backend=\"wasm_js\"",
+    "--cfg",
+    "web_sys_unstable_apis",
+]
 
 [package.metadata.bevy_cli.web.dev]
 features = ["dev"]
@@ -178,5 +184,8 @@ inherits = "dev"
 # oxidized_navigation and landmass_oxidized_navigation have no 0.16 releases yet
 oxidized_navigation = { git = "https://github.com/janhohenheim/oxidized_navigation", branch = "bevy-0.16" }
 landmass_oxidized_navigation = { git = "https://github.com/janhohenheim/landmass", branch = "bevy-0.16-oxidized" }
+landmass = { git = "https://github.com/janhohenheim/landmass", branch = "bevy-0.16-oxidized" }
+bevy_landmass = { git = "https://github.com/janhohenheim/landmass", branch = "bevy-0.16-oxidized" }
+bevy_mesh_decal = { git = "https://github.com/Jondolf/bevy_mesh_decal", branch = "bevy-jam-6" }
 # This rev includes massive performance improvements due to collider caching
 avian3d = { git = "https://github.com/Jondolf/avian" }

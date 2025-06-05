@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use bevy::{
     audio::{SpatialScale, Volume},
     prelude::*,
@@ -10,23 +12,30 @@ use bevy_firework::{
 };
 use bevy_hanabi::{
     AccelModifier, Attribute, ColorBlendMask, ColorBlendMode, ColorOverLifetimeModifier,
-    EffectAsset, ExprWriter, Gradient, LinearDragModifier, ParticleEffect, ScalarType,
-    SetAttributeModifier, SetPositionSphereModifier, SetVelocitySphereModifier, ShapeDimension,
-    SpawnerSettings,
+    EffectAsset, EffectProperties, ExprWriter, Gradient, LinearDragModifier, ParticleEffect,
+    ScalarType, ScalarValue, SetAttributeModifier, SetPositionSphereModifier,
+    SetVelocitySphereModifier, ShapeDimension, SpawnerSettings, Value,
 };
+use bevy_mesh_decal::spray_decal;
 
 use super::{OnExplode, assets::ExplosionAssets};
-use crate::{audio::SoundEffect, platform_support::is_webgpu_or_native};
+use crate::{
+    audio::SoundEffect,
+    despawn_after::DespawnAfter,
+    gameplay::{explosion::ExplodeOnDeath, health::OnDeath, npc::stats::NpcStats},
+    platform_support::is_webgpu_or_native,
+};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<PropExplosionVfx>();
 
     app.add_observer(on_explode_prop);
+    app.add_observer(on_enemy_death);
 }
 
 #[derive(Component, Debug, Default, Reflect)]
 #[reflect(Component, Debug, Default)]
-pub struct PropExplosionVfx;
+pub(crate) struct PropExplosionVfx;
 
 fn on_explode_prop(
     trigger: Trigger<OnExplode>,
@@ -71,6 +80,47 @@ fn on_explode_prop(
                 },
             );
     }
+}
+
+fn on_enemy_death(
+    trigger: Trigger<OnDeath>,
+    query: Query<(&GlobalTransform, Option<&NpcStats>), With<ExplodeOnDeath>>,
+    mut explosion_assets: ResMut<ExplosionAssets>,
+    mut commands: Commands,
+) {
+    let Ok((transform, stats)) = query.get(trigger.target()) else {
+        return;
+    };
+    let transform = transform.compute_transform();
+    let scale = stats.map_or(1.0, |s| s.size);
+
+    // Spawn the explosion particle effect.
+    let properties = EffectProperties::default().with_properties([(
+        "scale".to_string(),
+        Value::Scalar(ScalarValue::Float(scale)),
+    )]);
+    commands.spawn((
+        ParticleEffect::new(explosion_assets.enemy_explosion_vfx.clone()),
+        properties,
+        transform,
+        DespawnAfter::new(Duration::from_secs(2)),
+    ));
+
+    // Spray some blood splatter decals.
+    let blood_decal_texture = explosion_assets
+        .blood_splatter
+        .pick(&mut rand::thread_rng())
+        .clone();
+
+    // Generate a somewhat randomized rotation for the spray decal.
+    let mut rotation = Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2);
+    rotation = Quat::from_rotation_y(rand::random::<f32>() * std::f32::consts::TAU) * rotation;
+    rotation = Quat::from_rotation_z(rand::random::<f32>() * 10f32.to_radians()) * rotation;
+
+    let spray_transform = transform
+        .with_scale(Vec3::new(scale * 2.0, scale * 2.0, scale * 2.0))
+        .with_rotation(rotation);
+    spray_decal(&mut commands, blood_decal_texture, spray_transform);
 }
 
 fn bevy_firework_prop_explosion() -> ParticleSpawner {
@@ -152,8 +202,73 @@ pub(super) fn hanabi_prop_explosion(world: &mut World) -> EffectAsset {
     let update_accel = AccelModifier::new(accel);
 
     // Create the effect asset.
-    EffectAsset::new(100_000, SpawnerSettings::once(5000.0.into()), module)
+    EffectAsset::new(500_000, SpawnerSettings::once(5000.0.into()), module)
         .with_name("PropExplosionEffect")
+        .init(init_pos)
+        .init(init_vel)
+        .init(init_size)
+        .init(init_lifetime)
+        .update(update_drag)
+        .update(update_accel)
+        .render(ColorOverLifetimeModifier {
+            gradient,
+            blend: ColorBlendMode::Overwrite,
+            mask: ColorBlendMask::RGBA,
+        })
+        .mesh(unit_sphere)
+}
+
+pub(super) fn hanabi_enemy_explosion(world: &mut World) -> EffectAsset {
+    // TODO: Use slightly deformed icospheres
+    let unit_sphere: Handle<Mesh> = world.add_asset(Sphere::new(0.5).mesh().ico(4).unwrap());
+
+    let mut gradient = Gradient::new();
+    gradient.add_key(0.0, Vec4::new(1.0, 0.0, 0.0, 1.0));
+    gradient.add_key(0.6, Vec4::new(0.8, 0.0, 0.0, 1.0));
+    gradient.add_key(1.0, Vec4::new(0.6, 0.0, 0.0, 0.0));
+
+    let writer = ExprWriter::new();
+    let scale = writer.add_property("scale", ScalarValue::Float(1.0).into());
+
+    // On spawn, randomly initialize the position of the particle
+    // to be over the surface of a sphere of radius 1 units.
+    let init_pos = SetPositionSphereModifier {
+        center: writer.lit(Vec3::ZERO).expr(),
+        radius: (writer.prop(scale) * writer.lit(1.0)).expr(),
+        dimension: ShapeDimension::Volume,
+    };
+
+    // Initialize a radial initial velocity.
+    let init_vel = SetVelocitySphereModifier {
+        center: writer.lit(Vec3::ZERO).expr(),
+        speed: (writer.prop(scale) * writer.rand(ScalarType::Float) * writer.lit(5.0)).expr(),
+    };
+
+    // Initialize the size of the particle.
+    let init_size = SetAttributeModifier::new(
+        Attribute::SIZE,
+        (writer.prop(scale)
+            * (writer.rand(ScalarType::Float) * writer.lit(0.1) + writer.lit(0.01)))
+        .expr(),
+    );
+
+    // Initialize the total lifetime of the particle.
+    let lifetime = (writer.rand(ScalarType::Float) * writer.lit(1.5) + writer.lit(0.5)).expr();
+    let init_lifetime = SetAttributeModifier::new(Attribute::LIFETIME, lifetime);
+
+    let mut module = writer.finish();
+
+    // Add drag.
+    let drag = module.lit(3.0);
+    let update_drag = LinearDragModifier::new(drag);
+
+    // Every frame, add a gravity-like acceleration downward.
+    let accel = module.lit(Vec3::new(0.0, -9.81, 0.0));
+    let update_accel = AccelModifier::new(accel);
+
+    // Create the effect asset.
+    EffectAsset::new(500_000, SpawnerSettings::once(500.0.into()), module)
+        .with_name("EnemyExplosionEffect")
         .init(init_pos)
         .init(init_vel)
         .init(init_size)

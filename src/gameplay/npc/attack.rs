@@ -5,10 +5,7 @@ use bevy_simple_subsecond_system::hot;
 
 use crate::{
     PrePhysicsAppSystems,
-    gameplay::{
-        health::Health,
-        player::{Player, camera_shake::OnTrauma},
-    },
+    gameplay::{health::OnDamage, npc::stats::NpcStats, player::Player},
     third_party::avian3d::CollisionLayer,
 };
 
@@ -42,11 +39,17 @@ fn stop_attack(trigger: Trigger<OnRemove, Attacking>, mut commands: Commands) {
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn update_attack_phase(
-    mut query: Query<(Entity, &mut AttackPhase, &Attacking, &mut AttackStopwatch)>,
+    mut query: Query<(
+        Entity,
+        &mut AttackPhase,
+        &Attacking,
+        &mut AttackStopwatch,
+        &NpcStats,
+    )>,
     time: Res<Time>,
     mut commands: Commands,
 ) {
-    for (entity, mut phase, attacking, mut stopwatch) in query.iter_mut() {
+    for (entity, mut phase, attacking, mut stopwatch, stats) in query.iter_mut() {
         stopwatch.0.tick(time.delta());
         match *phase {
             AttackPhase::Windup => {
@@ -58,7 +61,7 @@ fn update_attack_phase(
                             ChildOf(entity),
                             Sensor,
                             Transform::from_xyz(0.0, 0.0, -1.5),
-                            Collider::cuboid(1.5, 1.5, 1.5),
+                            Collider::cuboid(1.5 * stats.size, 1.5 * stats.size, 1.5 * stats.size),
                             CollisionEventsEnabled,
                             CollisionLayers::new(CollisionLayer::Sensor, CollisionLayer::Player),
                         ))
@@ -84,7 +87,7 @@ fn update_attack_phase(
 #[cfg_attr(feature = "hot_patch", hot)]
 fn hit_player(
     trigger: Trigger<OnCollisionStart>,
-    mut player: Query<&mut Health, With<Player>>,
+    player: Query<(), With<Player>>,
     name: Query<NameOrEntity>,
     mut commands: Commands,
 ) {
@@ -92,13 +95,12 @@ fn hit_player(
         error!("Enemy hit collision without body");
         return;
     };
-    let Ok(mut health) = player.get_mut(body) else {
+    if !player.contains(body) {
         let name = name.get(body).unwrap();
         error!("Enemy hit non-player: {name}");
         return;
-    };
-    health.damage(10.0);
-    commands.trigger(OnTrauma(0.7));
+    }
+    commands.entity(body).trigger(OnDamage(10.0));
 }
 
 #[derive(Component, Deref, DerefMut, Debug, Reflect)]
@@ -115,6 +117,7 @@ pub(crate) struct Hitbox(Entity);
 #[reflect(Component)]
 pub(crate) struct Attacking {
     pub(crate) speed: f32,
+    pub(crate) damage: f32,
     pub(crate) dir: Option<Dir3>,
 }
 

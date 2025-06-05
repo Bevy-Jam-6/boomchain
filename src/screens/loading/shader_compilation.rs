@@ -2,10 +2,13 @@
 //! This reduces stuttering, especially for audio on Wasm.
 
 use bevy::prelude::*;
+use bevy_hanabi::ParticleEffect;
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
 
 use crate::{
+    gameplay::explosion::assets::ExplosionAssets,
+    platform_support::is_webgpu_or_native,
     shader_compilation::{LoadedPipelineCount, all_pipelines_loaded, spawn_shader_compilation_map},
     theme::{palette::SCREEN_BACKGROUND, prelude::*},
 };
@@ -18,6 +21,7 @@ pub(super) fn plugin(app: &mut App) {
         (
             spawn_or_skip_shader_compilation_loading_screen,
             spawn_shader_compilation_map,
+            setup_particle_effects,
         ),
     );
 
@@ -49,6 +53,23 @@ fn spawn_or_skip_shader_compilation_loading_screen(
         BackgroundColor(SCREEN_BACKGROUND),
         StateScoped(LoadingScreen::Shaders),
         children![(widget::label("Compiling shaders..."), LoadingShadersLabel)],
+    ));
+}
+
+fn setup_particle_effects(mut commands: Commands, explosion_assets: Res<ExplosionAssets>) {
+    if !is_webgpu_or_native() {
+        // Skip particle effects setup if Hanabi is not supported.
+        return;
+    }
+
+    // Spawn the particle effects for shader compilation.
+    commands.spawn((
+        StateScoped(LoadingScreen::Shaders),
+        ParticleEffect::new(explosion_assets.prop_explosion_vfx.clone()),
+    ));
+    commands.spawn((
+        StateScoped(LoadingScreen::Shaders),
+        ParticleEffect::new(explosion_assets.enemy_explosion_vfx.clone()),
     ));
 }
 

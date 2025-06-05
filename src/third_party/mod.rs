@@ -15,6 +15,7 @@ mod bevy_firework;
 mod bevy_framepace;
 mod bevy_hanabi;
 pub(crate) mod bevy_landmass;
+mod bevy_mesh_decal;
 mod bevy_tnua;
 pub(crate) mod bevy_trenchbroom;
 pub(crate) mod bevy_yarnspinner;
@@ -29,6 +30,7 @@ pub(super) fn plugin(app: &mut App) {
         bevy_firework::plugin,
         bevy_tnua::plugin,
         bevy_landmass::plugin,
+        bevy_mesh_decal::plugin,
         bevy_yarnspinner::plugin,
         avian_pickup::plugin,
         bevy_framepace::plugin,

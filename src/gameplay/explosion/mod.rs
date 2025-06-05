@@ -1,19 +1,17 @@
-mod assets;
+pub(crate) mod assets;
 pub(crate) mod effects;
 
 use avian3d::prelude::*;
-use bevy::{
-    ecs::{error::ignore, system::SystemParam},
-    prelude::*,
-};
+use bevy::{ecs::system::SystemParam, prelude::*};
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
 
 use crate::{
     auto_timer::{AutoTimer, OnAutoTimerFinish},
+    despawn_after::Despawn,
     gameplay::{
-        health::{Health, OnDeath},
-        npc::Npc,
+        health::{Health, OnDamage, OnDeath},
+        player::Player,
     },
     third_party::avian3d::CollisionLayer,
 };
@@ -25,6 +23,7 @@ pub(super) fn plugin(app: &mut App) {
 
     app.add_observer(on_shoot_explosive);
     app.add_observer(on_touch_explosive);
+    app.add_observer(on_enemy_death);
     app.add_observer(on_explode);
 
     // Insert `CollisionEventsEnabled` for all entities that can explode on contact,
@@ -51,21 +50,21 @@ pub(super) fn plugin(app: &mut App) {
 /// The explosion can be activated by triggering the [`OnExplode`] event.
 #[derive(Component, Clone, Copy, Debug, PartialEq, Reflect)]
 #[reflect(Component)]
-pub struct Explosive {
+pub(crate) struct Explosive {
     // TODO: Do we want to support a falloff?
     /// The radius of the explosion. Only entities within this radius will be affected.
-    pub radius: f32,
+    pub(crate) radius: f32,
     /// The strength of the explosion impulse.
-    pub impulse_strength: f32,
+    pub(crate) impulse_strength: f32,
     /// The damage dealt by the explosion.
-    pub damage: f32,
+    pub(crate) damage: f32,
 }
 
 impl Default for Explosive {
     fn default() -> Self {
         Self {
-            radius: 3.0,
-            impulse_strength: 15.0,
+            radius: 3.5,
+            impulse_strength: 25.0,
             damage: 100.0,
         }
     }
@@ -73,19 +72,19 @@ impl Default for Explosive {
 
 /// An event that is triggered when an explosive should explode.
 #[derive(Event, Clone, Copy, Debug, PartialEq)]
-pub struct OnExplode;
+pub(crate) struct OnExplode;
 
 /// A marker component for entities that have exploded or are in the process of exploding.
 #[derive(Component, Clone, Copy, Debug, Default, PartialEq, Reflect)]
-pub struct Exploded;
+pub(crate) struct Exploded;
 
 /// A marker component for entities that should explode when interacted with.
 #[derive(Component, Clone, Copy, Debug, PartialEq, Reflect)]
 #[reflect(Component)]
 #[require(Explosive)]
-pub struct ExplodeOnShoot {
+pub(crate) struct ExplodeOnShoot {
     /// The maximum distance the explosion can be triggered from.
-    pub max_distance: f32,
+    pub(crate) max_distance: f32,
 }
 
 impl Default for ExplodeOnShoot {
@@ -100,9 +99,9 @@ impl Default for ExplodeOnShoot {
 #[derive(Component, Clone, Copy, Debug, PartialEq, Reflect)]
 #[reflect(Component)]
 #[require(Explosive)]
-pub struct ExplodeOnContact {
+pub(crate) struct ExplodeOnContact {
     /// A [`LayerMask`] determining which [`CollisionLayers`] can trigger the explosion on contact.
-    pub layers: LayerMask,
+    pub(crate) layers: LayerMask,
 }
 
 impl Default for ExplodeOnContact {
@@ -112,6 +111,12 @@ impl Default for ExplodeOnContact {
         }
     }
 }
+
+/// A marker component for entities that should explode on death.
+#[derive(Component, Clone, Copy, Debug, PartialEq, Reflect)]
+#[reflect(Component)]
+#[require(Explosive)]
+pub(crate) struct ExplodeOnDeath;
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn on_shoot_explosive(
@@ -157,6 +162,39 @@ fn on_touch_explosive(
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
+fn on_enemy_death(
+    trigger: Trigger<OnDeath>,
+    mut commands: Commands,
+    explosive_query: Query<(&GlobalTransform, &Explosive), With<ExplodeOnDeath>>,
+) {
+    let entity = trigger.target();
+
+    // Get the explosive properties and transform of the entity.
+    if let Ok((transform, explosive)) = explosive_query.get(entity) {
+        // Trigger the explosion. We use a separate entity with a timer
+        // to delay the explosion until the dismembered body parts of enemies
+        // are ready for physics.
+        // Hacky, but this is a game jam :D could be cleaned up though
+        commands
+            .spawn((
+                RigidBody::Static,
+                AutoTimer(Timer::from_seconds(0.1, TimerMode::Once)),
+                // Just copy the transform and explosive properties to the temporary entity.
+                transform.compute_transform(),
+                *explosive,
+            ))
+            .observe(
+                |trigger: Trigger<OnAutoTimerFinish>, mut commands: Commands| {
+                    commands
+                        .entity(trigger.target())
+                        .trigger(OnExplode)
+                        .despawn();
+                },
+            );
+    }
+}
+
+#[cfg_attr(feature = "hot_patch", hot)]
 fn on_explode(
     trigger: Trigger<OnExplode>,
     query: Query<(&Explosive, &GlobalTransform, &ComputedCenterOfMass), Without<Exploded>>,
@@ -190,14 +228,13 @@ fn on_explode(
     explosion_helper.apply_explosion(explosive, explosive_global_com);
 
     // Despawn the explosive entity after the explosion.
-    explosion_helper.commands.entity(entity).try_despawn();
+    explosion_helper.commands.entity(entity).insert(Despawn);
 }
 
 /// A [`SystemParam`] for applying explosions in the world.
 #[derive(SystemParam)]
-pub struct ExplosionHelper<'w, 's> {
+pub(crate) struct ExplosionHelper<'w, 's> {
     collider_query: Query<'w, 's, (&'static Collider, &'static GlobalTransform)>,
-    explosive_query: Query<'w, 's, (), (With<Explosive>, Without<Exploded>)>,
     collider_of_query: Query<'w, 's, &'static ColliderOf>,
     body_query: Query<
         'w,
@@ -211,7 +248,7 @@ pub struct ExplosionHelper<'w, 's> {
             &'static RigidBodyColliders,
         ),
     >,
-    npc_health_query: Query<'w, 's, &'static mut Health, With<Npc>>,
+    damageable_query: Query<'w, 's, (), (With<Health>, Without<Player>)>,
     spatial_query: SpatialQuery<'w, 's>,
     commands: Commands<'w, 's>,
 }
@@ -220,7 +257,7 @@ impl ExplosionHelper<'_, '_> {
     /// Applies an explosion to all entities within the explosion radius at the given point.
     ///
     /// This also triggers the [`OnExplode`] event for any explosive entities hit by the explosion.
-    pub fn apply_explosion(&mut self, explosive: &Explosive, point: Vec3) {
+    pub(crate) fn apply_explosion(&mut self, explosive: &Explosive, point: Vec3) {
         // Query for all collider entities of characters and props within the explosion radius.
         let shape = Collider::sphere(explosive.radius);
         let filter = SpatialQueryFilter::default();
@@ -242,11 +279,6 @@ impl ExplosionHelper<'_, '_> {
 
         // Apply the explosion impulse to each hit body.
         for body in hit_bodies {
-            if let Ok(mut health) = self.npc_health_query.get_mut(body) {
-                // If the body is an NPC, apply damage.
-                health.damage(explosive.damage);
-            }
-
             // Get the body's transform, velocity, center of mass, and attached colliders.
             let Ok((rb, transform, mut lin_vel, mut ang_vel, local_com, colliders)) =
                 self.body_query.get_mut(body)
@@ -255,24 +287,17 @@ impl ExplosionHelper<'_, '_> {
             };
             let global_com = transform.translation() + transform.rotation() * local_com.0;
 
-            // If the entity is also an explosive, trigger its explosion.
-            // A chain reaction of props going boom!
-            if self.explosive_query.contains(body) {
-                // Delay the explosion slightly based on distance.
-                let delay = point.distance(global_com) * 0.05;
+            // If the entity has health, we apply damage to it.
+            if self.damageable_query.contains(body) {
+                // Use a small delay.
+                let delay = 0.2;
+                let damage = explosive.damage;
                 self.commands
                     .entity(body)
                     .try_insert_if_new(AutoTimer(Timer::from_seconds(delay, TimerMode::Once)))
                     .observe(
-                        |trigger: Trigger<OnAutoTimerFinish>, mut commands: Commands| {
-                            // We need to use `queue_handled` in case the explosion was triggered twice
-                            // and the entity was already despawned.
-                            commands.entity(trigger.target()).queue_handled(
-                                |mut entity_mut: EntityWorldMut| {
-                                    entity_mut.trigger(OnExplode);
-                                },
-                                ignore,
-                            );
+                        move |trigger: Trigger<OnAutoTimerFinish>, mut commands: Commands| {
+                            commands.entity(trigger.target()).trigger(OnDamage(damage));
                         },
                     );
             }

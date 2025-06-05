@@ -4,7 +4,14 @@ use bevy::{platform::collections::HashMap, prelude::*, time::Stopwatch};
 use bevy_trenchbroom::prelude::*;
 use rand::seq::SliceRandom as _;
 
-use crate::{PrePhysicsAppSystems, gameplay::npc::Npc, props::generic::BarrelLargeClosed};
+use crate::{
+    PrePhysicsAppSystems,
+    gameplay::{
+        hud::WaveIconParent,
+        npc::{Npc, stats::NpcStats},
+    },
+    props::generic::BarrelLargeClosed,
+};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Waves>();
@@ -13,7 +20,9 @@ pub(super) fn plugin(app: &mut App) {
     app.init_resource::<SpawnPackets>();
     app.add_systems(
         RunFixedMainLoop,
-        advance_waves.in_set(PrePhysicsAppSystems::SpawnWave),
+        advance_waves
+            .in_set(PrePhysicsAppSystems::SpawnWave)
+            .run_if(any_with_component::<WaveIconParent>),
     );
 }
 
@@ -43,16 +52,29 @@ impl Default for SpawnPackets {
             [
                 (Millis(0), SpawnVariant::BasicEnemy),
                 (Millis(100), SpawnVariant::BasicEnemy),
-                (Millis(200), SpawnVariant::BasicEnemy),
+                (Millis(200), SpawnVariant::BigEnemy),
                 (Millis(300), SpawnVariant::ExplosiveBarrel),
                 (Millis(400), SpawnVariant::BasicEnemy),
                 (Millis(500), SpawnVariant::ExplosiveBarrel),
-                (Millis(600), SpawnVariant::BasicEnemy),
+                (Millis(600), SpawnVariant::SmallEnemy),
+                (Millis(700), SpawnVariant::BasicEnemy),
             ]
             .into(),
         )])
     }
 }
+
+#[derive(Event)]
+pub(crate) struct WaveAdvanced;
+
+#[derive(Event)]
+pub(crate) struct WaveWaitingForEnemies;
+
+#[derive(Event)]
+pub(crate) struct WaveStartedPreparing;
+
+#[derive(Event)]
+pub(crate) struct WaveFinishedPreparing;
 
 fn advance_waves(
     mut waves: Single<&mut Waves>,
@@ -62,7 +84,28 @@ fn advance_waves(
     spawners: Query<(&Transform, &Spawner)>,
     mut commands: Commands,
 ) {
-    waves.tick(time.delta());
+    let is_preparing_before = waves.is_preparing();
+    let advancement = waves.try_advance(time.delta(), !enemies.is_empty());
+    let is_preparing_after = waves.is_preparing();
+
+    match advancement {
+        WaveAdvancement::Advanced => {
+            commands.trigger(WaveAdvanced);
+        }
+        WaveAdvancement::WaitingForEnemies => {
+            commands.trigger(WaveWaitingForEnemies);
+        }
+        WaveAdvancement::Ongoing => {}
+    }
+
+    if !is_preparing_before && is_preparing_after {
+        commands.trigger(WaveStartedPreparing);
+    }
+
+    if is_preparing_before && !is_preparing_after {
+        commands.trigger(WaveFinishedPreparing);
+    }
+
     if waves.is_finished() {
         if enemies.is_empty() {
             info_once!("Game finished");
@@ -71,8 +114,7 @@ fn advance_waves(
         }
         return;
     }
-    if waves.is_preparing() {
-    } else {
+    if !is_preparing_after {
         let difficulties = waves.pop_difficulties_to_spawn();
         for difficulty in difficulties {
             let available_packets = packets.filter_difficulty(difficulty);
@@ -99,22 +141,61 @@ fn advance_waves(
             let pos2 = Circle::new(spawner_radius).sample_interior(&mut rand::thread_rng());
             let pos3 = Vec3::new(pos2.x, 0.0, pos2.y);
             let spawn_position = spawner_transform + pos3;
+            let mut spawn_commands = commands.spawn((
+                Visibility::Inherited,
+                Transform::from_translation(spawn_position),
+            ));
             match spawn {
                 SpawnVariant::BasicEnemy => {
-                    info!("Spawning BasicEnemy at {}", waves.elapsed_millis());
-                    commands.spawn((
+                    spawn_commands.insert((
+                        Name::new("Basic Enemy"),
                         Npc,
-                        Visibility::Inherited,
-                        Transform::from_translation(spawn_position),
+                        NpcStats {
+                            health: 100.0,
+                            desired_speed: 7.0,
+                            max_speed: 8.0,
+                            attack_damage: 10.0,
+                            attack_speed_range: 1.2..2.1,
+                            size: 1.0,
+                            stagger_chance: 0.3,
+                            stagger_duration: 0.2..0.4,
+                        },
+                    ));
+                }
+                SpawnVariant::BigEnemy => {
+                    spawn_commands.insert((
+                        Name::new("Big Enemy"),
+                        Npc,
+                        NpcStats {
+                            health: 300.0,
+                            desired_speed: 5.0,
+                            max_speed: 5.0,
+                            attack_damage: 30.0,
+                            attack_speed_range: 0.9..1.4,
+                            size: 2.0,
+                            stagger_chance: 0.2,
+                            stagger_duration: 0.1..0.3,
+                        },
+                    ));
+                }
+                SpawnVariant::SmallEnemy => {
+                    spawn_commands.insert((
+                        Name::new("Small Enemy"),
+                        Npc,
+                        NpcStats {
+                            health: 50.0,
+                            desired_speed: 13.0,
+                            max_speed: 13.0,
+                            attack_damage: 10.0,
+                            attack_speed_range: 1.8..2.6,
+                            size: 0.7,
+                            stagger_chance: 0.4,
+                            stagger_duration: 0.2..0.3,
+                        },
                     ));
                 }
                 SpawnVariant::ExplosiveBarrel => {
-                    info!("Spawning ExplosiveBarrel at {}", waves.elapsed_millis());
-                    commands.spawn((
-                        BarrelLargeClosed,
-                        Visibility::Inherited,
-                        Transform::from_translation(spawn_position),
-                    ));
+                    spawn_commands.insert((Name::new("Explosive Barrel"), BarrelLargeClosed));
                 }
             }
         }
@@ -128,28 +209,56 @@ pub(crate) struct Waves {
     current_packets: Vec<SpawnPacket>,
     wave_stopwatch: Stopwatch,
     current_wave: usize,
+    total_waves: usize,
     prep_timer: Timer,
+}
+
+enum WaveAdvancement {
+    Advanced,
+    WaitingForEnemies,
+    Ongoing,
 }
 
 impl Waves {
     fn new(waves: impl Into<Vec<Wave>>) -> Self {
+        let waves = waves.into();
+        let len = waves.len();
         Self {
-            waves: waves.into(),
+            waves,
             current_packets: Vec::new(),
             wave_stopwatch: Stopwatch::default(),
             current_wave: 0,
+            total_waves: len,
             prep_timer: Timer::from_seconds(0.0, TimerMode::Once),
         }
     }
 
-    fn tick(&mut self, delta: Duration) {
+    pub(crate) fn current_wave_index(&self) -> usize {
+        self.current_wave
+    }
+
+    pub(crate) fn total_waves(&self) -> usize {
+        self.total_waves
+    }
+
+    pub(crate) fn prep_time_left(&self) -> Duration {
+        self.prep_timer.remaining()
+    }
+
+    fn try_advance(&mut self, delta: Duration, has_enemies: bool) -> WaveAdvancement {
+        let mut advancement = WaveAdvancement::Ongoing;
         if !self.is_finished()
             && self
                 .current_wave()
                 .map(|wave| wave.packet_kinds.is_empty())
                 .unwrap_or(false)
         {
-            self.advance_wave();
+            if has_enemies {
+                advancement = WaveAdvancement::WaitingForEnemies;
+            } else {
+                self.advance_wave();
+                advancement = WaveAdvancement::Advanced;
+            }
         }
         if self.is_preparing() {
             self.prep_timer.tick(delta);
@@ -159,6 +268,7 @@ impl Waves {
                 packet.tick(delta);
             }
         }
+        advancement
     }
 
     fn clean_finished_packets(&mut self) {
@@ -338,5 +448,7 @@ impl SpawnPacket {
 #[derive(Reflect, Clone, Copy)]
 enum SpawnVariant {
     BasicEnemy,
+    BigEnemy,
+    SmallEnemy,
     ExplosiveBarrel,
 }

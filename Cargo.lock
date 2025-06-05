@@ -1261,8 +1261,7 @@ dependencies = [
 [[package]]
 name = "bevy_landmass"
 version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "911f541cc364113576262da5830c823bd1ed502b743f08dd28a1122af20311b4"
+source = "git+https://github.com/janhohenheim/landmass?branch=bevy-0.16-oxidized#904474acb3e85d57f272862076d35c7e431f2e31"
 dependencies = [
  "bevy_app",
  "bevy_asset",
@@ -1363,6 +1362,14 @@ dependencies = [
  "thiserror 2.0.12",
  "tracing",
  "wgpu-types",
+]
+
+[[package]]
+name = "bevy_mesh_decal"
+version = "0.2.0"
+source = "git+https://github.com/Jondolf/bevy_mesh_decal?branch=bevy-jam-6#1ccf384cfe8cee692cd426daa299486ab9f1a614"
+dependencies = [
+ "bevy",
 ]
 
 [[package]]
@@ -2134,41 +2141,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "boomchain"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "avian3d",
- "avian_pickup",
- "bevy",
- "bevy-inspector-egui",
- "bevy-tnua",
- "bevy-tnua-avian3d",
- "bevy_enhanced_input",
- "bevy_firework",
- "bevy_fix_cursor_unlock_web",
- "bevy_framepace",
- "bevy_hanabi",
- "bevy_landmass",
- "bevy_mod_skinned_aabb",
- "bevy_shuffle_bag",
- "bevy_simple_subsecond_system",
- "bevy_trenchbroom",
- "bevy_yarnspinner",
- "bevy_yarnspinner_example_dialogue_view",
- "bitflags 2.9.1",
- "getrandom 0.3.3",
- "landmass_oxidized_navigation",
- "log",
- "noiz",
- "oxidized_navigation",
- "rand 0.8.5",
- "regex",
- "tracing",
- "web-sys",
-]
-
-[[package]]
 name = "built"
 version = "0.7.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2291,6 +2263,42 @@ name = "cfg_aliases"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "613afe47fcd5fac7ccf1db93babcb082c5994d996f20b8b159f2ad1658eb5724"
+
+[[package]]
+name = "chainboom"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "avian3d",
+ "avian_pickup",
+ "bevy",
+ "bevy-inspector-egui",
+ "bevy-tnua",
+ "bevy-tnua-avian3d",
+ "bevy_enhanced_input",
+ "bevy_firework",
+ "bevy_fix_cursor_unlock_web",
+ "bevy_framepace",
+ "bevy_hanabi",
+ "bevy_landmass",
+ "bevy_mesh_decal",
+ "bevy_mod_skinned_aabb",
+ "bevy_shuffle_bag",
+ "bevy_simple_subsecond_system",
+ "bevy_trenchbroom",
+ "bevy_yarnspinner",
+ "bevy_yarnspinner_example_dialogue_view",
+ "bitflags 2.9.1",
+ "getrandom 0.3.3",
+ "landmass_oxidized_navigation",
+ "log",
+ "noiz",
+ "oxidized_navigation",
+ "rand 0.8.5",
+ "regex",
+ "tracing",
+ "web-sys",
+]
 
 [[package]]
 name = "clang-sys"
@@ -4204,8 +4212,7 @@ dependencies = [
 [[package]]
 name = "landmass"
 version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7528806766f9c73b342df94f558d9e9d8cc5f62794df439694ef8372a296c37b"
+source = "git+https://github.com/janhohenheim/landmass?branch=bevy-0.16-oxidized#904474acb3e85d57f272862076d35c7e431f2e31"
 dependencies = [
  "disjoint",
  "dodgy_2d",
