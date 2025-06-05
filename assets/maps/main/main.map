@@ -4317,12 +4317,12 @@
 }
 // brush 465
 {
-( 368 -2000 944 ) ( 368 -1984 944 ) ( 368 -1984 1072 ) darkmod/stone/cobblestones/blocks_uneven_blue [ 0 -1 0 0 ] [ 0 0 -1 0 ] 0 0.1 0.1
-( -960 -2800 944 ) ( -960 -2800 945 ) ( -959 -2800 944 ) darkmod/stone/cobblestones/blocks_uneven_blue [ 1 0 0 0 ] [ 0 0 -1 0 ] 180 0.1 0.1
-( -960 -1616 864 ) ( -959 -1616 864 ) ( -960 -1615 864 ) darkmod/stone/cobblestones/blocks_uneven_blue [ -1 0 0 0 ] [ 0 -1 0 0 ] 180 0.1 0.1
-( 368 -2096 880 ) ( 496 -2112 880 ) ( 368 -2112 880 ) darkmod/stone/cobblestones/blocks_uneven_blue [ 1 0 0 0 ] [ 0 -1 0 0 ] 0 0.1 0.1
-( -944 -1216 960 ) ( -943 -1216 960 ) ( -944 -1216 961 ) darkmod/stone/cobblestones/blocks_uneven_blue [ -1 0 0 0 ] [ 0 0 -1 0 ] 270 0.1 0.1
-( 416 -1216 960 ) ( 416 -1088 944 ) ( 416 -1216 944 ) darkmod/stone/cobblestones/blocks_uneven_blue [ 0 1 0 0 ] [ 0 0 -1 0 ] 270 0.1 0.1
+( 368 -1216 880 ) ( 368 -2800 880 ) ( 368 -2800 864 ) darkmod/stone/cobblestones/blocks_uneven_blue [ 0 -1 0 0 ] [ 0 0 -1 0 ] 0 0.1 0.1
+( 368 -2800 880 ) ( 445 -2800 880 ) ( 435 -2800 864 ) darkmod/stone/cobblestones/blocks_uneven_blue [ 1 0 0 0 ] [ 0 0 -1 0 ] 180 0.1 0.1
+( 435 -2800 864 ) ( 435 -1216 864 ) ( 368 -1216 864 ) darkmod/stone/cobblestones/blocks_uneven_blue [ -1 0 0 0 ] [ 0 -1 0 0 ] 180 0.1 0.1
+( 368 -1216 880 ) ( 445 -1216 880 ) ( 445 -2800 880 ) darkmod/stone/cobblestones/blocks_uneven_blue [ 1 0 0 0 ] [ 0 -1 0 0 ] 0 0.1 0.1
+( 435 -1216 864 ) ( 445 -1216 880 ) ( 368 -1216 880 ) darkmod/stone/cobblestones/blocks_uneven_blue [ -1 0 0 0 ] [ 0 0 -1 0 ] 270 0.1 0.1
+( 445 -2800 880 ) ( 445 -1216 880 ) ( 435 -1216 864 ) darkmod/stone/cobblestones/blocks_uneven_blue [ 0 1.0000000000000002 0 0 ] [ 0 0 1.0000000000000002 -896 ] 270 0.1 0.1
 }
 // brush 466
 {
