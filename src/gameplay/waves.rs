@@ -9,7 +9,7 @@ use crate::{
     PrePhysicsAppSystems,
     gameplay::{
         hud::WaveIconParent,
-        npc::{Npc, stats::NpcStats},
+        npc::{NPC_RADIUS, Npc, stats::NpcStats},
     },
     props::generic::BarrelLargeClosed,
     third_party::avian3d::CollisionLayer,
@@ -152,7 +152,7 @@ fn advance_waves(
             let spawn_position = if let Some(hit) =
                 spatial_query.cast_ray(spawner_transform, dir, 100.0, true, &filter)
             {
-                spawner_transform + dir * (hit.distance - 0.2)
+                spawner_transform + dir * (hit.distance - 1.0).max(0.0)
             } else {
                 try_spawn_position
             };
