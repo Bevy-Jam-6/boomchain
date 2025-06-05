@@ -114,6 +114,7 @@ fn advance_waves(
 
     if waves.is_finished() {
         if enemies.is_empty() {
+            info!("Game won");
             commands.trigger(GameWon);
         } else {
             info_once!("Game finished, but there are still enemies");
