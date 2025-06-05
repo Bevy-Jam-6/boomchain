@@ -202,7 +202,7 @@ pub(super) fn hanabi_prop_explosion(world: &mut World) -> EffectAsset {
     let update_accel = AccelModifier::new(accel);
 
     // Create the effect asset.
-    EffectAsset::new(100_000, SpawnerSettings::once(5000.0.into()), module)
+    EffectAsset::new(500_000, SpawnerSettings::once(5000.0.into()), module)
         .with_name("PropExplosionEffect")
         .init(init_pos)
         .init(init_vel)
@@ -267,7 +267,7 @@ pub(super) fn hanabi_enemy_explosion(world: &mut World) -> EffectAsset {
     let update_accel = AccelModifier::new(accel);
 
     // Create the effect asset.
-    EffectAsset::new(100_000, SpawnerSettings::once(500.0.into()), module)
+    EffectAsset::new(500_000, SpawnerSettings::once(500.0.into()), module)
         .with_name("EnemyExplosionEffect")
         .init(init_pos)
         .init(init_vel)

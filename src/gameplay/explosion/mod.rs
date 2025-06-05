@@ -10,8 +10,8 @@ use crate::{
     auto_timer::{AutoTimer, OnAutoTimerFinish},
     despawn_after::Despawn,
     gameplay::{
-        health::{OnDamage, OnDeath},
-        npc::Npc,
+        health::{Health, OnDamage, OnDeath},
+        player::Player,
     },
     third_party::avian3d::CollisionLayer,
 };
@@ -235,7 +235,6 @@ fn on_explode(
 #[derive(SystemParam)]
 pub(crate) struct ExplosionHelper<'w, 's> {
     collider_query: Query<'w, 's, (&'static Collider, &'static GlobalTransform)>,
-    explosive_query: Query<'w, 's, (), (With<Explosive>, Without<Exploded>)>,
     collider_of_query: Query<'w, 's, &'static ColliderOf>,
     body_query: Query<
         'w,
@@ -249,7 +248,7 @@ pub(crate) struct ExplosionHelper<'w, 's> {
             &'static RigidBodyColliders,
         ),
     >,
-    npc_query: Query<'w, 's, (), With<Npc>>,
+    damageable_query: Query<'w, 's, (), (With<Health>, Without<Player>)>,
     spatial_query: SpatialQuery<'w, 's>,
     commands: Commands<'w, 's>,
 }
@@ -280,13 +279,6 @@ impl ExplosionHelper<'_, '_> {
 
         // Apply the explosion impulse to each hit body.
         for body in hit_bodies {
-            if self.npc_query.contains(body) {
-                // If the body is an NPC, apply damage.
-                self.commands
-                    .entity(body)
-                    .trigger(OnDamage(explosive.damage));
-            }
-
             // Get the body's transform, velocity, center of mass, and attached colliders.
             let Ok((rb, transform, mut lin_vel, mut ang_vel, local_com, colliders)) =
                 self.body_query.get_mut(body)
@@ -295,17 +287,17 @@ impl ExplosionHelper<'_, '_> {
             };
             let global_com = transform.translation() + transform.rotation() * local_com.0;
 
-            // If the entity is also an explosive, trigger its explosion.
-            // A chain reaction of props going boom!
-            if self.explosive_query.contains(body) {
-                // Delay the explosion slightly based on distance.
-                let delay = point.distance(global_com) * 0.05;
+            // If the entity has health, we apply damage to it.
+            if self.damageable_query.contains(body) {
+                // Use a small delay.
+                let delay = 0.2;
+                let damage = explosive.damage;
                 self.commands
                     .entity(body)
                     .try_insert_if_new(AutoTimer(Timer::from_seconds(delay, TimerMode::Once)))
                     .observe(
-                        |trigger: Trigger<OnAutoTimerFinish>, mut commands: Commands| {
-                            commands.entity(trigger.target()).trigger(OnExplode);
+                        move |trigger: Trigger<OnAutoTimerFinish>, mut commands: Commands| {
+                            commands.entity(trigger.target()).trigger(OnDamage(damage));
                         },
                     );
             }
