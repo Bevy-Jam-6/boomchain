@@ -141,14 +141,13 @@ fn add_angry_icon(
         warn!("Angry icon already exists for enemy {enemy}");
         return;
     }
-    info!("Adding angry icon for enemy {enemy}");
     commands.entity(container).with_child((
         Node {
             width: Px(32.0),
             height: Px(32.0),
             ..default()
         },
-        ImageNode::new(hud_assets.angry.clone()).with_color(Color::BLACK),
+        ImageNode::new(hud_assets.angry.clone()).with_color(Color::srgba(0.0, 0.0, 0.0, 3.0)),
         AngryIcon(enemy),
     ));
 }
@@ -183,7 +182,7 @@ fn add_dead_icon(
         .remove::<AngryIcon>()
         .insert(DeadIcon)
         .with_child((
-            ImageNode::new(hud_assets.dead.clone()).with_color(Color::srgba(1.0, 0.0, 0.0, 1.0)),
+            ImageNode::new(hud_assets.dead.clone()).with_color(Color::srgba(1.0, 0.0, 0.0, 3.0)),
         ));
 }
 
