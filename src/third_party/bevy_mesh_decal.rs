@@ -1,5 +1,5 @@
 //! [bevy_mesh_decal](https://github.com/Aronry/bevy_mesh_decal) is our CPU decal system.
-//! It supports bot native and web builds, unlike Bevy's current built-in decals.
+//! It supports both native and web builds, unlike Bevy's current built-in decals.
 
 use avian3d::prelude::Collider;
 use bevy::{prelude::*, scene::SceneInstanceReady};
