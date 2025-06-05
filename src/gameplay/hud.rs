@@ -276,9 +276,9 @@ fn spawn_health_bar(health: Single<&Health, With<Player>>, mut commands: Command
 }
 
 fn update_health_bar(
-    health: Single<&Health, With<Player>>,
+    health: Single<Option<&Health>, With<Player>>,
     mut health_bar: Single<&mut Node, With<HealthBar>>,
 ) {
-    let hp = health.fraction();
+    let hp = health.map(|h| h.fraction()).unwrap_or(0.0);
     health_bar.width = Percent(hp * 100.0);
 }
