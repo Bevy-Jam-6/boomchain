@@ -12,12 +12,20 @@ pub(super) fn plugin(app: &mut App) {
     app.add_observer(on_game_won);
 }
 
+#[derive(Component)]
+struct GameWonMarker;
+
 fn on_game_won(
     _trigger: Trigger<GameWon>,
     mut crosshair: Single<&mut CrosshairState>,
     mut block_input: ResMut<BlocksInput>,
     mut commands: Commands,
+    game_won_marker: Query<(), With<GameWonMarker>>,
 ) {
+    if !game_won_marker.is_empty() {
+        return;
+    }
+    commands.spawn((GameWonMarker, StateScoped(Screen::Gameplay)));
     commands.spawn((
         widget::ui_root("Game Won Menu"),
         GlobalZIndex(2),

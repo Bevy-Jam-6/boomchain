@@ -96,7 +96,6 @@ pub(crate) struct PrepTimeText;
 fn spawn_wave_hud(mut commands: Commands) {
     commands.spawn((
         Name::new("Health HUD"),
-        GlobalZIndex(2),
         Node {
             flex_direction: FlexDirection::Column,
             margin: UiRect::horizontal(Auto),
@@ -110,15 +109,16 @@ fn spawn_wave_hud(mut commands: Commands) {
             (Text::new("Wave 1/10:"), WaveText),
             (
                 Node {
-                    width: Percent(100.0),
-                    max_width: Px(300.0),
+                    width: Percent(300.0),
+                    max_width: Px(1000.0),
                     min_height: Px(50.0),
+                    margin: UiRect::all(Px(10.0)),
                     flex_direction: FlexDirection::Row,
                     flex_wrap: FlexWrap::Wrap,
                     ..default()
                 },
                 BorderRadius::all(Px(10.0)),
-                BackgroundColor(Color::from(tailwind::GRAY_200).with_alpha(0.3)),
+                BackgroundColor(Color::from(tailwind::GRAY_200).with_alpha(0.2)),
                 WaveIconParent,
             )
         ],
@@ -142,14 +142,13 @@ fn add_angry_icon(
         warn!("Angry icon already exists for enemy {enemy}");
         return;
     }
-    info!("Adding angry icon for enemy {enemy}");
     commands.entity(container).with_child((
         Node {
             width: Px(32.0),
             height: Px(32.0),
             ..default()
         },
-        ImageNode::new(hud_assets.angry.clone()).with_color(Color::BLACK),
+        ImageNode::new(hud_assets.angry.clone()).with_color(Color::srgba(0.0, 0.0, 0.0, 3.0)),
         AngryIcon(enemy),
     ));
 }
@@ -184,7 +183,7 @@ fn add_dead_icon(
         .remove::<AngryIcon>()
         .insert(DeadIcon)
         .with_child((
-            ImageNode::new(hud_assets.dead.clone()).with_color(Color::srgba(1.0, 0.0, 0.0, 1.0)),
+            ImageNode::new(hud_assets.dead.clone()).with_color(Color::srgba(1.0, 0.0, 0.0, 3.0)),
         ));
 }
 
@@ -243,14 +242,13 @@ fn spawn_health_bar(health: Single<&Health, With<Player>>, mut commands: Command
     commands.spawn((
         Name::new("Health HUD"),
         StateScoped(Screen::Gameplay),
-        GlobalZIndex(2),
         Node {
             position_type: PositionType::Absolute,
             width: Percent(100.0),
             height: Percent(100.0),
             align_items: AlignItems::End,
             justify_content: JustifyContent::Center,
-            bottom: Px(60.0),
+            bottom: Px(20.0),
             ..default()
         },
         Pickable::IGNORE,
@@ -258,11 +256,11 @@ fn spawn_health_bar(health: Single<&Health, With<Player>>, mut commands: Command
             Node {
                 width: Percent(100.0),
                 max_width: Px(500.0),
-                height: Px(50.0),
+                height: Px(30.0),
                 ..default()
             },
             BorderRadius::all(Px(10.0)),
-            BackgroundColor(Color::from(tailwind::GRAY_600)),
+            BackgroundColor(Color::from(tailwind::ZINC_900.with_alpha(0.8))),
             children![(
                 HealthBar,
                 Node {
@@ -271,16 +269,16 @@ fn spawn_health_bar(health: Single<&Health, With<Player>>, mut commands: Command
                     ..default()
                 },
                 BorderRadius::all(Px(10.0)),
-                BackgroundColor(Color::from(tailwind::RED_500)),
+                BackgroundColor(Color::from(tailwind::RED_500.with_alpha(0.5))),
             )],
         )],
     ));
 }
 
 fn update_health_bar(
-    health: Single<&Health, With<Player>>,
+    health: Single<Option<&Health>, With<Player>>,
     mut health_bar: Single<&mut Node, With<HealthBar>>,
 ) {
-    let hp = health.fraction();
+    let hp = health.map(|h| h.fraction()).unwrap_or(0.0);
     health_bar.width = Percent(hp * 100.0);
 }
