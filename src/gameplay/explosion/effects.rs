@@ -27,7 +27,6 @@ use crate::{
     despawn_after::DespawnAfter,
     gameplay::{
         explosion::ExplodeOnDeath, health::OnDeath, npc::stats::NpcStats,
-        player::camera::CustomRenderLayer,
     },
     platform_support::is_webgpu_or_native,
 };

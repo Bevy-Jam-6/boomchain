@@ -9,7 +9,7 @@ use crate::{
     PrePhysicsAppSystems,
     gameplay::{
         hud::WaveIconParent,
-        npc::{NPC_RADIUS, Npc, stats::NpcStats},
+        npc::{Npc, stats::NpcStats},
     },
     props::generic::BarrelLargeClosed,
     third_party::avian3d::CollisionLayer,
@@ -78,6 +78,9 @@ pub(crate) struct WaveStartedPreparing;
 #[derive(Event)]
 pub(crate) struct WaveFinishedPreparing;
 
+#[derive(Event)]
+pub(crate) struct GameWon;
+
 fn advance_waves(
     mut waves: Single<&mut Waves>,
     packets: Res<SpawnPackets>,
@@ -111,7 +114,7 @@ fn advance_waves(
 
     if waves.is_finished() {
         if enemies.is_empty() {
-            info_once!("Game finished");
+            commands.trigger(GameWon);
         } else {
             info_once!("Game finished, but there are still enemies");
         }
