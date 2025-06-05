@@ -1,20 +1,24 @@
 use std::time::Duration;
 
+use super::{Player, assets::PlayerAssets, camera::PlayerCamera, default_input::Shoot};
 use crate::{
     RenderLayer,
     audio::{sound_effect, sped_up_sound_effect},
     despawn_after::DespawnAfter,
     gameplay::{
-        crosshair::CrosshairState, health::OnDamage, npc::Npc, player::camera_shake::OnTrauma,
+        crosshair::CrosshairState,
+        health::OnDamage,
+        npc::Npc,
+        player::{camera::CustomRenderLayer, camera_shake::OnTrauma},
     },
     third_party::avian3d::CollisionLayer,
 };
-
-use super::{Player, assets::PlayerAssets, camera::PlayerCamera, default_input::Shoot};
 use avian3d::prelude::*;
 use bevy::{prelude::*, render::view::RenderLayers};
 use bevy_enhanced_input::events::Started;
 use bevy_hanabi::prelude::*;
+#[cfg(feature = "hot_patch")]
+use bevy_simple_subsecond_system::hot;
 
 #[derive(Component, Debug, Reflect)]
 #[reflect(Component)]
@@ -40,6 +44,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_observer(shooting_sounds);
     app.add_observer(handle_hits);
     app.add_observer(shooting_sounds_reload);
+    app.add_observer(spawn_muzzle_flash);
 
     // Only until the animations work again.
     app.add_systems(Update, remove_shooting);
@@ -129,6 +134,40 @@ fn shooting_sounds_reload(
     player_assets: ResMut<PlayerAssets>,
 ) {
     commands.spawn(sound_effect(player_assets.reload_sound.clone()));
+}
+
+#[cfg_attr(feature = "hot_patch", hot)]
+fn spawn_muzzle_flash(
+    _trigger: Trigger<OnAdd, Shooting>,
+    cam: Single<Entity, With<PlayerCamera>>,
+    mut commands: Commands,
+) {
+    commands.entity(*cam).with_children(|parent| {
+        parent.spawn((
+            Transform::from_xyz(-0.45, -0.1, -3.8),
+            DespawnAfter::new(Duration::from_millis(200)),
+            PointLight {
+                intensity: 7000.0,
+                shadows_enabled: false,
+                ..default()
+            },
+            RenderLayers::from(RenderLayer::VIEW_MODEL),
+            CustomRenderLayer,
+        ));
+        parent.spawn((
+            Transform::from_xyz(-0.5, -0.1, -0.0),
+            DespawnAfter::new(Duration::from_millis(200)),
+            PointLight {
+                intensity: 23500.0,
+                shadows_enabled: true,
+                #[cfg(feature = "native")]
+                soft_shadows_enabled: true,
+                ..default()
+            },
+            RenderLayers::from(RenderLayer::DEFAULT),
+            CustomRenderLayer,
+        ));
+    });
 }
 
 fn handle_hits(

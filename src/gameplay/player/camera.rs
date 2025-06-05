@@ -284,16 +284,30 @@ fn sync_camera_translation_with_player(
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
-fn add_render_layers_to_point_light(trigger: Trigger<OnAdd, PointLight>, mut commands: Commands) {
+fn add_render_layers_to_point_light(
+    trigger: Trigger<OnAdd, PointLight>,
+    custom_render_layer: Query<(), With<CustomRenderLayer>>,
+    mut commands: Commands,
+) {
     let entity = trigger.target();
+    if custom_render_layer.contains(entity) {
+        return;
+    }
     commands.entity(entity).insert(RenderLayers::from(
         RenderLayer::DEFAULT | RenderLayer::VIEW_MODEL,
     ));
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
-fn add_render_layers_to_spot_light(trigger: Trigger<OnAdd, SpotLight>, mut commands: Commands) {
+fn add_render_layers_to_spot_light(
+    trigger: Trigger<OnAdd, SpotLight>,
+    custom_render_layer: Query<(), With<CustomRenderLayer>>,
+    mut commands: Commands,
+) {
     let entity = trigger.target();
+    if custom_render_layer.contains(entity) {
+        return;
+    }
     commands.entity(entity).insert(RenderLayers::from(
         RenderLayer::DEFAULT | RenderLayer::VIEW_MODEL,
     ));
@@ -302,9 +316,13 @@ fn add_render_layers_to_spot_light(trigger: Trigger<OnAdd, SpotLight>, mut comma
 #[cfg_attr(feature = "hot_patch", hot)]
 fn add_render_layers_to_directional_light(
     trigger: Trigger<OnAdd, DirectionalLight>,
+    custom_render_layer: Query<(), With<CustomRenderLayer>>,
     mut commands: Commands,
 ) {
     let entity = trigger.target();
+    if custom_render_layer.contains(entity) {
+        return;
+    }
     commands.entity(entity).insert(RenderLayers::from(
         RenderLayer::DEFAULT | RenderLayer::VIEW_MODEL,
     ));
@@ -313,6 +331,10 @@ fn add_render_layers_to_directional_light(
 #[derive(Resource, Reflect, Debug, Deref, DerefMut)]
 #[reflect(Resource)]
 pub(crate) struct WorldModelFov(pub(crate) f32);
+
+#[derive(Component, Debug, Reflect)]
+#[reflect(Component)]
+pub(crate) struct CustomRenderLayer;
 
 impl Default for WorldModelFov {
     fn default() -> Self {
