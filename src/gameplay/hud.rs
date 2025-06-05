@@ -109,15 +109,16 @@ fn spawn_wave_hud(mut commands: Commands) {
             (Text::new("Wave 1/10:"), WaveText),
             (
                 Node {
-                    width: Percent(100.0),
-                    max_width: Px(300.0),
+                    width: Percent(300.0),
+                    max_width: Px(1000.0),
                     min_height: Px(50.0),
+                    margin: UiRect::all(Px(10.0)),
                     flex_direction: FlexDirection::Row,
                     flex_wrap: FlexWrap::Wrap,
                     ..default()
                 },
                 BorderRadius::all(Px(10.0)),
-                BackgroundColor(Color::from(tailwind::GRAY_200).with_alpha(0.3)),
+                BackgroundColor(Color::from(tailwind::GRAY_200).with_alpha(0.2)),
                 WaveIconParent,
             )
         ],
@@ -247,7 +248,7 @@ fn spawn_health_bar(health: Single<&Health, With<Player>>, mut commands: Command
             height: Percent(100.0),
             align_items: AlignItems::End,
             justify_content: JustifyContent::Center,
-            bottom: Px(60.0),
+            bottom: Px(20.0),
             ..default()
         },
         Pickable::IGNORE,
@@ -255,11 +256,11 @@ fn spawn_health_bar(health: Single<&Health, With<Player>>, mut commands: Command
             Node {
                 width: Percent(100.0),
                 max_width: Px(500.0),
-                height: Px(50.0),
+                height: Px(30.0),
                 ..default()
             },
             BorderRadius::all(Px(10.0)),
-            BackgroundColor(Color::from(tailwind::GRAY_600)),
+            BackgroundColor(Color::from(tailwind::ZINC_900.with_alpha(0.8))),
             children![(
                 HealthBar,
                 Node {
@@ -268,7 +269,7 @@ fn spawn_health_bar(health: Single<&Health, With<Player>>, mut commands: Command
                     ..default()
                 },
                 BorderRadius::all(Px(10.0)),
-                BackgroundColor(Color::from(tailwind::RED_500)),
+                BackgroundColor(Color::from(tailwind::RED_500.with_alpha(0.5))),
             )],
         )],
     ));
