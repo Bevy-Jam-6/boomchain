@@ -6,7 +6,10 @@ use bevy::prelude::*;
 use bevy_simple_subsecond_system::hot;
 use bevy_trenchbroom::prelude::*;
 
-use crate::props::{effects::disable_shadow_casting_on_instance_ready, setup::static_bundle};
+use crate::{
+    props::{effects::disable_shadow_casting_on_instance_ready, setup::static_bundle},
+    third_party::bevy_trenchbroom::LoadTrenchbroomModel as _,
+};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_observer(setup_lamp_shaded);
@@ -27,12 +30,11 @@ fn setup_lamp_shaded(
     asset_server: Res<AssetServer>,
     mut commands: Commands,
 ) {
-    let bundle =
-        static_bundle::<LampShaded>(&asset_server, ColliderConstructor::ConvexHullFromMesh);
+    let model = asset_server.load_trenchbroom_model::<LampShaded>();
     commands
         .entity(trigger.target())
         .insert((
-            bundle,
+            SceneRoot(model),
             children![(
                 SpotLight {
                     color: Color::srgb_u8(232, 199, 176),
