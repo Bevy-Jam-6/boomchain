@@ -110,7 +110,7 @@ fn spawn_wave_hud(mut commands: Commands) {
             flex_direction: FlexDirection::Column,
             margin: UiRect::horizontal(Auto),
             align_items: AlignItems::Center,
-            top: Px(20.0),
+            top: Px(10.0),
             ..default()
         },
         StateScoped(Screen::Gameplay),
@@ -120,9 +120,9 @@ fn spawn_wave_hud(mut commands: Commands) {
             (
                 Node {
                     width: Percent(300.0),
-                    max_width: Px(1000.0),
-                    min_height: Px(50.0),
-                    margin: UiRect::all(Px(10.0)),
+                    max_width: Px(1100.0),
+                    min_height: Px(32.0),
+                    margin: UiRect::horizontal(Px(10.0)),
                     flex_direction: FlexDirection::Row,
                     flex_wrap: FlexWrap::Wrap,
                     ..default()
