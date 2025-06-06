@@ -13,66 +13,68 @@ use crate::{
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(
         Update,
-        (tag_out_of_navmesh, despawn_out_of_navmesh, despawn_lonely)
-            .in_set(PostPhysicsAppSystems::TickTimers),
+        (despawn_lazy, despawn_lonely).in_set(PostPhysicsAppSystems::TickTimers),
     );
-}
-
-fn tag_out_of_navmesh(
-    mut commands: Commands,
-    agent_state: Query<(Entity, &AgentState, &AgentOf)>,
-    parent: Query<(&LinearVelocity, &AiState)>,
-) {
-    for (entity, agent_state, agent_of) in agent_state.iter() {
-        let Ok((velocity, ai_state)) = parent.get(agent_of.get()) else {
-            error!("Agent parent has no velocity");
-            continue;
-        };
-        if is_out_of_navmesh(*agent_state, *velocity, ai_state.clone()) {
-            commands.entity(entity).insert(OutOfNavmesh::default());
-        }
-    }
-}
-
-fn despawn_out_of_navmesh(
-    mut commands: Commands,
-    mut out_of_navmesh: Query<(Entity, &AgentState, &mut OutOfNavmesh, &AgentOf)>,
-    parent: Query<(&LinearVelocity, &AiState)>,
-    time: Res<Time>,
-) {
-    for (agent_entity, agent_state, mut out_of_navmesh, agent_of) in out_of_navmesh.iter_mut() {
-        let parent_entity = agent_of.get();
-        let Ok((velocity, ai_state)) = parent.get(parent_entity) else {
-            error!("Agent parent has no velocity");
-            continue;
-        };
-        if !is_out_of_navmesh(*agent_state, *velocity, ai_state.clone()) {
-            commands.entity(agent_entity).remove::<OutOfNavmesh>();
-            continue;
-        }
-        out_of_navmesh.0.tick(time.delta());
-        if out_of_navmesh.0.finished() {
-            commands.entity(parent_entity).trigger(OnDamage(1000.0));
-        }
-    }
-}
-
-fn is_out_of_navmesh(agent_state: AgentState, velocity: LinearVelocity, ai_state: AiState) -> bool {
-    match agent_state {
-        AgentState::AgentNotOnNavMesh | AgentState::NoPath => true,
-        AgentState::Moving => velocity.length_squared() > 1.0,
-        _ if matches!(ai_state, AiState::Chase) => velocity.length_squared() > 1.0,
-        _ => false,
-    }
+    app.add_observer(init_last_translation);
 }
 
 #[derive(Component, Debug, Reflect)]
 #[reflect(Component)]
-pub(crate) struct OutOfNavmesh(Timer);
+pub(crate) struct Lazy {
+    begin: Vec3,
+    timer: Timer,
+}
 
-impl Default for OutOfNavmesh {
-    fn default() -> Self {
-        Self(Timer::from_seconds(5.0, TimerMode::Repeating))
+#[derive(Component, Debug, Reflect, Deref, DerefMut)]
+#[reflect(Component)]
+pub(crate) struct LastEnemyTranslation(Vec3);
+
+fn init_last_translation(
+    trigger: Trigger<OnAdd, Npc>,
+    mut commands: Commands,
+    transform: Query<&Transform>,
+) {
+    let transform = transform.get(trigger.target()).copied().unwrap_or_default();
+    commands
+        .entity(trigger.target())
+        .insert(LastEnemyTranslation(transform.translation));
+}
+
+fn despawn_lazy(
+    mut commands: Commands,
+    mut enemies: Query<(
+        Entity,
+        &mut LastEnemyTranslation,
+        &AiState,
+        &Transform,
+        Option<&mut Lazy>,
+    )>,
+    time: Res<Time>,
+) {
+    for (entity, mut last_translation_mut, ai_state, transform, mut lazy) in enemies.iter_mut() {
+        let last_translation = **last_translation_mut;
+        let translation = transform.translation;
+        **last_translation_mut = translation;
+        if let Some(mut lazy) = lazy {
+            if lazy.begin.distance_squared(translation) > 1.0 || matches!(ai_state, AiState::Attack)
+            {
+                commands.entity(entity).remove::<Lazy>();
+                continue;
+            }
+            lazy.timer.tick(time.delta());
+            if lazy.timer.finished() {
+                commands.entity(entity).trigger(OnDamage(1000.0));
+            }
+            continue;
+        }
+        if translation.distance_squared(last_translation) < 1.0
+            && !matches!(ai_state, AiState::Attack)
+        {
+            commands.entity(entity).insert(Lazy {
+                begin: translation,
+                timer: Timer::from_seconds(5.0, TimerMode::Once),
+            });
+        }
     }
 }
 
