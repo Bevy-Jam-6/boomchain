@@ -51,8 +51,26 @@ impl FromWorld for ExplosionAssets {
         };
         let blood_splatter = ShuffleBag::try_new(
             [
-                create_material(world, "images/blood/BloodFabric01.png"),
-                create_material(world, "images/blood/BloodFabric04.png"),
+                create_material(world, {
+                    #[cfg(feature = "dev")]
+                    {
+                        "images/blood/BloodFabric01.png"
+                    }
+                    #[cfg(not(feature = "dev"))]
+                    {
+                        "images/blood/BloodFabric01.ktx2"
+                    }
+                }),
+                create_material(world, {
+                    #[cfg(feature = "dev")]
+                    {
+                        "images/blood/BloodFabric04.png"
+                    }
+                    #[cfg(not(feature = "dev"))]
+                    {
+                        "images/blood/BloodFabric04.ktx2"
+                    }
+                }),
             ],
             rng,
         )
