@@ -147,14 +147,18 @@ fn play_animations(
                     }
                     PlayerAnimationState::Idle => {
                         transitions
-                            .play(&mut anim_player, animations.idle, Duration::from_millis(50))
+                            .play(
+                                &mut anim_player,
+                                animations.idle,
+                                Duration::from_millis(300),
+                            )
                             .repeat();
                     }
                     PlayerAnimationState::Shooting => {
                         transitions.play(
                             &mut anim_player,
                             animations.shoot,
-                            Duration::from_millis(300),
+                            Duration::from_millis(50),
                         );
                     }
                     PlayerAnimationState::Walking => {

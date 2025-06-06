@@ -17,15 +17,15 @@
 			"mesh":0,
 			"name":"Gun",
 			"rotation":[
-				0.4964591860771179,
-				-0.49080973863601685,
-				0.5090734362602234,
-				0.5034664273262024
+				0.5010464191436768,
+				-0.49544858932495117,
+				0.5045598149299622,
+				0.4989014267921448
 			],
 			"translation":[
-				0.44363531470298767,
+				0.3488178253173828,
 				-1.0949963331222534,
-				1.8161286115646362
+				1.5137739181518555
 			]
 		}
 	],
@@ -185,7 +185,7 @@
 				},
 				{
 					"input":24,
-					"interpolation":"STEP",
+					"interpolation":"LINEAR",
 					"output":25
 				}
 			]
@@ -437,9 +437,9 @@
 		{
 			"bufferView":21,
 			"componentType":5126,
-			"count":16,
+			"count":12,
 			"max":[
-				0.6666666666666666
+				0.5
 			],
 			"min":[
 				0.041666666666666664
@@ -449,13 +449,13 @@
 		{
 			"bufferView":22,
 			"componentType":5126,
-			"count":16,
+			"count":12,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":23,
 			"componentType":5126,
-			"count":16,
+			"count":12,
 			"type":"VEC4"
 		},
 		{
@@ -463,7 +463,7 @@
 			"componentType":5126,
 			"count":2,
 			"max":[
-				0.6666666666666666
+				0.5
 			],
 			"min":[
 				0.041666666666666664
@@ -593,28 +593,28 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":64,
+			"byteLength":48,
 			"byteOffset":15060
 		},
 		{
 			"buffer":0,
-			"byteLength":192,
-			"byteOffset":15124
+			"byteLength":144,
+			"byteOffset":15108
 		},
 		{
 			"buffer":0,
-			"byteLength":256,
-			"byteOffset":15316
+			"byteLength":192,
+			"byteOffset":15252
 		},
 		{
 			"buffer":0,
 			"byteLength":8,
-			"byteOffset":15572
+			"byteOffset":15444
 		},
 		{
 			"buffer":0,
 			"byteLength":24,
-			"byteOffset":15580
+			"byteOffset":15452
 		}
 	],
 	"samplers":[
@@ -625,7 +625,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":15604,
+			"byteLength":15476,
 			"uri":"pump_action_shotgun.bin"
 		}
 	]
