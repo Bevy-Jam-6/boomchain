@@ -1,13 +1,9 @@
-use avian3d::prelude::LinearVelocity;
 use bevy::{ecs::relationship::Relationship, prelude::*};
-use bevy_landmass::AgentState;
 
 use crate::{
-    PostPhysicsAppSystems,
     audio::sound_effect,
     gameplay::{
         health::{Health, OnDamage},
-        npc::{Npc, ai_state::AiState, navigation::AgentOf},
         player::{Player, assets::PlayerAssets, camera_shake::OnTrauma},
     },
 };

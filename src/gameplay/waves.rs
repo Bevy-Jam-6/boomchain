@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use avian3d::prelude::*;
-use bevy::{platform::collections::HashMap, prelude::*, time::Stopwatch};
+use bevy::{prelude::*, time::Stopwatch};
 use bevy_trenchbroom::prelude::*;
 use rand::seq::SliceRandom as _;
 

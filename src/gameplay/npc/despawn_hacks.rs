@@ -1,12 +1,11 @@
 use avian3d::prelude::*;
 use bevy::{ecs::relationship::Relationship as _, prelude::*};
-use bevy_landmass::AgentState;
 
 use crate::{
     PostPhysicsAppSystems,
     gameplay::{
         health::OnDamage,
-        npc::{Npc, ai_state::AiState, navigation::AgentOf},
+        npc::{Npc, ai_state::AiState},
     },
 };
 
@@ -51,7 +50,7 @@ fn despawn_lazy(
     )>,
     time: Res<Time>,
 ) {
-    for (entity, mut last_translation_mut, ai_state, transform, mut lazy) in enemies.iter_mut() {
+    for (entity, mut last_translation_mut, ai_state, transform, lazy) in enemies.iter_mut() {
         let last_translation = **last_translation_mut;
         let translation = transform.translation;
         **last_translation_mut = translation;
