@@ -110,7 +110,8 @@ fn spawn_wave_hud(mut commands: Commands) {
             flex_direction: FlexDirection::Column,
             margin: UiRect::horizontal(Auto),
             align_items: AlignItems::Center,
-            top: Px(10.0),
+            top: Px(5.0),
+            row_gap: Px(5.0),
             ..default()
         },
         StateScoped(Screen::Gameplay),
@@ -120,7 +121,7 @@ fn spawn_wave_hud(mut commands: Commands) {
             (
                 Node {
                     width: Percent(300.0),
-                    max_width: Px(1100.0),
+                    max_width: Px(1200.0),
                     min_height: Px(32.0),
                     margin: UiRect::horizontal(Px(10.0)),
                     flex_direction: FlexDirection::Row,
@@ -228,8 +229,14 @@ fn spawn_prep_icon(
             children![
                 (Text::new(""), PrepTimeText),
                 (
-                    Text::new("Press F to open the upgrade menu!"),
-                    UpgradeMenuText(Timer::from_seconds(0.7, TimerMode::Repeating)),
+                    Node {
+                        margin: UiRect::top(Px(10.0)),
+                        ..default()
+                    },
+                    Text::new("Press F to upgrade!"),
+                    TextFont::default().with_font_size(24.0),
+                    TextColor(Color::from(tailwind::GREEN_600)),
+                    UpgradeMenuText(Timer::from_seconds(0.7, TimerMode::Once)),
                 ),
             ],
         ));
@@ -252,6 +259,12 @@ fn blink_upgrade_menu_text(
             Visibility::Visible | Visibility::Inherited => Visibility::Hidden,
             Visibility::Hidden => Visibility::Inherited,
         };
+        **timer = match *visibility {
+            Visibility::Visible | Visibility::Inherited => {
+                Timer::from_seconds(0.7, TimerMode::Once)
+            }
+            Visibility::Hidden => Timer::from_seconds(0.3, TimerMode::Once),
+        }
     }
 }
 
