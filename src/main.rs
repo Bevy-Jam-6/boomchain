@@ -206,7 +206,7 @@ impl From<RenderLayer> for RenderLayers {
 }
 
 /// Whether or not the game is paused.
-#[derive(States, Copy, Clone, Eq, PartialEq, Hash, Debug, Default)]
+#[derive(States, Copy, Clone, Eq, PartialEq, Hash, Debug, Default, Deref, DerefMut)]
 #[states(scoped_entities)]
 struct Pause(pub(crate) bool);
 

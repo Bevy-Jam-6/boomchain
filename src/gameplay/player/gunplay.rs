@@ -30,11 +30,11 @@ pub(crate) struct Reloading;
 
 #[derive(Debug, Component, Reflect)]
 #[reflect(Component)]
-struct WeaponStats {
-    damage: f32,
-    pellets: u32,
-    spread_radius: f32,
-    pushback: f32,
+pub(crate) struct WeaponStats {
+    pub(crate) damage: f32,
+    pub(crate) pellets: u32,
+    pub(crate) spread_radius: f32,
+    pub(crate) pushback: f32,
 }
 
 pub(super) fn plugin(app: &mut App) {

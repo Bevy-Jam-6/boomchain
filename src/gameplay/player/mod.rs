@@ -15,7 +15,7 @@ use bevy_trenchbroom::prelude::*;
 use default_input::DefaultInputContext;
 use navmesh_position::LastValidPlayerNavmeshPosition;
 
-use crate::third_party::avian3d::CollisionLayer;
+use crate::{gameplay::player::movement::MovementStats, third_party::avian3d::CollisionLayer};
 
 use super::health::Health;
 
@@ -88,6 +88,7 @@ fn setup_player(trigger: Trigger<OnAdd, Player>, mut commands: Commands) {
             // The player character needs to be configured as a dynamic rigid body of the physics
             // engine.
             Collider::capsule(PLAYER_RADIUS, PLAYER_CAPSULE_LENGTH),
+            MovementStats::default(),
             // This is Tnua's interface component.
             TnuaController::default(),
             // A sensor shape is not strictly necessary, but without it we'll get weird results.

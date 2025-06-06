@@ -35,6 +35,18 @@ struct AccumulatedInput {
     last_move: Option<Vec3>,
 }
 
+#[derive(Component, Reflect)]
+#[reflect(Component)]
+pub(crate) struct MovementStats {
+    pub(crate) speed_factor: f32,
+}
+
+impl Default for MovementStats {
+    fn default() -> Self {
+        Self { speed_factor: 1.0 }
+    }
+}
+
 #[cfg_attr(feature = "hot_patch", hot)]
 fn init_accumulated_input(trigger: Trigger<OnAdd, Player>, mut commands: Commands) {
     commands
@@ -59,10 +71,10 @@ fn clear_accumulated_input(mut accumulated_inputs: Query<&mut AccumulatedInput>)
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn apply_movement(
-    player_controller: Single<(&mut TnuaController, &AccumulatedInput)>,
+    player_controller: Single<(&mut TnuaController, &AccumulatedInput, &MovementStats)>,
     transform: Single<&Transform, With<PlayerCamera>>,
 ) {
-    let (mut controller, accumulated_input) = player_controller.into_inner();
+    let (mut controller, accumulated_input, movement_stats) = player_controller.into_inner();
     let last_move = accumulated_input.last_move.unwrap_or_default();
     // Feed the basis every frame. Even if the player doesn't move - just use `desired_velocity:
     // Vec3::ZERO`. `TnuaController` starts without a basis, which will make the character collider
@@ -71,7 +83,7 @@ fn apply_movement(
     let yaw_quat = Quat::from_axis_angle(Vec3::Y, yaw);
     controller.basis(TnuaBuiltinWalk {
         // The `desired_velocity` determines how the character will move.
-        desired_velocity: yaw_quat * last_move,
+        desired_velocity: yaw_quat * last_move * movement_stats.speed_factor,
         // The `float_height` must be greater (even if by little) from the distance between the
         // character's center and the lowest point of its collider.
         float_height: PLAYER_FLOAT_HEIGHT,
