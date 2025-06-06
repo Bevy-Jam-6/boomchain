@@ -331,8 +331,8 @@ impl Default for SpawnPackets {
                     (Millis(200), SpawnVariant::BasicEnemy),
                     (Millis(300), SpawnVariant::BasicEnemy),
                     (Millis(400), SpawnVariant::BasicEnemy),
-                    (Millis(100), SpawnVariant::BasicEnemy),
-                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(400), SpawnVariant::BasicEnemy),
+                    (Millis(400), SpawnVariant::BasicEnemy),
                     (Millis(500), SpawnVariant::BasicEnemy),
                     (Millis(600), SpawnVariant::BasicEnemy),
                     (Millis(700), SpawnVariant::BasicEnemy),
@@ -357,8 +357,8 @@ impl Default for SpawnPackets {
                     (Millis(200), SpawnVariant::BasicEnemy),
                     (Millis(300), SpawnVariant::BasicEnemy),
                     (Millis(400), SpawnVariant::BasicEnemy),
-                    (Millis(100), SpawnVariant::BasicEnemy),
-                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(400), SpawnVariant::BasicEnemy),
+                    (Millis(400), SpawnVariant::BasicEnemy),
                     (Millis(500), SpawnVariant::BasicEnemy),
                     (Millis(600), SpawnVariant::BasicEnemy),
                     (Millis(700), SpawnVariant::BasicEnemy),
@@ -718,8 +718,6 @@ impl Waves {
                     .unwrap()
                     .packet_kinds
                     .remove(&millis);
-            } else {
-                break;
             }
         }
         difficulties
