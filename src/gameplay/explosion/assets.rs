@@ -52,8 +52,7 @@ impl FromWorld for ExplosionAssets {
         let blood_splatter = ShuffleBag::try_new(
             [
                 create_material(world, "images/blood/BloodFabric01.png"),
-                create_material(world, "images/blood/BloodFabric07.png"),
-                create_material(world, "images/blood/BloodFabric12.png"),
+                create_material(world, "images/blood/BloodFabric04.png"),
             ],
             rng,
         )

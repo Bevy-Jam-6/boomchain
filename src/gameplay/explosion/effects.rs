@@ -19,6 +19,7 @@ use bevy_hanabi::{
     SetVelocitySphereModifier, ShapeDimension, SpawnerSettings, Value,
 };
 use bevy_mesh_decal::spray_decal;
+use rand::Rng as _;
 
 use super::{OnExplode, assets::ExplosionAssets};
 use crate::{
@@ -132,12 +133,22 @@ fn on_enemy_death(
         .clone();
 
     // Generate a somewhat randomized rotation for the spray decal.
+    let mut rng = rand::thread_rng();
     let mut rotation = Quat::from_rotation_x(-std::f32::consts::FRAC_PI_2);
-    rotation = Quat::from_rotation_y(rand::random::<f32>() * std::f32::consts::TAU) * rotation;
-    rotation = Quat::from_rotation_z(rand::random::<f32>() * 10f32.to_radians()) * rotation;
+    rotation = Quat::from_rotation_y(rng.gen_range(0.0..std::f32::consts::TAU)) * rotation;
+    rotation = Quat::from_rotation_z(rng.gen_range(0.0..10f32.to_radians())) * rotation;
+    let scale_x = rng.gen_range(0.8..1.2);
+    let scale_y = rng.gen_range(0.8..1.2);
+    let scale_z = rng.gen_range(0.8..1.2);
+    let base_scale = scale * 2.5;
 
     let spray_transform = transform
-        .with_scale(Vec3::new(scale * 2.0, scale * 2.0, scale * 2.0))
+        .with_translation(transform.translation - Vec3::Y * 0.3)
+        .with_scale(Vec3::new(
+            base_scale * scale_x,
+            base_scale * scale_y,
+            base_scale * scale_z,
+        ))
         .with_rotation(rotation);
     spray_decal(&mut commands, blood_decal_texture, spray_transform);
 }
