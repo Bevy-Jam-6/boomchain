@@ -1,5 +1,4 @@
-use avian3d::prelude::*;
-use bevy::{ecs::relationship::Relationship as _, prelude::*};
+use bevy::prelude::*;
 
 use crate::{
     PostPhysicsAppSystems,

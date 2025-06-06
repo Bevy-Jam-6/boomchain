@@ -1,4 +1,4 @@
-use bevy::{ecs::relationship::Relationship, prelude::*};
+use bevy::prelude::*;
 
 use crate::{
     audio::sound_effect,
