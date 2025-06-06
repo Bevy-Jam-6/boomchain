@@ -533,9 +533,7 @@ fn advance_waves(
             .iter_mut()
             .flat_map(|packet| packet.pop_spawns())
             .collect::<Vec<_>>();
-        if !spawns.is_empty() {
-            info!("Spawning {} enemies", spawns.len());
-        }
+
         waves.clean_finished_packets();
         let spawners = spawners.iter().collect::<Vec<_>>();
         for spawn in spawns {
@@ -566,7 +564,6 @@ fn advance_waves(
             ));
             match spawn {
                 SpawnVariant::BasicEnemy => {
-                    info!("Spawning basic enemy");
                     spawn_commands.insert((
                         Name::new("Basic Enemy"),
                         Npc,
@@ -583,7 +580,6 @@ fn advance_waves(
                     ));
                 }
                 SpawnVariant::BigEnemy => {
-                    info!("Spawning big enemy");
                     spawn_commands.insert((
                         Name::new("Big Enemy"),
                         Npc,
@@ -600,7 +596,6 @@ fn advance_waves(
                     ));
                 }
                 SpawnVariant::SmallEnemy => {
-                    info!("Spawning small enemy");
                     spawn_commands.insert((
                         Name::new("Small Enemy"),
                         Npc,
@@ -617,7 +612,6 @@ fn advance_waves(
                     ));
                 }
                 SpawnVariant::ExplosiveBarrel => {
-                    info!("Spawning explosive barrel");
                     spawn_commands.insert((Name::new("Explosive Barrel"), BarrelLargeClosed));
                 }
             }
@@ -724,7 +718,7 @@ impl Waves {
                 self.current_wave_mut()
                     .unwrap()
                     .packet_kinds
-                    .remove(&millis);
+                    .retain(|(m, _)| *m != millis);
             }
         }
         difficulties
@@ -766,7 +760,7 @@ impl Default for Spawner {
 #[derive(Reflect, Debug)]
 struct Wave {
     prep_time: Millis,
-    packet_kinds: HashMap<Millis, Difficulty>,
+    packet_kinds: Vec<(Millis, Difficulty)>,
 }
 
 impl Wave {
@@ -829,11 +823,11 @@ impl SpawnPackets {
 struct SpawnPacket {
     difficulty: Difficulty,
     stopwatch: Stopwatch,
-    spawns: HashMap<Millis, SpawnVariant>,
+    spawns: Vec<(Millis, SpawnVariant)>,
 }
 
 impl SpawnPacket {
-    fn new(difficulty: Difficulty, spawns: HashMap<Millis, SpawnVariant>) -> Self {
+    fn new(difficulty: Difficulty, spawns: Vec<(Millis, SpawnVariant)>) -> Self {
         Self {
             difficulty,
             stopwatch: Stopwatch::default(),
@@ -851,7 +845,7 @@ impl SpawnPacket {
         {
             if self.elapsed_millis() > millis {
                 spawns.push(spawn_variant);
-                self.spawns.remove(&millis);
+                self.spawns.retain(|(m, _)| *m != millis);
             }
         }
         spawns
