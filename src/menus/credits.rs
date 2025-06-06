@@ -29,7 +29,7 @@ fn spawn_credits_menu(mut commands: Commands, fonts: Res<FontAssets>) {
         StateScoped(Menu::Credits),
         GlobalZIndex(2),
         children![
-            widget::header("Created by", fonts.default.clone()),
+            widget::header("Created By", fonts.default.clone()),
             created_by(fonts.default.clone()),
             widget::header("Assets", fonts.default.clone()),
             assets(fonts.default.clone()),
@@ -128,7 +128,7 @@ impl FromWorld for CreditsAssets {
     fn from_world(world: &mut World) -> Self {
         let assets = world.resource::<AssetServer>();
         Self {
-            music: assets.load("audio/music/Monkeys Spinning Monkeys.ogg"),
+            music: assets.load("audio/music/crazy_bike.ogg"),
         }
     }
 }

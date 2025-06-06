@@ -29,10 +29,10 @@ fn spawn_pause_menu(
         GlobalZIndex(2),
         StateScoped(Menu::Pause),
         children![
-            widget::header("Game paused", fonts.default.clone()),
+            widget::header("Game Paused", fonts.default.clone()),
             widget::button("Continue", fonts.default.clone(), close_menu),
             widget::button("Settings", fonts.default.clone(), open_settings_menu),
-            widget::button("Quit to title", fonts.default.clone(), quit_to_title),
+            widget::button("Quit to Title", fonts.default.clone(), quit_to_title),
         ],
     ));
     crosshair

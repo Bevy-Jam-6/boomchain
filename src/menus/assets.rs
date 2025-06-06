@@ -20,8 +20,26 @@ impl FromWorld for MenuAssets {
     fn from_world(world: &mut World) -> Self {
         let assets = world.resource::<AssetServer>();
         Self {
-            background_texture_1: assets.load("images/blood/BloodFabric04Grayscale.png"),
-            background_texture_2: assets.load("images/blood/BloodFabric07Grayscale.png"),
+            background_texture_1: assets.load({
+                #[cfg(feature = "dev")]
+                {
+                    "images/blood/BloodFabric04Grayscale.png"
+                }
+                #[cfg(not(feature = "dev"))]
+                {
+                    "images/blood/BloodFabric04Grayscale.ktx2"
+                }
+            }),
+            background_texture_2: assets.load({
+                #[cfg(feature = "dev")]
+                {
+                    "images/blood/BloodFabric07Grayscale.png"
+                }
+                #[cfg(not(feature = "dev"))]
+                {
+                    "images/blood/BloodFabric04Grayscale.ktx2"
+                }
+            }),
         }
     }
 }

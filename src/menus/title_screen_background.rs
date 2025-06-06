@@ -3,7 +3,7 @@
 use bevy::{
     color::palettes::tailwind::{GRAY_600, RED_600},
     prelude::*,
-    window::PrimaryWindow,
+    window::{PrimaryWindow, WindowResized},
 };
 use rand::Rng;
 
@@ -16,9 +16,12 @@ pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Screen::Title), spawn_title_screen_background);
     app.add_systems(
         Update,
-        (scroll_background, animate_alpha).run_if(in_state(Screen::Title)),
+        (scroll_background, animate_alpha, reset_on_window_resize).run_if(in_state(Screen::Title)),
     );
 }
+
+#[derive(Component)]
+struct TextureScrollSpeed(f32);
 
 #[derive(Component)]
 struct AlphaAnimationPhaseProgress(f32);
@@ -60,6 +63,7 @@ fn spawn_title_screen_background(mut commands: Commands, menu_assets: Res<MenuAs
                     image_mode: NodeImageMode::Auto,
                     ..default()
                 },
+                TextureScrollSpeed(80.0),
                 AlphaAnimationPhaseProgress(t),
                 ChildOf(background_entity),
                 Node {
@@ -76,6 +80,21 @@ fn spawn_title_screen_background(mut commands: Commands, menu_assets: Res<MenuAs
     }
 }
 
+fn reset_on_window_resize(
+    event_reader: EventReader<WindowResized>,
+    mut commands: Commands,
+    query: Query<Entity, (With<ImageNode>, With<TextureScrollSpeed>)>,
+) {
+    if event_reader.is_empty() {
+        return;
+    }
+
+    if let Some(entity) = query.iter().next() {
+        commands.entity(entity).despawn();
+        commands.run_system_cached(spawn_title_screen_background);
+    }
+}
+
 fn animate_alpha(
     time: Res<Time>,
     mut query: Query<(&mut ImageNode, &AlphaAnimationPhaseProgress)>,
@@ -88,15 +107,16 @@ fn animate_alpha(
     }
 }
 
+// TODO: This doesn't work well with resizing the window.
 fn scroll_background(
     time: Res<Time>,
-    mut query: Query<(&mut Node, &ComputedNode), With<ImageNode>>,
+    mut query: Query<(&mut Node, &ComputedNode, &TextureScrollSpeed), With<ImageNode>>,
     window: Single<&Window, With<PrimaryWindow>>,
 ) {
     let window_height = window.height();
-    for (mut node, computed_node) in &mut query {
+    for (mut node, computed_node, scroll_speed) in &mut query {
         if let Val::Px(top) = &mut node.top {
-            *top += time.delta_secs() * 40.0;
+            *top += time.delta_secs() * scroll_speed.0;
             if *top > window_height {
                 *top = -computed_node.size.y;
             }
