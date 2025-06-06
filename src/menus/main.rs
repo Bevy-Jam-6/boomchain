@@ -1,34 +1,38 @@
 //! The main menu (seen on the title screen).
+
 use bevy::{prelude::*, window::CursorGrabMode};
 
-use crate::{
-    menus::Menu,
-    screens::Screen,
-    theme::{palette::SCREEN_BACKGROUND, widget},
-};
+use crate::{font::FontAssets, menus::Menu, screens::Screen, theme::widget};
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(OnEnter(Menu::Main), spawn_main_menu);
 }
 
-fn spawn_main_menu(mut commands: Commands) {
+fn spawn_main_menu(mut commands: Commands, fonts: Res<FontAssets>) {
     commands.spawn((
         widget::ui_root("Main Menu"),
-        BackgroundColor(SCREEN_BACKGROUND),
         GlobalZIndex(2),
         StateScoped(Menu::Main),
         #[cfg(not(target_family = "wasm"))]
         children![
-            widget::button("Play", enter_loading_screen),
-            widget::button("Settings", open_settings_menu),
-            widget::button("Credits", open_credits_menu),
-            widget::button("Exit", exit_app),
+            (
+                Text::new("Chainboom"),
+                TextFont::from_font_size(52.0).with_font(fonts.default.clone())
+            ),
+            widget::button("Play", fonts.default.clone(), enter_loading_screen),
+            widget::button("Settings", fonts.default.clone(), open_settings_menu),
+            widget::button("Credits", fonts.default.clone(), open_credits_menu),
+            widget::button("Exit", fonts.default.clone(), exit_app),
         ],
         #[cfg(target_family = "wasm")]
         children![
-            widget::button("Play", enter_loading_screen),
-            widget::button("Settings", open_settings_menu),
-            widget::button("Credits", open_credits_menu),
+            (
+                Text::new("Chainboom"),
+                TextFont::from_font_size(52.0).with_font(fonts.default.clone())
+            ),
+            widget::button("Play", fonts.default.clone(), enter_loading_screen),
+            widget::button("Settings", fonts.default.clone(), open_settings_menu),
+            widget::button("Credits", fonts.default.clone(), open_credits_menu),
         ],
     ));
 }

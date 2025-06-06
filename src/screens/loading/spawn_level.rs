@@ -6,6 +6,7 @@ use bevy_landmass::{NavMesh, coords::ThreeD};
 use bevy_simple_subsecond_system::hot;
 
 use crate::{
+    font::FontAssets,
     gameplay::level::spawn_level,
     screens::Screen,
     theme::{palette::SCREEN_BACKGROUND, prelude::*},
@@ -25,12 +26,12 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
-fn spawn_level_loading_screen(mut commands: Commands) {
+fn spawn_level_loading_screen(mut commands: Commands, fonts: Res<FontAssets>) {
     commands.spawn((
         widget::ui_root("Loading Screen"),
         BackgroundColor(SCREEN_BACKGROUND),
         StateScoped(LoadingScreen::Level),
-        children![widget::label("Spawning Level...")],
+        children![widget::label("Spawning Level...", fonts.default.clone())],
     ));
 }
 

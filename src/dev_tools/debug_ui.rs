@@ -4,6 +4,7 @@ use std::any::Any as _;
 
 use super::input::{ForceFreeCursor, ToggleDebugUi};
 use crate::RenderLayer;
+use crate::font::FontAssets;
 use crate::gameplay::crosshair::CrosshairState;
 use crate::{PostPhysicsAppSystems, theme::widget};
 use avian3d::prelude::*;
@@ -98,7 +99,7 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
-fn setup_debug_ui_text(mut commands: Commands) {
+fn setup_debug_ui_text(mut commands: Commands, fonts: Res<FontAssets>) {
     commands.spawn((
         Name::new("Debug UI"),
         Node {
@@ -109,7 +110,10 @@ fn setup_debug_ui_text(mut commands: Commands) {
             ..default()
         },
         Pickable::IGNORE,
-        children![(widget::label("Debug UI"), DebugUiText)],
+        children![(
+            widget::label("Debug UI", fonts.default.clone()),
+            DebugUiText
+        )],
     ));
 }
 
