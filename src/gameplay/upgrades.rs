@@ -125,7 +125,7 @@ fn upgrade_speed(
     mut movement_stats: Single<&mut MovementStats, With<Player>>,
     mut commands: Commands,
 ) {
-    movement_stats.speed_factor += 0.1;
+    movement_stats.speed_factor += 0.15;
     commands.trigger(DespawnUpgrades);
 }
 
@@ -134,7 +134,7 @@ fn upgrade_accuracy(
     mut weapon_stats: Single<&mut WeaponStats, With<Player>>,
     mut commands: Commands,
 ) {
-    weapon_stats.spread_radius = (weapon_stats.spread_radius - 0.015).max(0.0);
+    weapon_stats.spread_radius = (weapon_stats.spread_radius - 0.02).max(0.0);
     commands.trigger(DespawnUpgrades);
 }
 
@@ -143,7 +143,7 @@ fn upgrade_damage(
     mut weapon_stats: Single<&mut WeaponStats, With<Player>>,
     mut commands: Commands,
 ) {
-    weapon_stats.damage += 1.0;
+    weapon_stats.damage += 1.5;
     commands.trigger(DespawnUpgrades);
 }
 
