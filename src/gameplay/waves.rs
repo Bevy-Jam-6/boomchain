@@ -114,7 +114,6 @@ fn advance_waves(
 
     if waves.is_finished() {
         if enemies.is_empty() {
-            info!("Game won");
             commands.trigger(GameWon);
         } else {
             info_once!("Game finished, but there are still enemies");
@@ -203,8 +202,8 @@ fn advance_waves(
                         Npc,
                         NpcStats {
                             health: 30.0,
-                            desired_speed: 13.0,
-                            max_speed: 13.0,
+                            desired_speed: 12.0,
+                            max_speed: 12.0,
                             attack_damage: 10.0,
                             attack_speed_range: 1.8..2.6,
                             size: 0.7,
