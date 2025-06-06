@@ -533,6 +533,9 @@ fn advance_waves(
             .iter_mut()
             .flat_map(|packet| packet.pop_spawns())
             .collect::<Vec<_>>();
+        if !spawns.is_empty() {
+            info!("Spawning {} enemies", spawns.len());
+        }
         waves.clean_finished_packets();
         let spawners = spawners.iter().collect::<Vec<_>>();
         for spawn in spawns {
@@ -563,6 +566,7 @@ fn advance_waves(
             ));
             match spawn {
                 SpawnVariant::BasicEnemy => {
+                    info!("Spawning basic enemy");
                     spawn_commands.insert((
                         Name::new("Basic Enemy"),
                         Npc,
@@ -579,6 +583,7 @@ fn advance_waves(
                     ));
                 }
                 SpawnVariant::BigEnemy => {
+                    info!("Spawning big enemy");
                     spawn_commands.insert((
                         Name::new("Big Enemy"),
                         Npc,
@@ -595,6 +600,7 @@ fn advance_waves(
                     ));
                 }
                 SpawnVariant::SmallEnemy => {
+                    info!("Spawning small enemy");
                     spawn_commands.insert((
                         Name::new("Small Enemy"),
                         Npc,
@@ -611,6 +617,7 @@ fn advance_waves(
                     ));
                 }
                 SpawnVariant::ExplosiveBarrel => {
+                    info!("Spawning explosive barrel");
                     spawn_commands.insert((Name::new("Explosive Barrel"), BarrelLargeClosed));
                 }
             }
