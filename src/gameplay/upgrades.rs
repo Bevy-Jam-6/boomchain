@@ -41,6 +41,13 @@ pub(crate) enum Upgrade {
     Health,
     Damage,
     Speed,
+    Accuracy,
+}
+impl Upgrade {
+    fn all_except_health() -> Vec<Upgrade> {
+        // Add new upgrades here!
+        vec![Upgrade::Damage, Upgrade::Speed, Upgrade::Accuracy]
+    }
 }
 
 #[derive(Component, Reflect, Debug)]
@@ -48,7 +55,7 @@ pub(crate) enum Upgrade {
 struct UpgradeMenu;
 
 fn offer_upgrades(_trigger: Trigger<WaveStartedPreparing>, mut commands: Commands) {
-    let available_upgrades = [Upgrade::Damage, Upgrade::Speed];
+    let available_upgrades = Upgrade::all_except_health();
     let upgrades = available_upgrades
         .choose_multiple(&mut rand::thread_rng(), 2)
         .copied();
@@ -86,6 +93,9 @@ fn spawn_upgrade_ui(
             Upgrade::Speed => {
                 menu_commands.with_child(button("Increase Movement Speed", upgrade_speed))
             }
+            Upgrade::Accuracy => {
+                menu_commands.with_child(button("Increase Weapon Accuracy", upgrade_accuracy))
+            }
         };
     }
 }
@@ -115,7 +125,16 @@ fn upgrade_speed(
     mut movement_stats: Single<&mut MovementStats, With<Player>>,
     mut commands: Commands,
 ) {
-    movement_stats.speed_factor += 0.3;
+    movement_stats.speed_factor += 0.1;
+    commands.trigger(DespawnUpgrades);
+}
+
+fn upgrade_accuracy(
+    _: Trigger<Pointer<Click>>,
+    mut weapon_stats: Single<&mut WeaponStats, With<Player>>,
+    mut commands: Commands,
+) {
+    weapon_stats.spread_radius = (weapon_stats.spread_radius - 0.015).max(0.0);
     commands.trigger(DespawnUpgrades);
 }
 
@@ -124,7 +143,7 @@ fn upgrade_damage(
     mut weapon_stats: Single<&mut WeaponStats, With<Player>>,
     mut commands: Commands,
 ) {
-    weapon_stats.damage += 3.0;
+    weapon_stats.damage += 1.0;
     commands.trigger(DespawnUpgrades);
 }
 
