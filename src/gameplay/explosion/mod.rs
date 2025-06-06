@@ -296,24 +296,25 @@ impl ExplosionHelper<'_, '_> {
             if let Ok(is_player) = self.damageable_query.get(body) {
                 let mut damage = explosive.damage;
 
-                if is_player && !explosive.damages_player {
-                    continue;
-                }
-
                 if is_player {
+                    // If the explosive damages the player, we apply a scaled damage immediately.
+                    if !explosive.damages_player {
+                        continue;
+                    }
                     damage *= EXPLOSION_PLAYER_DAMAGE_SCALE;
+                    self.commands.entity(body).trigger(OnDamage(damage));
+                } else {
+                    // For damage against enemies or explosives, we use a small delay.
+                    let delay = 0.2;
+                    self.commands
+                        .entity(body)
+                        .try_insert_if_new(AutoTimer(Timer::from_seconds(delay, TimerMode::Once)))
+                        .observe(
+                            move |trigger: Trigger<OnAutoTimerFinish>, mut commands: Commands| {
+                                commands.entity(trigger.target()).trigger(OnDamage(damage));
+                            },
+                        );
                 }
-
-                // Use a small delay.
-                let delay = 0.2;
-                self.commands
-                    .entity(body)
-                    .try_insert_if_new(AutoTimer(Timer::from_seconds(delay, TimerMode::Once)))
-                    .observe(
-                        move |trigger: Trigger<OnAutoTimerFinish>, mut commands: Commands| {
-                            commands.entity(trigger.target()).trigger(OnDamage(damage));
-                        },
-                    );
             }
 
             if !rb.is_dynamic() {
