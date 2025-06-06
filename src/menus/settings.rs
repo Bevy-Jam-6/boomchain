@@ -7,12 +7,12 @@ use bevy::{audio::Volume, input::common_conditions::input_just_pressed, prelude:
 use bevy_simple_subsecond_system::hot;
 
 use crate::{
-    Pause,
     audio::{DEFAULT_VOLUME, max_volume},
+    font::FontAssets,
     gameplay::player::camera::{CameraSensitivity, WorldModelFov},
     menus::Menu,
     screens::Screen,
-    theme::{palette::SCREEN_BACKGROUND, prelude::*},
+    theme::prelude::*,
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -37,13 +37,13 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
-fn spawn_settings_menu(mut commands: Commands, paused: Res<State<Pause>>) {
-    let mut entity_commands = commands.spawn((
+fn spawn_settings_menu(mut commands: Commands, fonts: Res<FontAssets>) {
+    commands.spawn((
         widget::ui_root("Settings Screen"),
         StateScoped(Menu::Settings),
         GlobalZIndex(2),
         children![
-            widget::header("Settings"),
+            widget::header("Settings", fonts.default.clone()),
             (
                 Name::new("Settings Grid"),
                 Node {
@@ -56,16 +56,21 @@ fn spawn_settings_menu(mut commands: Commands, paused: Res<State<Pause>>) {
                 children![
                     // Audio
                     (
-                        widget::label("Audio Volume"),
+                        widget::label("Audio Volume", fonts.default.clone()),
                         Node {
                             justify_self: JustifySelf::End,
                             ..default()
                         }
                     ),
-                    widget::plus_minus_bar(GlobalVolumeLabel, lower_volume, raise_volume),
+                    widget::plus_minus_bar(
+                        GlobalVolumeLabel,
+                        lower_volume,
+                        raise_volume,
+                        fonts.default.clone(),
+                    ),
                     // Camera Sensitivity
                     (
-                        widget::label("Camera Sensitivity"),
+                        widget::label("Camera Sensitivity", fonts.default.clone()),
                         Node {
                             justify_self: JustifySelf::End,
                             ..default()
@@ -74,25 +79,28 @@ fn spawn_settings_menu(mut commands: Commands, paused: Res<State<Pause>>) {
                     widget::plus_minus_bar(
                         CameraSensitivityLabel,
                         lower_camera_sensitivity,
-                        raise_camera_sensitivity
+                        raise_camera_sensitivity,
+                        fonts.default.clone(),
                     ),
                     // Camera FOV
                     (
-                        widget::label("Camera FOV"),
+                        widget::label("Camera FOV", fonts.default.clone()),
                         Node {
                             justify_self: JustifySelf::End,
                             ..default()
                         }
                     ),
-                    widget::plus_minus_bar(CameraFovLabel, lower_camera_fov, raise_camera_fov),
+                    widget::plus_minus_bar(
+                        CameraFovLabel,
+                        lower_camera_fov,
+                        raise_camera_fov,
+                        fonts.default.clone(),
+                    ),
                 ],
             ),
-            widget::button("Back", go_back_on_click),
+            widget::button("Back", fonts.default.clone(), go_back_on_click),
         ],
     ));
-    if paused.get() == &Pause(false) {
-        entity_commands.insert(BackgroundColor(SCREEN_BACKGROUND));
-    }
 }
 
 #[derive(Resource, Reflect, Debug)]

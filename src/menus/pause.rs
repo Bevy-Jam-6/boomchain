@@ -2,7 +2,10 @@
 
 use std::any::Any as _;
 
-use crate::{gameplay::crosshair::CrosshairState, menus::Menu, screens::Screen, theme::widget};
+use crate::{
+    font::FontAssets, gameplay::crosshair::CrosshairState, menus::Menu, screens::Screen,
+    theme::widget,
+};
 use bevy::{input::common_conditions::input_just_pressed, prelude::*};
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
@@ -19,16 +22,17 @@ fn spawn_pause_menu(
     mut commands: Commands,
     mut crosshair: Single<&mut CrosshairState>,
     mut time: ResMut<Time<Virtual>>,
+    fonts: Res<FontAssets>,
 ) {
     commands.spawn((
         widget::ui_root("Pause Menu"),
         GlobalZIndex(2),
         StateScoped(Menu::Pause),
         children![
-            widget::header("Game paused"),
-            widget::button("Continue", close_menu),
-            widget::button("Settings", open_settings_menu),
-            widget::button("Quit to title", quit_to_title),
+            widget::header("Game paused", fonts.default.clone()),
+            widget::button("Continue", fonts.default.clone(), close_menu),
+            widget::button("Settings", fonts.default.clone(), open_settings_menu),
+            widget::button("Quit to title", fonts.default.clone(), quit_to_title),
         ],
     ));
     crosshair

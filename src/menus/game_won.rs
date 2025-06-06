@@ -3,6 +3,7 @@ use std::any::Any as _;
 use bevy::prelude::*;
 
 use crate::{
+    font::FontAssets,
     gameplay::{crosshair::CrosshairState, player::default_input::BlocksInput, waves::GameWon},
     screens::Screen,
     theme::widget,
@@ -23,6 +24,7 @@ fn on_game_won(
     _trigger: Trigger<GameWon>,
     mut crosshair: Single<&mut CrosshairState>,
     mut block_input: ResMut<BlocksInput>,
+    fonts: Res<FontAssets>,
     mut commands: Commands,
     game_won_marker: Query<(), With<GameWonMarker>>,
 ) {
@@ -36,8 +38,11 @@ fn on_game_won(
         StateScoped(Screen::Gameplay),
         GameWonMenu,
         children![
-            widget::header("Congratulations! You've won the game!"),
-            widget::button("Quit to title", quit_to_title),
+            widget::header(
+                "Congratulations! You've won the game!",
+                fonts.default.clone()
+            ),
+            widget::button("Quit to Title", fonts.default.clone(), quit_to_title),
         ],
     ));
     crosshair.wants_free_cursor.insert(on_game_won.type_id());

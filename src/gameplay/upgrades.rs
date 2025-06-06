@@ -6,6 +6,7 @@ use rand::seq::SliceRandom;
 
 use crate::{
     Pause,
+    font::FontAssets,
     gameplay::{
         crosshair::CrosshairState,
         health::Health,
@@ -71,6 +72,7 @@ fn spawn_upgrade_ui(
     mut commands: Commands,
     mut block_input: ResMut<BlocksInput>,
     mut crosshair_state: Single<&mut CrosshairState>,
+    fonts: Res<FontAssets>,
 ) {
     if !upgrade_menus.is_empty() {
         return;
@@ -86,16 +88,24 @@ fn spawn_upgrade_ui(
     ));
     for upgrade in upgrades.iter() {
         match upgrade {
-            Upgrade::Health => menu_commands.with_child(button("Heal", upgrade_health)),
-            Upgrade::Damage => {
-                menu_commands.with_child(button("Increase Weapon Damage", upgrade_damage))
+            Upgrade::Health => {
+                menu_commands.with_child(button("Heal", fonts.default.clone(), upgrade_health))
             }
-            Upgrade::Speed => {
-                menu_commands.with_child(button("Increase Movement Speed", upgrade_speed))
-            }
-            Upgrade::Accuracy => {
-                menu_commands.with_child(button("Increase Weapon Accuracy", upgrade_accuracy))
-            }
+            Upgrade::Damage => menu_commands.with_child(button(
+                "Increase Weapon Damage",
+                fonts.default.clone(),
+                upgrade_damage,
+            )),
+            Upgrade::Speed => menu_commands.with_child(button(
+                "Increase Movement Speed",
+                fonts.default.clone(),
+                upgrade_speed,
+            )),
+            Upgrade::Accuracy => menu_commands.with_child(button(
+                "Increase Weapon Accuracy",
+                fonts.default.clone(),
+                upgrade_accuracy,
+            )),
         };
     }
 }

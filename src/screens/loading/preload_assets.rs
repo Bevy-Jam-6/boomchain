@@ -7,6 +7,7 @@ use bevy_simple_subsecond_system::hot;
 
 use crate::{
     asset_tracking::{ResourceHandles, all_assets_loaded},
+    font::FontAssets,
     theme::{palette::SCREEN_BACKGROUND, prelude::*},
 };
 
@@ -35,6 +36,7 @@ fn spawn_or_skip_asset_loading_screen(
     mut commands: Commands,
     resource_handles: Res<ResourceHandles>,
     mut next_screen: ResMut<NextState<LoadingScreen>>,
+    fonts: Res<FontAssets>,
 ) {
     if resource_handles.is_all_done() {
         next_screen.set(LoadingScreen::Shaders);
@@ -44,7 +46,10 @@ fn spawn_or_skip_asset_loading_screen(
         widget::ui_root("Loading Screen"),
         BackgroundColor(SCREEN_BACKGROUND),
         StateScoped(LoadingScreen::Assets),
-        children![(widget::label("Loading Assets"), LoadingAssetsLabel)],
+        children![(
+            widget::label("Loading Assets", fonts.default.clone()),
+            LoadingAssetsLabel
+        )],
     ));
 }
 

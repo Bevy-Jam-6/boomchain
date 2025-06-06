@@ -3,6 +3,7 @@ use std::any::Any as _;
 use bevy::prelude::*;
 
 use crate::{
+    font::FontAssets,
     gameplay::{
         crosshair::CrosshairState,
         health::OnDeath,
@@ -25,6 +26,7 @@ fn on_player_death(
     player: Query<(), With<Player>>,
     mut crosshair: Single<&mut CrosshairState>,
     mut block_input: ResMut<BlocksInput>,
+    fonts: Res<FontAssets>,
     mut commands: Commands,
 ) {
     if !player.contains(trigger.target()) {
@@ -35,9 +37,9 @@ fn on_player_death(
         StateScoped(Screen::Gameplay),
         GameOverMenu,
         children![
-            widget::header("Game Over"),
-            widget::button("Try again", try_again),
-            widget::button("Quit to title", quit_to_title),
+            widget::header("Game Over", fonts.default.clone()),
+            widget::button("Try Again", fonts.default.clone(), try_again),
+            widget::button("Quit to Title", fonts.default.clone(), quit_to_title),
         ],
     ));
     crosshair

@@ -7,6 +7,7 @@ use bevy_hanabi::ParticleEffect;
 use bevy_simple_subsecond_system::hot;
 
 use crate::{
+    font::FontAssets,
     gameplay::explosion::assets::ExplosionAssets,
     platform_support::is_webgpu_or_native,
     shader_compilation::{LoadedPipelineCount, all_pipelines_loaded, spawn_shader_compilation_map},
@@ -43,6 +44,7 @@ fn spawn_or_skip_shader_compilation_loading_screen(
     mut commands: Commands,
     loaded_pipeline_count: Res<LoadedPipelineCount>,
     mut next_screen: ResMut<NextState<LoadingScreen>>,
+    fonts: Res<FontAssets>,
 ) {
     if loaded_pipeline_count.is_done() {
         next_screen.set(LoadingScreen::Level);
@@ -52,7 +54,10 @@ fn spawn_or_skip_shader_compilation_loading_screen(
         widget::ui_root("Loading Screen"),
         BackgroundColor(SCREEN_BACKGROUND),
         StateScoped(LoadingScreen::Shaders),
-        children![(widget::label("Compiling shaders..."), LoadingShadersLabel)],
+        children![(
+            widget::label("Compiling shaders...", fonts.default.clone()),
+            LoadingShadersLabel
+        )],
     ));
 }
 

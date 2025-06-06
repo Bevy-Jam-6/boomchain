@@ -7,11 +7,7 @@ use bevy::{
 use bevy_simple_subsecond_system::hot;
 
 use crate::{
-    Pause,
-    asset_tracking::LoadResource,
-    audio::music,
-    menus::Menu,
-    theme::{palette::SCREEN_BACKGROUND, prelude::*},
+    asset_tracking::LoadResource, audio::music, font::FontAssets, menus::Menu, theme::prelude::*,
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -27,62 +23,65 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
-fn spawn_credits_menu(mut commands: Commands, paused: Res<State<Pause>>) {
-    let mut entity_commands = commands.spawn((
+fn spawn_credits_menu(mut commands: Commands, fonts: Res<FontAssets>) {
+    commands.spawn((
         widget::ui_root("Credits Screen"),
         StateScoped(Menu::Credits),
         GlobalZIndex(2),
         children![
-            widget::header("Created by"),
-            created_by(),
-            widget::header("Assets"),
-            assets(),
-            widget::button("Back", go_back_on_click),
+            widget::header("Created by", fonts.default.clone()),
+            created_by(fonts.default.clone()),
+            widget::header("Assets", fonts.default.clone()),
+            assets(fonts.default.clone()),
+            widget::button("Back", fonts.default.clone(), go_back_on_click),
         ],
     ));
-    if paused.get() == &Pause(false) {
-        entity_commands.insert(BackgroundColor(SCREEN_BACKGROUND));
-    }
 }
 
-fn created_by() -> impl Bundle {
-    grid(vec![
-        ["Joe Shmoe", "Implemented alligator wrestling AI"],
-        ["Jane Doe", "Made the music for the alien invasion"],
-    ])
+fn created_by(font: Handle<Font>) -> impl Bundle {
+    grid(
+        font,
+        vec![
+            ["Joe Shmoe", "Implemented alligator wrestling AI"],
+            ["Jane Doe", "Made the music for the alien invasion"],
+        ],
+    )
 }
 
-fn assets() -> impl Bundle {
-    grid(vec![
-        [
-            "Bevy logo",
-            "All rights reserved by the Bevy Foundation, permission granted for splash screen use when unmodified",
+fn assets(font: Handle<Font>) -> impl Bundle {
+    grid(
+        font,
+        vec![
+            [
+                "Bevy logo",
+                "All rights reserved by the Bevy Foundation, permission granted for splash screen use when unmodified",
+            ],
+            ["Button SFX", "CC0 by Jaszunio15"],
+            ["Music", "CC BY 3.0 by Kevin MacLeod"],
+            ["Ambient music and Footstep SFX", "CC0 by NOX SOUND"],
+            [
+                "Throw SFX",
+                "FilmCow Royalty Free SFX Library License Agreement by Jason Steele",
+            ],
+            [
+                "Fox model",
+                "CC0 1.0 Universal by PixelMannen (model), CC BY 4.0 International by tomkranis (Rigging & Animation), CC BY 4.0 International by AsoboStudio and scurest (Conversion to glTF)",
+            ],
+            [
+                "Player model",
+                "You can use it commercially without the need to credit me by Drillimpact",
+            ],
+            ["Vocals", "CC BY 4.0 by Dillon Becker"],
+            ["Night Sky HDRI 001", "CC0 by ambientCG"],
+            [
+                "Rest of the assets",
+                "CC BY-NC-SA 3.0 by The Dark Mod Team, converted to Bevy-friendly assets by Jan Hohenheim",
+            ],
         ],
-        ["Button SFX", "CC0 by Jaszunio15"],
-        ["Music", "CC BY 3.0 by Kevin MacLeod"],
-        ["Ambient music and Footstep SFX", "CC0 by NOX SOUND"],
-        [
-            "Throw SFX",
-            "FilmCow Royalty Free SFX Library License Agreement by Jason Steele",
-        ],
-        [
-            "Fox model",
-            "CC0 1.0 Universal by PixelMannen (model), CC BY 4.0 International by tomkranis (Rigging & Animation), CC BY 4.0 International by AsoboStudio and scurest (Conversion to glTF)",
-        ],
-        [
-            "Player model",
-            "You can use it commercially without the need to credit me by Drillimpact",
-        ],
-        ["Vocals", "CC BY 4.0 by Dillon Becker"],
-        ["Night Sky HDRI 001", "CC0 by ambientCG"],
-        [
-            "Rest of the assets",
-            "CC BY-NC-SA 3.0 by The Dark Mod Team, converted to Bevy-friendly assets by Jan Hohenheim",
-        ],
-    ])
+    )
 }
 
-fn grid(content: Vec<[&'static str; 2]>) -> impl Bundle {
+fn grid(font: Handle<Font>, content: Vec<[&'static str; 2]>) -> impl Bundle {
     (
         Name::new("Grid"),
         Node {
@@ -93,9 +92,9 @@ fn grid(content: Vec<[&'static str; 2]>) -> impl Bundle {
             ..default()
         },
         Children::spawn(SpawnIter(content.into_iter().flatten().enumerate().map(
-            |(i, text)| {
+            move |(i, text)| {
                 (
-                    widget::label_small(text),
+                    widget::label_small(text, font.clone()),
                     Node {
                         justify_self: if i % 2 == 0 {
                             JustifySelf::End

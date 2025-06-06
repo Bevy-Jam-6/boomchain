@@ -50,12 +50,12 @@ fn trigger_on_press(
 #[cfg_attr(feature = "hot_patch", hot)]
 fn apply_interaction_palette(
     mut palette_query: Query<
-        (&Interaction, &InteractionPalette, &mut BackgroundColor),
+        (&Interaction, &InteractionPalette, &mut BorderColor),
         Changed<Interaction>,
     >,
 ) {
-    for (interaction, palette, mut background) in &mut palette_query {
-        *background = match interaction {
+    for (interaction, palette, mut border_color) in &mut palette_query {
+        *border_color = match interaction {
             Interaction::None => palette.none,
             Interaction::Hovered => palette.hovered,
             Interaction::Pressed => palette.pressed,
