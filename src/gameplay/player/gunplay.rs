@@ -15,7 +15,7 @@ use crate::{
 };
 use avian3d::prelude::*;
 use bevy::{prelude::*, render::view::RenderLayers};
-use bevy_enhanced_input::events::Started;
+use bevy_enhanced_input::prelude::*;
 use bevy_hanabi::prelude::*;
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
@@ -64,7 +64,7 @@ fn setup_weapon_stats(trigger: Trigger<OnAdd, Player>, mut commands: Commands) {
 }
 
 fn shooting(
-    trigger: Trigger<Started<Shoot>>,
+    trigger: Trigger<Fired<Shoot>>,
     mut commands: Commands,
     shooting: Query<(), With<Shooting>>,
     crosshair_state: Single<&CrosshairState>,
