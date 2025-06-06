@@ -15,7 +15,7 @@ use crate::{
 };
 use avian3d::prelude::*;
 use bevy::{prelude::*, render::view::RenderLayers};
-use bevy_enhanced_input::events::Started;
+use bevy_enhanced_input::prelude::*;
 use bevy_hanabi::prelude::*;
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
@@ -30,11 +30,11 @@ pub(crate) struct Reloading;
 
 #[derive(Debug, Component, Reflect)]
 #[reflect(Component)]
-struct WeaponStats {
-    damage: f32,
-    pellets: u32,
-    spread_radius: f32,
-    pushback: f32,
+pub(crate) struct WeaponStats {
+    pub(crate) damage: f32,
+    pub(crate) pellets: u32,
+    pub(crate) spread_radius: f32,
+    pub(crate) pushback: f32,
 }
 
 pub(super) fn plugin(app: &mut App) {
@@ -64,7 +64,7 @@ fn setup_weapon_stats(trigger: Trigger<OnAdd, Player>, mut commands: Commands) {
 }
 
 fn shooting(
-    trigger: Trigger<Started<Shoot>>,
+    trigger: Trigger<Fired<Shoot>>,
     mut commands: Commands,
     shooting: Query<(), With<Shooting>>,
     crosshair_state: Single<&CrosshairState>,

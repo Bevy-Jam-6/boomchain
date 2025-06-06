@@ -54,6 +54,10 @@ pub(crate) struct DropProp;
 #[input_action(output = bool)]
 pub(crate) struct Shoot;
 
+#[derive(Debug, InputAction)]
+#[input_action(output = bool)]
+pub(crate) struct OpenUpgradeMenu;
+
 #[derive(Debug, InputContext, Default)]
 pub(crate) struct DefaultInputContext;
 
@@ -105,6 +109,8 @@ fn default_binding(
         .to((KeyCode::KeyG, GamepadButton::East));
 
     actions.bind::<Shoot>().to(MouseButton::Left);
+
+    actions.bind::<OpenUpgradeMenu>().to(KeyCode::KeyF);
 }
 
 #[derive(Resource, Default, Reflect, Deref, DerefMut)]

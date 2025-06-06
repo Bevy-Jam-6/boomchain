@@ -1,8 +1,8 @@
 //! The game's main screen states and transitions between them.
 
 mod credits;
-mod game_over;
-mod game_won;
+pub(crate) mod game_over;
+pub(crate) mod game_won;
 mod main;
 mod pause;
 mod settings;

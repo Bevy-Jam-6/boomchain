@@ -15,6 +15,10 @@ pub(super) fn plugin(app: &mut App) {
 #[derive(Component)]
 struct GameWonMarker;
 
+#[derive(Component, Reflect)]
+#[reflect(Component)]
+pub(crate) struct GameWonMenu;
+
 fn on_game_won(
     _trigger: Trigger<GameWon>,
     mut crosshair: Single<&mut CrosshairState>,
@@ -30,6 +34,7 @@ fn on_game_won(
         widget::ui_root("Game Won Menu"),
         GlobalZIndex(2),
         StateScoped(Screen::Gameplay),
+        GameWonMenu,
         children![
             widget::header("Congratulations! You've won the game!"),
             widget::button("Quit to title", quit_to_title),

@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use avian3d::prelude::*;
-use bevy::{platform::collections::HashMap, prelude::*, time::Stopwatch};
+use bevy::{prelude::*, time::Stopwatch};
 use bevy_trenchbroom::prelude::*;
 use rand::seq::SliceRandom as _;
 
@@ -33,15 +33,123 @@ impl Default for Waves {
         Self::new([
             Wave {
                 prep_time: Millis(0),
-                packet_kinds: [(Millis(0), Difficulty(0)), (Millis(5000), Difficulty(0))].into(),
+                packet_kinds: [
+                    (Millis(0), Difficulty(0)),
+                    (Millis(5000), Difficulty(0)),
+                    (Millis(10000), Difficulty(0)),
+                ]
+                .into(),
             },
             Wave {
                 prep_time: Millis(10000),
-                packet_kinds: [(Millis(0), Difficulty(0)), (Millis(5000), Difficulty(0))].into(),
+                packet_kinds: [
+                    (Millis(0), Difficulty(0)),
+                    (Millis(5000), Difficulty(0)),
+                    (Millis(10000), Difficulty(1)),
+                ]
+                .into(),
             },
             Wave {
                 prep_time: Millis(10000),
-                packet_kinds: [(Millis(0), Difficulty(0)), (Millis(5000), Difficulty(0))].into(),
+                packet_kinds: [
+                    (Millis(0), Difficulty(0)),
+                    (Millis(2000), Difficulty(1)),
+                    (Millis(6000), Difficulty(1)),
+                    (Millis(11000), Difficulty(0)),
+                ]
+                .into(),
+            },
+            Wave {
+                prep_time: Millis(10000),
+                packet_kinds: [
+                    (Millis(0), Difficulty(1)),
+                    (Millis(4000), Difficulty(1)),
+                    (Millis(7000), Difficulty(1)),
+                    (Millis(11000), Difficulty(1)),
+                ]
+                .into(),
+            },
+            Wave {
+                prep_time: Millis(10000),
+                packet_kinds: [
+                    (Millis(0), Difficulty(0)),
+                    (Millis(0), Difficulty(0)),
+                    (Millis(4000), Difficulty(1)),
+                    (Millis(4000), Difficulty(1)),
+                    (Millis(8000), Difficulty(1)),
+                    (Millis(12000), Difficulty(1)),
+                ]
+                .into(),
+            },
+            Wave {
+                prep_time: Millis(10000),
+                packet_kinds: [
+                    (Millis(0), Difficulty(2)),
+                    (Millis(4000), Difficulty(1)),
+                    (Millis(8000), Difficulty(1)),
+                    (Millis(8000), Difficulty(1)),
+                    (Millis(8000), Difficulty(0)),
+                    (Millis(12000), Difficulty(1)),
+                ]
+                .into(),
+            },
+            Wave {
+                prep_time: Millis(10000),
+                packet_kinds: [
+                    (Millis(0), Difficulty(2)),
+                    (Millis(4000), Difficulty(2)),
+                    (Millis(8000), Difficulty(2)),
+                    (Millis(8000), Difficulty(1)),
+                    (Millis(8000), Difficulty(0)),
+                    (Millis(12000), Difficulty(1)),
+                ]
+                .into(),
+            },
+            Wave {
+                prep_time: Millis(10000),
+                packet_kinds: [
+                    (Millis(0), Difficulty(2)),
+                    (Millis(0), Difficulty(2)),
+                    (Millis(8000), Difficulty(2)),
+                    (Millis(8000), Difficulty(1)),
+                    (Millis(8000), Difficulty(0)),
+                    (Millis(12000), Difficulty(1)),
+                    (Millis(12000), Difficulty(1)),
+                ]
+                .into(),
+            },
+            Wave {
+                prep_time: Millis(10000),
+                packet_kinds: [
+                    (Millis(0), Difficulty(2)),
+                    (Millis(0), Difficulty(1)),
+                    (Millis(0), Difficulty(1)),
+                    (Millis(3000), Difficulty(1)),
+                    (Millis(3000), Difficulty(1)),
+                    (Millis(8000), Difficulty(2)),
+                    (Millis(8000), Difficulty(1)),
+                    (Millis(8000), Difficulty(0)),
+                    (Millis(8000), Difficulty(0)),
+                    (Millis(12000), Difficulty(1)),
+                    (Millis(12000), Difficulty(2)),
+                ]
+                .into(),
+            },
+            Wave {
+                prep_time: Millis(10000),
+                packet_kinds: [
+                    (Millis(0), Difficulty(2)),
+                    (Millis(0), Difficulty(2)),
+                    (Millis(0), Difficulty(2)),
+                    (Millis(0), Difficulty(1)),
+                    (Millis(0), Difficulty(1)),
+                    (Millis(0), Difficulty(1)),
+                    (Millis(2000), Difficulty(2)),
+                    (Millis(2000), Difficulty(2)),
+                    (Millis(2000), Difficulty(2)),
+                    (Millis(2000), Difficulty(2)),
+                ]
+                .into(),
             },
         ])
     }
@@ -49,20 +157,310 @@ impl Default for Waves {
 
 impl Default for SpawnPackets {
     fn default() -> Self {
-        Self(vec![SpawnPacket::new(
-            Difficulty(0),
-            [
-                (Millis(0), SpawnVariant::BasicEnemy),
-                (Millis(100), SpawnVariant::BasicEnemy),
-                (Millis(200), SpawnVariant::BigEnemy),
-                (Millis(300), SpawnVariant::ExplosiveBarrel),
-                (Millis(400), SpawnVariant::BasicEnemy),
-                (Millis(500), SpawnVariant::ExplosiveBarrel),
-                (Millis(600), SpawnVariant::SmallEnemy),
-                (Millis(700), SpawnVariant::BasicEnemy),
-            ]
-            .into(),
-        )])
+        Self(vec![
+            SpawnPacket::new(
+                Difficulty(0),
+                [
+                    (Millis(0), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(200), SpawnVariant::BasicEnemy),
+                    (Millis(300), SpawnVariant::BasicEnemy),
+                ]
+                .into(),
+            ),
+            SpawnPacket::new(
+                Difficulty(0),
+                [
+                    (Millis(0), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(200), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(300), SpawnVariant::BasicEnemy),
+                    (Millis(400), SpawnVariant::ExplosiveBarrel),
+                    (Millis(500), SpawnVariant::ExplosiveBarrel),
+                ]
+                .into(),
+            ),
+            SpawnPacket::new(
+                Difficulty(0),
+                [
+                    (Millis(0), SpawnVariant::BigEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(200), SpawnVariant::BasicEnemy),
+                    (Millis(300), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(400), SpawnVariant::BasicEnemy),
+                ]
+                .into(),
+            ),
+            SpawnPacket::new(
+                Difficulty(0),
+                [
+                    (Millis(0), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(200), SpawnVariant::ExplosiveBarrel),
+                    (Millis(300), SpawnVariant::ExplosiveBarrel),
+                    (Millis(400), SpawnVariant::ExplosiveBarrel),
+                    (Millis(500), SpawnVariant::ExplosiveBarrel),
+                    (Millis(600), SpawnVariant::ExplosiveBarrel),
+                    (Millis(700), SpawnVariant::ExplosiveBarrel),
+                ]
+                .into(),
+            ),
+            SpawnPacket::new(
+                Difficulty(1),
+                [
+                    (Millis(0), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(200), SpawnVariant::BigEnemy),
+                    (Millis(300), SpawnVariant::ExplosiveBarrel),
+                    (Millis(400), SpawnVariant::BasicEnemy),
+                    (Millis(500), SpawnVariant::ExplosiveBarrel),
+                    (Millis(600), SpawnVariant::SmallEnemy),
+                    (Millis(700), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                ]
+                .into(),
+            ),
+            SpawnPacket::new(
+                Difficulty(1),
+                [
+                    (Millis(0), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BigEnemy),
+                    (Millis(200), SpawnVariant::BigEnemy),
+                    (Millis(300), SpawnVariant::BigEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(400), SpawnVariant::BigEnemy),
+                    (Millis(500), SpawnVariant::ExplosiveBarrel),
+                    (Millis(600), SpawnVariant::SmallEnemy),
+                    (Millis(700), SpawnVariant::BasicEnemy),
+                ]
+                .into(),
+            ),
+            SpawnPacket::new(
+                Difficulty(1),
+                [
+                    (Millis(0), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(200), SpawnVariant::BasicEnemy),
+                    (Millis(300), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(400), SpawnVariant::BasicEnemy),
+                    (Millis(500), SpawnVariant::BasicEnemy),
+                    (Millis(600), SpawnVariant::BasicEnemy),
+                    (Millis(700), SpawnVariant::BasicEnemy),
+                    (Millis(800), SpawnVariant::ExplosiveBarrel),
+                    (Millis(800), SpawnVariant::ExplosiveBarrel),
+                    (Millis(900), SpawnVariant::BasicEnemy),
+                    (Millis(1000), SpawnVariant::BasicEnemy),
+                    (Millis(1100), SpawnVariant::BasicEnemy),
+                    (Millis(1200), SpawnVariant::BasicEnemy),
+                ]
+                .into(),
+            ),
+            SpawnPacket::new(
+                Difficulty(2),
+                [
+                    (Millis(0), SpawnVariant::SmallEnemy),
+                    (Millis(100), SpawnVariant::SmallEnemy),
+                    (Millis(200), SpawnVariant::SmallEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(300), SpawnVariant::SmallEnemy),
+                    (Millis(400), SpawnVariant::SmallEnemy),
+                    (Millis(500), SpawnVariant::BasicEnemy),
+                    (Millis(600), SpawnVariant::BasicEnemy),
+                    (Millis(700), SpawnVariant::BasicEnemy),
+                    (Millis(800), SpawnVariant::ExplosiveBarrel),
+                    (Millis(800), SpawnVariant::ExplosiveBarrel),
+                    (Millis(900), SpawnVariant::BasicEnemy),
+                ]
+                .into(),
+            ),
+            SpawnPacket::new(
+                Difficulty(2),
+                [
+                    (Millis(0), SpawnVariant::SmallEnemy),
+                    (Millis(100), SpawnVariant::SmallEnemy),
+                    (Millis(200), SpawnVariant::BigEnemy),
+                    (Millis(300), SpawnVariant::BigEnemy),
+                    (Millis(400), SpawnVariant::BigEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(500), SpawnVariant::BasicEnemy),
+                    (Millis(600), SpawnVariant::BigEnemy),
+                    (Millis(700), SpawnVariant::BasicEnemy),
+                    (Millis(800), SpawnVariant::ExplosiveBarrel),
+                    (Millis(800), SpawnVariant::ExplosiveBarrel),
+                    (Millis(900), SpawnVariant::BasicEnemy),
+                ]
+                .into(),
+            ),
+            SpawnPacket::new(
+                Difficulty(2),
+                [
+                    (Millis(0), SpawnVariant::BigEnemy),
+                    (Millis(100), SpawnVariant::BigEnemy),
+                    (Millis(200), SpawnVariant::BigEnemy),
+                    (Millis(300), SpawnVariant::BigEnemy),
+                    (Millis(400), SpawnVariant::BigEnemy),
+                    (Millis(500), SpawnVariant::BigEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(600), SpawnVariant::BigEnemy),
+                    (Millis(700), SpawnVariant::BigEnemy),
+                    (Millis(800), SpawnVariant::BigEnemy),
+                    (Millis(900), SpawnVariant::BigEnemy),
+                    (Millis(1000), SpawnVariant::BigEnemy),
+                ]
+                .into(),
+            ),
+            SpawnPacket::new(
+                Difficulty(2),
+                [
+                    (Millis(0), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(200), SpawnVariant::BasicEnemy),
+                    (Millis(300), SpawnVariant::BasicEnemy),
+                    (Millis(400), SpawnVariant::BasicEnemy),
+                    (Millis(400), SpawnVariant::BasicEnemy),
+                    (Millis(400), SpawnVariant::BasicEnemy),
+                    (Millis(500), SpawnVariant::BasicEnemy),
+                    (Millis(600), SpawnVariant::BasicEnemy),
+                    (Millis(700), SpawnVariant::BasicEnemy),
+                    (Millis(800), SpawnVariant::BasicEnemy),
+                    (Millis(900), SpawnVariant::BasicEnemy),
+                    (Millis(1000), SpawnVariant::BasicEnemy),
+                    (Millis(1100), SpawnVariant::BasicEnemy),
+                    (Millis(1200), SpawnVariant::BasicEnemy),
+                    (Millis(1300), SpawnVariant::BasicEnemy),
+                    (Millis(1400), SpawnVariant::BasicEnemy),
+                    (Millis(1500), SpawnVariant::BasicEnemy),
+                    (Millis(1600), SpawnVariant::BasicEnemy),
+                    (Millis(1700), SpawnVariant::BasicEnemy),
+                ]
+                .into(),
+            ),
+            SpawnPacket::new(
+                Difficulty(3),
+                [
+                    (Millis(0), SpawnVariant::BasicEnemy),
+                    (Millis(100), SpawnVariant::BasicEnemy),
+                    (Millis(200), SpawnVariant::BasicEnemy),
+                    (Millis(300), SpawnVariant::BasicEnemy),
+                    (Millis(400), SpawnVariant::BasicEnemy),
+                    (Millis(400), SpawnVariant::BasicEnemy),
+                    (Millis(400), SpawnVariant::BasicEnemy),
+                    (Millis(500), SpawnVariant::BasicEnemy),
+                    (Millis(600), SpawnVariant::BasicEnemy),
+                    (Millis(700), SpawnVariant::BasicEnemy),
+                    (Millis(800), SpawnVariant::BasicEnemy),
+                    (Millis(900), SpawnVariant::BasicEnemy),
+                    (Millis(1000), SpawnVariant::BasicEnemy),
+                    (Millis(1100), SpawnVariant::BasicEnemy),
+                    (Millis(1200), SpawnVariant::BasicEnemy),
+                    (Millis(1300), SpawnVariant::BasicEnemy),
+                    (Millis(1400), SpawnVariant::BasicEnemy),
+                    (Millis(1500), SpawnVariant::BasicEnemy),
+                    (Millis(1600), SpawnVariant::BasicEnemy),
+                    (Millis(1700), SpawnVariant::BasicEnemy),
+                    (Millis(1800), SpawnVariant::BasicEnemy),
+                    (Millis(1900), SpawnVariant::BasicEnemy),
+                    (Millis(2000), SpawnVariant::BasicEnemy),
+                    (Millis(2100), SpawnVariant::BasicEnemy),
+                    (Millis(2200), SpawnVariant::BasicEnemy),
+                    (Millis(2300), SpawnVariant::BasicEnemy),
+                    (Millis(2400), SpawnVariant::BasicEnemy),
+                    (Millis(2500), SpawnVariant::BasicEnemy),
+                    (Millis(2600), SpawnVariant::BasicEnemy),
+                    (Millis(2700), SpawnVariant::BasicEnemy),
+                    (Millis(2800), SpawnVariant::BasicEnemy),
+                    (Millis(2900), SpawnVariant::BasicEnemy),
+                    (Millis(3000), SpawnVariant::BasicEnemy),
+                    (Millis(3100), SpawnVariant::BasicEnemy),
+                    (Millis(3200), SpawnVariant::BasicEnemy),
+                    (Millis(3300), SpawnVariant::BasicEnemy),
+                    (Millis(3400), SpawnVariant::BasicEnemy),
+                    (Millis(3500), SpawnVariant::BasicEnemy),
+                    (Millis(3600), SpawnVariant::BasicEnemy),
+                    (Millis(3700), SpawnVariant::BasicEnemy),
+                    (Millis(3800), SpawnVariant::BasicEnemy),
+                ]
+                .into(),
+            ),
+            SpawnPacket::new(
+                Difficulty(3),
+                [
+                    (Millis(0), SpawnVariant::SmallEnemy),
+                    (Millis(100), SpawnVariant::SmallEnemy),
+                    (Millis(200), SpawnVariant::SmallEnemy),
+                    (Millis(300), SpawnVariant::SmallEnemy),
+                    (Millis(400), SpawnVariant::SmallEnemy),
+                    (Millis(100), SpawnVariant::SmallEnemy),
+                    (Millis(100), SpawnVariant::SmallEnemy),
+                    (Millis(500), SpawnVariant::SmallEnemy),
+                    (Millis(600), SpawnVariant::SmallEnemy),
+                    (Millis(700), SpawnVariant::SmallEnemy),
+                    (Millis(800), SpawnVariant::SmallEnemy),
+                    (Millis(900), SpawnVariant::SmallEnemy),
+                    (Millis(1000), SpawnVariant::SmallEnemy),
+                    (Millis(1100), SpawnVariant::SmallEnemy),
+                    (Millis(1200), SpawnVariant::SmallEnemy),
+                    (Millis(1300), SpawnVariant::SmallEnemy),
+                    (Millis(1400), SpawnVariant::SmallEnemy),
+                    (Millis(1500), SpawnVariant::SmallEnemy),
+                    (Millis(1600), SpawnVariant::SmallEnemy),
+                ]
+                .into(),
+            ),
+            SpawnPacket::new(
+                Difficulty(3),
+                [
+                    (Millis(0), SpawnVariant::BigEnemy),
+                    (Millis(100), SpawnVariant::BigEnemy),
+                    (Millis(200), SpawnVariant::BigEnemy),
+                    (Millis(300), SpawnVariant::BigEnemy),
+                    (Millis(400), SpawnVariant::BigEnemy),
+                    (Millis(500), SpawnVariant::BigEnemy),
+                    (Millis(600), SpawnVariant::BigEnemy),
+                    (Millis(700), SpawnVariant::BigEnemy),
+                    (Millis(800), SpawnVariant::BigEnemy),
+                    (Millis(900), SpawnVariant::ExplosiveBarrel),
+                    (Millis(800), SpawnVariant::ExplosiveBarrel),
+                    (Millis(900), SpawnVariant::ExplosiveBarrel),
+                    (Millis(1000), SpawnVariant::ExplosiveBarrel),
+                    (Millis(1100), SpawnVariant::ExplosiveBarrel),
+                    (Millis(1200), SpawnVariant::ExplosiveBarrel),
+                    (Millis(1300), SpawnVariant::ExplosiveBarrel),
+                    (Millis(1400), SpawnVariant::SmallEnemy),
+                    (Millis(1500), SpawnVariant::SmallEnemy),
+                    (Millis(1600), SpawnVariant::SmallEnemy),
+                    (Millis(1700), SpawnVariant::BasicEnemy),
+                    (Millis(1800), SpawnVariant::BasicEnemy),
+                    (Millis(1900), SpawnVariant::BasicEnemy),
+                    (Millis(2000), SpawnVariant::BasicEnemy),
+                    (Millis(2100), SpawnVariant::BasicEnemy),
+                    (Millis(2200), SpawnVariant::BasicEnemy),
+                    (Millis(2300), SpawnVariant::BasicEnemy),
+                    (Millis(2400), SpawnVariant::BasicEnemy),
+                    (Millis(2500), SpawnVariant::BasicEnemy),
+                    (Millis(2600), SpawnVariant::BasicEnemy),
+                    (Millis(2700), SpawnVariant::BasicEnemy),
+                    (Millis(2800), SpawnVariant::BasicEnemy),
+                    (Millis(2900), SpawnVariant::BasicEnemy),
+                    (Millis(3000), SpawnVariant::BasicEnemy),
+                ]
+                .into(),
+            ),
+        ])
     }
 }
 
@@ -135,6 +533,7 @@ fn advance_waves(
             .iter_mut()
             .flat_map(|packet| packet.pop_spawns())
             .collect::<Vec<_>>();
+
         waves.clean_finished_packets();
         let spawners = spawners.iter().collect::<Vec<_>>();
         for spawn in spawns {
@@ -173,7 +572,7 @@ fn advance_waves(
                             desired_speed: 7.0,
                             max_speed: 8.0,
                             attack_damage: 10.0,
-                            attack_speed_range: 1.2..2.1,
+                            attack_speed_range: 1.5..2.3,
                             size: 1.0,
                             stagger_chance: 0.3,
                             stagger_duration: 0.2..0.4,
@@ -185,11 +584,11 @@ fn advance_waves(
                         Name::new("Big Enemy"),
                         Npc,
                         NpcStats {
-                            health: 300.0,
+                            health: 400.0,
                             desired_speed: 5.0,
                             max_speed: 5.0,
-                            attack_damage: 30.0,
-                            attack_speed_range: 0.9..1.4,
+                            attack_damage: 40.0,
+                            attack_speed_range: 1.1..1.7,
                             size: 2.0,
                             stagger_chance: 0.2,
                             stagger_duration: 0.1..0.3,
@@ -202,12 +601,12 @@ fn advance_waves(
                         Npc,
                         NpcStats {
                             health: 30.0,
-                            desired_speed: 12.0,
-                            max_speed: 12.0,
+                            desired_speed: 11.0,
+                            max_speed: 11.0,
                             attack_damage: 10.0,
-                            attack_speed_range: 1.8..2.6,
+                            attack_speed_range: 2.1..2.8,
                             size: 0.7,
-                            stagger_chance: 0.4,
+                            stagger_chance: 0.5,
                             stagger_duration: 0.2..0.3,
                         },
                     ));
@@ -319,9 +718,7 @@ impl Waves {
                 self.current_wave_mut()
                     .unwrap()
                     .packet_kinds
-                    .remove(&millis);
-            } else {
-                break;
+                    .retain(|(m, _)| *m != millis);
             }
         }
         difficulties
@@ -363,7 +760,7 @@ impl Default for Spawner {
 #[derive(Reflect, Debug)]
 struct Wave {
     prep_time: Millis,
-    packet_kinds: HashMap<Millis, Difficulty>,
+    packet_kinds: Vec<(Millis, Difficulty)>,
 }
 
 impl Wave {
@@ -426,11 +823,11 @@ impl SpawnPackets {
 struct SpawnPacket {
     difficulty: Difficulty,
     stopwatch: Stopwatch,
-    spawns: HashMap<Millis, SpawnVariant>,
+    spawns: Vec<(Millis, SpawnVariant)>,
 }
 
 impl SpawnPacket {
-    fn new(difficulty: Difficulty, spawns: HashMap<Millis, SpawnVariant>) -> Self {
+    fn new(difficulty: Difficulty, spawns: Vec<(Millis, SpawnVariant)>) -> Self {
         Self {
             difficulty,
             stopwatch: Stopwatch::default(),
@@ -448,7 +845,7 @@ impl SpawnPacket {
         {
             if self.elapsed_millis() > millis {
                 spawns.push(spawn_variant);
-                self.spawns.remove(&millis);
+                self.spawns.retain(|(m, _)| *m != millis);
             }
         }
         spawns

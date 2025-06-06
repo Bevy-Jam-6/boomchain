@@ -7,6 +7,7 @@ use crate::asset_tracking::LoadResource;
 use crate::gameplay::health::{Health, OnDeath};
 use crate::gameplay::npc::Npc;
 use crate::gameplay::player::Player;
+use crate::gameplay::upgrades::Upgrades;
 use crate::gameplay::waves::{WaveAdvanced, WaveFinishedPreparing, WaveStartedPreparing, Waves};
 use crate::screens::Screen;
 
@@ -18,7 +19,12 @@ pub(super) fn plugin(app: &mut App) {
     );
     app.add_systems(
         Update,
-        (update_health_bar, update_prep_time_text, update_wave_text),
+        (
+            update_health_bar,
+            update_prep_time_text,
+            update_wave_text,
+            blink_upgrade_menu_text,
+        ),
     );
     app.register_type::<HealthBar>();
     app.register_type::<WaveText>();
@@ -93,14 +99,19 @@ pub(crate) struct DeadIcon;
 #[reflect(Component)]
 pub(crate) struct PrepTimeText;
 
+#[derive(Component, Reflect, Deref, DerefMut)]
+#[reflect(Component)]
+pub(crate) struct UpgradeMenuText(Timer);
+
 fn spawn_wave_hud(mut commands: Commands) {
     commands.spawn((
-        Name::new("Health HUD"),
+        Name::new("Spawn Wave HUD"),
         Node {
             flex_direction: FlexDirection::Column,
             margin: UiRect::horizontal(Auto),
             align_items: AlignItems::Center,
-            top: Px(20.0),
+            top: Px(5.0),
+            row_gap: Px(5.0),
             ..default()
         },
         StateScoped(Screen::Gameplay),
@@ -110,9 +121,9 @@ fn spawn_wave_hud(mut commands: Commands) {
             (
                 Node {
                     width: Percent(300.0),
-                    max_width: Px(1000.0),
-                    min_height: Px(50.0),
-                    margin: UiRect::all(Px(10.0)),
+                    max_width: Px(1200.0),
+                    min_height: Px(32.0),
+                    margin: UiRect::horizontal(Px(10.0)),
                     flex_direction: FlexDirection::Row,
                     flex_wrap: FlexWrap::Wrap,
                     ..default()
@@ -208,14 +219,53 @@ fn spawn_prep_icon(
     container: Single<Entity, With<WaveIconParent>>,
     mut commands: Commands,
 ) {
-    commands.entity(*container).with_child((
-        Node {
-            margin: UiRect::horizontal(Px(10.0)),
-            ..default()
-        },
-        Text::new(""),
-        PrepTimeText,
-    ));
+    commands.entity(*container).with_children(|parent| {
+        parent.spawn((
+            Node {
+                margin: UiRect::horizontal(Px(10.0)),
+                flex_direction: FlexDirection::Column,
+                ..default()
+            },
+            children![
+                (Text::new(""), PrepTimeText),
+                (
+                    Node {
+                        margin: UiRect::top(Px(10.0)),
+                        ..default()
+                    },
+                    Text::new("Press F to upgrade!"),
+                    TextFont::default().with_font_size(24.0),
+                    TextColor(Color::from(tailwind::GREEN_600)),
+                    UpgradeMenuText(Timer::from_seconds(0.7, TimerMode::Once)),
+                ),
+            ],
+        ));
+    });
+}
+
+fn blink_upgrade_menu_text(
+    upgrade_menu_text: Single<(Entity, &mut UpgradeMenuText, &mut Visibility)>,
+    upgrades: Query<(), With<Upgrades>>,
+    time: Res<Time>,
+    mut commands: Commands,
+) {
+    let (entity, mut timer, mut visibility) = upgrade_menu_text.into_inner();
+    if upgrades.is_empty() {
+        commands.entity(entity).despawn();
+    }
+    timer.tick(time.delta());
+    if timer.finished() {
+        *visibility = match *visibility {
+            Visibility::Visible | Visibility::Inherited => Visibility::Hidden,
+            Visibility::Hidden => Visibility::Inherited,
+        };
+        **timer = match *visibility {
+            Visibility::Visible | Visibility::Inherited => {
+                Timer::from_seconds(0.7, TimerMode::Once)
+            }
+            Visibility::Hidden => Timer::from_seconds(0.3, TimerMode::Once),
+        }
+    }
 }
 
 fn update_prep_time_text(
@@ -223,7 +273,7 @@ fn update_prep_time_text(
     mut prep_time_text: Single<&mut Text, With<PrepTimeText>>,
 ) {
     ***prep_time_text = format!(
-        "Get Ready! {} s",
+        "Next wave in {} s",
         waves.prep_time_left().as_secs_f32().ceil() as u32
     );
 }

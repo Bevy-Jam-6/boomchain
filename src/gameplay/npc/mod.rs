@@ -19,10 +19,11 @@ use crate::{
 };
 
 use super::{animation::AnimationPlayerAncestor, health::Health};
-mod ai_state;
+pub(crate) mod ai_state;
 mod animation;
 mod assets;
 mod attack;
+pub(crate) mod despawn_hacks;
 pub(crate) mod lifecycle;
 pub(crate) mod navigation;
 mod sound;
@@ -38,6 +39,7 @@ pub(super) fn plugin(app: &mut App) {
         attack::plugin,
         lifecycle::plugin,
         stats::plugin,
+        despawn_hacks::plugin,
     ));
     app.register_type::<Npc>();
     app.add_observer(on_add);

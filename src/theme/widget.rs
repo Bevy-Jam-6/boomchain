@@ -131,7 +131,8 @@ where
                     children![(
                         Name::new("Button Text"),
                         Text(text),
-                        TextFont::from_font_size(40.0),
+                        TextLayout::new_with_justify(JustifyText::Center),
+                        TextFont::from_font_size(32.0),
                         TextColor(BUTTON_TEXT),
                         // Don't bubble picking events from the text up to the button.
                         Pickable::IGNORE,

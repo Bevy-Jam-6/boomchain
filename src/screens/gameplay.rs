@@ -2,7 +2,11 @@
 
 use bevy::{input::common_conditions::input_just_pressed, prelude::*, ui::Val::*};
 
-use crate::{Pause, menus::Menu, screens::Screen};
+use crate::{
+    Pause,
+    menus::{Menu, game_over::GameOverMenu, game_won::GameWonMenu},
+    screens::Screen,
+};
 
 pub(super) fn plugin(app: &mut App) {
     // Toggle pause on key press.
@@ -12,7 +16,9 @@ pub(super) fn plugin(app: &mut App) {
             (pause, spawn_pause_overlay, open_pause_menu).run_if(
                 in_state(Screen::Gameplay)
                     .and(in_state(Menu::None))
-                    .and(input_just_pressed(KeyCode::KeyP).or(input_just_pressed(KeyCode::Escape))),
+                    .and(input_just_pressed(KeyCode::KeyP).or(input_just_pressed(KeyCode::Escape)))
+                    .and(not(any_with_component::<GameOverMenu>))
+                    .and(not(any_with_component::<GameWonMenu>)),
             ),
             close_menu.run_if(
                 in_state(Screen::Gameplay)

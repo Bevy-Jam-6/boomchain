@@ -27,6 +27,10 @@ impl Health {
         self.current / self.max
     }
 
+    pub(crate) fn heal_full(&mut self) {
+        self.current = self.max;
+    }
+
     fn damage(&mut self, amount: f32) {
         self.current -= amount;
         self.current = self.current.max(0.0);
