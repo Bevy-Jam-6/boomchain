@@ -1,7 +1,8 @@
-use std::any::Any;
+use std::{any::Any, iter::once};
 
 use bevy::prelude::*;
 use bevy_enhanced_input::prelude::*;
+use rand::seq::SliceRandom;
 
 use crate::{
     Pause,
@@ -33,11 +34,9 @@ pub(super) fn plugin(app: &mut App) {
 
 #[derive(Component, Reflect, Debug, Deref, DerefMut)]
 #[reflect(Component)]
-pub(crate) struct Upgrades {
-    pub(crate) upgrades: Vec<Upgrade>,
-}
+pub(crate) struct Upgrades(Vec<Upgrade>);
 
-#[derive(Reflect, Debug)]
+#[derive(Reflect, Debug, Clone, Copy)]
 pub(crate) enum Upgrade {
     Health,
     Damage,
@@ -49,12 +48,13 @@ pub(crate) enum Upgrade {
 struct UpgradeMenu;
 
 fn offer_upgrades(_trigger: Trigger<WaveStartedPreparing>, mut commands: Commands) {
-    commands.spawn((
-        Upgrades {
-            upgrades: vec![Upgrade::Health, Upgrade::Damage, Upgrade::Speed],
-        },
-        StateScoped(Screen::Gameplay),
-    ));
+    let available_upgrades = [Upgrade::Damage, Upgrade::Speed];
+    let upgrades = available_upgrades
+        .choose_multiple(&mut rand::thread_rng(), 2)
+        .copied();
+    // Healing is always available.
+    let upgrades = once(Upgrade::Health).chain(upgrades).collect();
+    commands.spawn((Upgrades(upgrades), StateScoped(Screen::Gameplay)));
 }
 
 fn spawn_upgrade_ui(
@@ -79,9 +79,13 @@ fn spawn_upgrade_ui(
     ));
     for upgrade in upgrades.iter() {
         match upgrade {
-            Upgrade::Health => menu_commands.with_child(button("Health", upgrade_health)),
-            Upgrade::Damage => menu_commands.with_child(button("Damage", upgrade_damage)),
-            Upgrade::Speed => menu_commands.with_child(button("Speed", upgrade_speed)),
+            Upgrade::Health => menu_commands.with_child(button("Heal", upgrade_health)),
+            Upgrade::Damage => {
+                menu_commands.with_child(button("Increase Weapon Damage", upgrade_damage))
+            }
+            Upgrade::Speed => {
+                menu_commands.with_child(button("Increase Movement Speed", upgrade_speed))
+            }
         };
     }
 }
