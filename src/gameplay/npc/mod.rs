@@ -19,7 +19,7 @@ use crate::{
 };
 
 use super::{animation::AnimationPlayerAncestor, health::Health};
-mod ai_state;
+pub(crate) mod ai_state;
 mod animation;
 mod assets;
 mod attack;
