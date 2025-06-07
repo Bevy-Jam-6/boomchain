@@ -8,7 +8,11 @@ use bevy::{
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
 
-use crate::{PostPhysicsAppSystems, screens::Screen, theme::prelude::*};
+use crate::{
+    PostPhysicsAppSystems,
+    screens::Screen,
+    theme::{palette::SCREEN_BACKGROUND, prelude::*},
+};
 
 pub(super) fn plugin(app: &mut App) {
     // Spawn splash screen.
@@ -46,7 +50,7 @@ pub(super) fn plugin(app: &mut App) {
     );
 }
 
-const SPLASH_BACKGROUND_COLOR: Color = Color::srgb(0.157, 0.157, 0.157);
+const SPLASH_BACKGROUND_COLOR: Color = SCREEN_BACKGROUND;
 const SPLASH_DURATION_SECS: f32 = 1.8;
 const SPLASH_FADE_DURATION_SECS: f32 = 0.6;
 

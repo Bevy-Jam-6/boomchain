@@ -41,54 +41,96 @@ fn spawn_credits_menu(mut commands: Commands, fonts: Res<FontAssets>) {
 fn created_by(font: Handle<Font>) -> impl Bundle {
     grid(
         font,
+        JustifySelf::default(),
         vec![
-            ["Joe Shmoe", "Implemented alligator wrestling AI"],
-            ["Jane Doe", "Made the music for the alien invasion"],
+            ["Jan Hohenheim", "Developer, Animation"],
+            ["Joona Aalto", "Developer, UI Design"],
+            ["Mathias Fischler", "Developer, Soundtrack"],
+            ["Sara Herbst", "Map Design"],
+            ["Tau Gärtli", "UI Design Help"],
         ],
     )
 }
 
 fn assets(font: Handle<Font>) -> impl Bundle {
-    grid(
-        font,
-        vec![
-            [
-                "Bevy logo",
-                "All rights reserved by the Bevy Foundation, permission granted for splash screen use when unmodified",
-            ],
-            ["Button SFX", "CC0 by Jaszunio15"],
-            ["Music", "CC BY 3.0 by Kevin MacLeod"],
-            ["Ambient music and Footstep SFX", "CC0 by NOX SOUND"],
-            [
-                "Throw SFX",
-                "FilmCow Royalty Free SFX Library License Agreement by Jason Steele",
-            ],
-            [
-                "Fox model",
-                "CC0 1.0 Universal by PixelMannen (model), CC BY 4.0 International by tomkranis (Rigging & Animation), CC BY 4.0 International by AsoboStudio and scurest (Conversion to glTF)",
-            ],
-            [
-                "Player model",
-                "You can use it commercially without the need to credit me by Drillimpact",
-            ],
-            ["Vocals", "CC BY 4.0 by Dillon Becker"],
-            ["Night Sky HDRI 001", "CC0 by ambientCG"],
-            [
-                "Rest of the assets",
-                "CC BY-NC-SA 3.0 by The Dark Mod Team, converted to Bevy-friendly assets by Jan Hohenheim",
-            ],
+    (
+        Node {
+            column_gap: Px(30.0),
+            ..default()
+        },
+        children![
+            grid(
+                font.clone(),
+                JustifySelf::Start,
+                vec![
+                    [
+                        "Bevy Logo",
+                        "All rights reserved by the Bevy Foundation, permission granted for splash screen use when unmodified",
+                    ],
+                    ["Blood Textures", "texture.ninja, CC0 by Joost Vanhouette"],
+                    [
+                        "Angry Face Icon",
+                        "openmoji.org, CC BY-SA 4.0 by Mariella Steeb",
+                    ],
+                    ["Player Vocals", "CC BY 4.0 by Dillon Becker"],
+                    ["Button SFX", "CC0 by Jaszunio15"],
+                    ["Footstep SFX", "CC0 by NOX SOUND"],
+                    ["Shotgun SFX", "FREE FPS SFX Pack, CC BY-ND 4.0 by LMGLolo"],
+                    ["Explosion SFX", "Small Explosion Audio Pack by EpeSami"],
+                    [
+                        "Zombie SFX",
+                        "Zombies and Ghouls - Audio Pack, CC BY-SA 4.0 by VoiceBosch",
+                    ],
+                ],
+            ),
+            grid(
+                font,
+                JustifySelf::Start,
+                vec![
+                    [
+                        "Enemy Attack SFX",
+                        "Whoosh, A Free Sound Library! by Gene Chaban",
+                    ],
+                    [
+                        "Enemy Death SFX",
+                        "Impacts 01, Pixabay Content License by freesound_community, modified by Joona Aalto",
+                    ],
+                    [
+                        "Shotgun Model",
+                        "PSX Shotgun Asset-Pack, CC-BY by Doctor_sci3nce",
+                    ],
+                    [
+                        "Zombie Model",
+                        "Zombie Number 3 - Animated, CC BY 4.0 by Tony Flanagan",
+                    ],
+                    ["Night Sky HDRI 001", "CC0 by ambientCG"],
+                    [
+                        "Environment Assets",
+                        "CC BY-NC-SA 3.0 by The Dark Mod Team, converted to Bevy-friendly assets by Jan Hohenheim",
+                    ],
+                    [
+                        "Jersey 25 Font",
+                        "Google Fonts, OFL by Sarah Cardigan-Fried",
+                    ],
+                ],
+            ),
         ],
     )
 }
 
-fn grid(font: Handle<Font>, content: Vec<[&'static str; 2]>) -> impl Bundle {
+fn grid(
+    font: Handle<Font>,
+    justify_self: JustifySelf,
+    content: Vec<[&'static str; 2]>,
+) -> impl Bundle {
     (
         Name::new("Grid"),
         Node {
             display: Display::Grid,
-            row_gap: Px(10.0),
-            column_gap: Px(30.0),
-            grid_template_columns: RepeatedGridTrack::px(2, 400.0),
+            row_gap: Px(5.0),
+            column_gap: Px(20.0),
+            grid_template_columns: RepeatedGridTrack::max_content(2),
+            justify_self,
             ..default()
         },
         Children::spawn(SpawnIter(content.into_iter().flatten().enumerate().map(
@@ -101,6 +143,7 @@ fn grid(font: Handle<Font>, content: Vec<[&'static str; 2]>) -> impl Bundle {
                         } else {
                             JustifySelf::Start
                         },
+                        max_width: if i % 2 == 0 { Auto } else { Px(300.0) },
                         ..default()
                     },
                 )

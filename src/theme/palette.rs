@@ -3,7 +3,9 @@ use bevy::{
     prelude::*,
 };
 
+// #FFE6E6
 pub(crate) const LABEL_TEXT: Color = Color::srgb(1.0, 0.9, 0.9);
+// #E68080
 pub(crate) const HEADER_TEXT: Color = Color::srgb(0.9, 0.5, 0.5);
 pub(crate) const BUTTON_TEXT: Color = Color::srgb(1.0, 0.925, 0.925);
 
@@ -15,4 +17,5 @@ pub(crate) const BUTTON_BORDER: Color = Color::Srgba(GRAY_500);
 pub(crate) const BUTTON_HOVERED_BORDER: Color = Color::Srgba(RED_500);
 pub(crate) const BUTTON_PRESSED_BORDER: Color = Color::Srgba(RED_400);
 
+// #080202
 pub(crate) const SCREEN_BACKGROUND: Color = Color::srgb(0.035, 0.01, 0.01);

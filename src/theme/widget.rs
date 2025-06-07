@@ -45,7 +45,7 @@ pub(crate) fn label(text: impl Into<String>, font: Handle<Font>) -> impl Bundle 
 }
 
 pub(crate) fn label_small(text: impl Into<String>, font: Handle<Font>) -> impl Bundle {
-    label_base(text, 12.0, font)
+    label_base(text, 14.0, font)
 }
 
 /// A simple text label.
