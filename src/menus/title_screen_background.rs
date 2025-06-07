@@ -63,7 +63,7 @@ fn spawn_title_screen_background(mut commands: Commands, menu_assets: Res<MenuAs
                     image_mode: NodeImageMode::Auto,
                     ..default()
                 },
-                TextureScrollSpeed(80.0),
+                TextureScrollSpeed(40.0),
                 AlphaAnimationPhaseProgress(t),
                 ChildOf(background_entity),
                 Node {
