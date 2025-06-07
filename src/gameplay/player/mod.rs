@@ -25,6 +25,7 @@ pub(crate) mod camera;
 pub(crate) mod camera_shake;
 pub(crate) mod default_input;
 pub(crate) mod dialogue;
+pub(crate) mod fall_damage;
 pub(crate) mod gunplay;
 pub(crate) mod lifecycle;
 pub(crate) mod movement;
@@ -34,12 +35,15 @@ pub(crate) mod pickup;
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Player>();
+    app.register_type::<GroundCast>();
+
     app.add_plugins((
         animation::plugin,
         assets::plugin,
         camera::plugin,
         default_input::plugin,
         dialogue::plugin,
+        fall_damage::plugin,
         movement::plugin,
         movement_sound::plugin,
         pickup::plugin,
@@ -50,6 +54,7 @@ pub(super) fn plugin(app: &mut App) {
     ));
     app.add_observer(setup_player);
     app.add_systems(PreUpdate, assert_only_one_player);
+    app.add_systems(FixedLast, update_ground_cast);
 }
 
 #[derive(PointClass, Component, Debug, Clone, Copy, PartialEq, Eq, Default, Reflect)]
@@ -102,6 +107,8 @@ fn setup_player(trigger: Trigger<OnAdd, Player>, mut commands: Commands) {
                 static_coefficient: 0.0,
                 combine_rule: CoefficientCombine::Multiply,
             },
+            // For detecting the ground without Tnua's `is_airborne` state.
+            GroundCast::default(),
             ColliderDensity(100.0),
             CollisionLayers::new(
                 [CollisionLayer::Character, CollisionLayer::Player],
@@ -121,4 +128,28 @@ fn setup_player(trigger: Trigger<OnAdd, Player>, mut commands: Commands) {
 #[cfg_attr(feature = "hot_patch", hot)]
 fn assert_only_one_player(player: Populated<(), With<Player>>) {
     assert_eq!(1, player.iter().count());
+}
+
+#[derive(Component, Clone, Copy, Debug, Default, Deref, DerefMut, Reflect)]
+#[reflect(Component)]
+pub struct GroundCast(pub Option<ShapeHitData>);
+
+fn update_ground_cast(
+    mut player: Query<(Entity, &Transform, &Collider, &mut GroundCast), With<Player>>,
+    spatial_query: SpatialQuery,
+) {
+    for (entity, transform, collider, mut ground_cast) in &mut player {
+        let max_distance = PLAYER_FLOAT_HEIGHT;
+        let filter = SpatialQueryFilter::default()
+            .with_mask([CollisionLayer::Default, CollisionLayer::Prop])
+            .with_excluded_entities([entity]);
+        ground_cast.0 = spatial_query.cast_shape(
+            collider,
+            transform.translation,
+            Quat::IDENTITY,
+            Dir3::NEG_Y,
+            &ShapeCastConfig::from_max_distance(max_distance),
+            &filter,
+        );
+    }
 }
