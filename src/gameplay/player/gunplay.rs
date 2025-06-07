@@ -9,7 +9,7 @@ use crate::{
         crosshair::CrosshairState,
         health::OnDamage,
         npc::Npc,
-        player::{PLAYER_FLOAT_HEIGHT, camera::CustomRenderLayer, camera_shake::OnTrauma},
+        player::{GroundCast, camera::CustomRenderLayer, camera_shake::OnTrauma},
     },
     third_party::avian3d::CollisionLayer,
 };
@@ -175,31 +175,15 @@ fn spawn_muzzle_flash(
 
 fn shot_pushback(
     trigger: Trigger<OnAdd, Shooting>,
-    mut player: Query<(&mut LinearVelocity, &Collider, &WeaponStats), With<Player>>,
+    mut player: Query<(&mut LinearVelocity, &GroundCast, &WeaponStats), With<Player>>,
     player_camera_parent: Single<&Transform, With<PlayerCamera>>,
-    spatial_query: SpatialQuery,
 ) {
-    let Ok((mut lin_vel, collider, weapon_stats)) = player.get_mut(trigger.target()) else {
+    let Ok((mut lin_vel, ground_cast, weapon_stats)) = player.get_mut(trigger.target()) else {
         return;
     };
     let back = player_camera_parent.back();
 
-    // Cast the player's collider downwards to check if it's grounded.
-    // This seems to work better here than tnua's `is_airborne` check.
-    let max_distance = PLAYER_FLOAT_HEIGHT;
-    let filter = SpatialQueryFilter::default()
-        .with_mask([CollisionLayer::Default, CollisionLayer::Prop])
-        .with_excluded_entities([trigger.target()]);
-    let hit = spatial_query.cast_shape(
-        collider,
-        player_camera_parent.translation,
-        Quat::IDENTITY,
-        Dir3::NEG_Y,
-        &ShapeCastConfig::from_max_distance(max_distance),
-        &filter,
-    );
-
-    if hit.is_none() {
+    if ground_cast.is_none() {
         // Apply pushback
         lin_vel.0 += back * weapon_stats.pushback;
     }
