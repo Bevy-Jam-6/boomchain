@@ -8,6 +8,7 @@ use bevy::prelude::*;
 mod animation;
 pub(crate) mod crosshair;
 pub(crate) mod explosion;
+pub(crate) mod gore_settings;
 pub(crate) mod health;
 pub(crate) mod hud;
 pub(crate) mod level;
@@ -21,6 +22,7 @@ pub(super) fn plugin(app: &mut App) {
         animation::plugin,
         crosshair::plugin,
         explosion::plugin,
+        gore_settings::plugin,
         npc::plugin,
         player::plugin,
         health::plugin,
