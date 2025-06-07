@@ -5468,401 +5468,376 @@
 // entity 54
 {
 "classname" "light_lamp_plain"
-"origin" "1336 64 280"
-}
-// entity 55
-{
-"classname" "light_lamp_plain"
 "origin" "192 528 198"
 }
-// entity 56
+// entity 55
 {
 "classname" "lamp_sitting"
 "origin" "1153 206 24"
 }
-// entity 57
+// entity 56
 {
 "classname" "light_lamp_plain"
 "origin" "1184 360 272"
 }
-// entity 58
+// entity 57
 {
 "classname" "crate_square"
 "origin" "348 -32 24"
 }
-// entity 59
+// entity 58
 {
 "classname" "lamp_sitting"
 "origin" "364 -32 48"
 }
-// entity 60
+// entity 59
 {
 "classname" "light_lamp_plain"
 "origin" "1114 -1248 944"
 "intensity" "50000"
 }
-// entity 61
+// entity 60
 {
 "classname" "light_lamp_plain"
 "origin" "552 -248 448"
 }
-// entity 62
+// entity 61
 {
 "classname" "light_lamp_plain"
 "origin" "256 -392 152"
 "color" "255 170 0"
 }
-// entity 63
+// entity 62
 {
 "classname" "crate_square"
 "origin" "360 -32 24"
 "angles" "0 180 0"
 }
-// entity 64
+// entity 63
 {
 "classname" "spawner"
 "origin" "-728 -2504 424"
 }
-// entity 65
+// entity 64
 {
 "classname" "spawner"
 "origin" "-600 -1952 552"
 "radius" "2"
 }
-// entity 66
+// entity 65
 {
 "classname" "spawner"
 "origin" "1128 -1416 800"
 "radius" "1"
 }
-// entity 67
+// entity 66
 {
 "classname" "barrel_large_closed"
 "origin" "1128 -1896 136"
 }
-// entity 68
+// entity 67
 {
 "classname" "barrel_large_closed"
 "origin" "1176 -2440 504"
 }
-// entity 69
+// entity 68
 {
 "classname" "barrel_large_closed"
 "origin" "1224 -520 152"
 }
-// entity 70
+// entity 69
 {
 "classname" "barrel_large_closed"
 "origin" "1176 -520 152"
 }
-// entity 71
+// entity 70
 {
 "classname" "barrel_large_closed"
 "origin" "1128 -520 152"
 }
-// entity 72
+// entity 71
 {
 "classname" "barrel_large_closed"
 "origin" "1080 -520 152"
 }
-// entity 73
+// entity 72
 {
 "classname" "barrel_large_closed"
 "origin" "1032 -520 152"
 }
-// entity 74
+// entity 73
 {
 "classname" "barrel_large_closed"
 "origin" "136 -488 88"
 }
-// entity 75
+// entity 74
 {
 "classname" "barrel_large_closed"
 "origin" "184 -488 88"
 }
-// entity 76
+// entity 75
 {
 "classname" "barrel_large_closed"
 "origin" "136 -488 152"
 }
-// entity 77
+// entity 76
 {
 "classname" "barrel_large_closed"
 "origin" "184 -488 152"
 }
-// entity 78
+// entity 77
 {
 "classname" "barrel_large_closed"
 "origin" "1160 -2024 776"
 }
-// entity 79
+// entity 78
 {
 "classname" "barrel_large_closed"
 "origin" "1160 -2072 776"
 }
-// entity 80
+// entity 79
 {
 "classname" "barrel_large_closed"
 "origin" "1160 -2120 776"
 }
-// entity 81
+// entity 80
 {
 "classname" "package_medium"
 "origin" "-440 -2696 392"
 }
-// entity 82
+// entity 81
 {
 "classname" "package_medium"
 "origin" "-488 -2696 392"
 }
-// entity 83
+// entity 82
 {
 "classname" "package_medium"
 "origin" "-536 -2696 392"
 }
-// entity 84
+// entity 83
 {
 "classname" "crate_big"
 "origin" "168 -2680 392"
 }
-// entity 85
+// entity 84
 {
 "classname" "crate_big"
 "origin" "-296 -1720 392"
 }
-// entity 86
+// entity 85
 {
 "classname" "crate_small"
 "origin" "-296 -1784 392"
 }
+// entity 86
+{
+"classname" "crate_big"
+"origin" "1304 -88 160"
+}
 // entity 87
 {
-"classname" "crate_big"
-"origin" "1304 -24 152"
+"classname" "crate_small"
+"origin" "1308 -128 156"
 }
 // entity 88
-{
-"classname" "crate_big"
-"origin" "1304 -88 152"
-}
-// entity 89
-{
-"classname" "crate_small"
-"origin" "1288 -136 152"
-}
-// entity 90
-{
-"classname" "generator2"
-"origin" "1336 152 168"
-}
-// entity 91
 {
 "classname" "crate_small"
 "origin" "776 -1192 152"
 }
-// entity 92
+// entity 89
 {
 "classname" "package_small"
 "origin" "760 -1752 152"
 }
-// entity 93
+// entity 90
 {
 "classname" "package_medium"
 "origin" "824 -1752 152"
 "angles" "0 -90 0"
 }
-// entity 94
+// entity 91
 {
 "classname" "package_medium"
 "origin" "824 -1752 184"
 "angles" "0 -90 0"
 }
-// entity 95
+// entity 92
 {
 "classname" "bookshelf"
 "origin" "1352 -1832 144"
 "angles" "0 -180 0"
 }
-// entity 96
+// entity 93
 {
 "classname" "bookshelf"
-"origin" "1352 -1912 144"
+"origin" "1352 -1928 144"
 "angles" "0 -180 0"
 }
-// entity 97
+// entity 94
 {
 "classname" "bookshelf"
-"origin" "1352 -2000 144"
+"origin" "1352 -2024 144"
 "angles" "0 -180 0"
 }
-// entity 98
+// entity 95
 {
 "classname" "crate_big"
 "origin" "1400 -2120 152"
 }
-// entity 99
+// entity 96
 {
 "classname" "crate_big"
 "origin" "1208 -3544 376"
 }
-// entity 100
+// entity 97
 {
 "classname" "crate_small"
 "origin" "1160 -3544 360"
 }
-// entity 101
+// entity 98
 {
 "classname" "crate_square"
 "origin" "1016 -3592 152"
 "angles" "0 -90 0"
 }
-// entity 102
+// entity 99
 {
 "classname" "crate_square"
 "origin" "1096 -3592 152"
 "angles" "0 -90 0"
 }
-// entity 103
+// entity 100
 {
 "classname" "crate_square"
 "origin" "1096 -3592 184"
 "angles" "0 -90 0"
 }
-// entity 104
+// entity 101
 {
 "classname" "crate_big"
 "origin" "1168 -3592 152"
 }
-// entity 105
+// entity 102
 {
 "classname" "crate_square"
 "origin" "-344 -1544 600"
 }
-// entity 106
+// entity 103
 {
 "classname" "spawner"
 "origin" "1144 -2776 168"
 "radius" "15"
 }
-// entity 107
+// entity 104
 {
 "classname" "crate_big"
 "origin" "136 -2552 392"
 }
-// entity 108
+// entity 105
 {
 "classname" "crate_big"
 "origin" "232 -2536 392"
 }
-// entity 109
+// entity 106
 {
 "classname" "crate_big"
 "origin" "200 -2600 392"
 }
-// entity 110
+// entity 107
 {
 "classname" "crate_big"
 "origin" "280 -2648 392"
 }
-// entity 111
+// entity 108
 {
 "classname" "crate_small"
 "origin" "120 -2616 392"
 }
-// entity 112
+// entity 109
 {
 "classname" "crate_small"
 "origin" "152 -2744 392"
 }
-// entity 113
+// entity 110
 {
 "classname" "crate_small"
 "origin" "120 -2680 392"
 }
-// entity 114
+// entity 111
 {
 "classname" "crate_square"
 "origin" "264 -2712 392"
 }
-// entity 115
+// entity 112
 {
 "classname" "crate_big"
-"origin" "376 -472 88"
+"origin" "376 -472 92"
 }
-// entity 116
-{
-"classname" "crate_big"
-"origin" "312 -472 88"
-}
-// entity 117
+// entity 113
 {
 "classname" "crate_small"
-"origin" "344 -456 152"
+"origin" "332 -472 96"
 }
-// entity 118
-{
-"classname" "crate_small"
-"origin" "296 -456 152"
-}
-// entity 119
+// entity 114
 {
 "classname" "crate_square"
 "origin" "1016 -3592 216"
 "angles" "0 -90 0"
 }
-// entity 120
+// entity 115
 {
 "classname" "crate_square"
 "origin" "1016 -3592 184"
 "angles" "0 -90 0"
 }
-// entity 121
+// entity 116
 {
 "classname" "crate_square"
 "origin" "1096 -3592 216"
 "angles" "0 -90 0"
 }
-// entity 122
+// entity 117
 {
 "classname" "crate_big"
 "origin" "1192 -3592 208"
 }
-// entity 123
+// entity 118
 {
 "classname" "crate_big"
 "origin" "1224 -3576 152"
 }
-// entity 124
+// entity 119
 {
 "classname" "crate_square"
 "origin" "-376 -1544 632"
 }
-// entity 125
+// entity 120
 {
 "classname" "crate_square"
 "origin" "-392 -1544 600"
 }
-// entity 126
+// entity 121
 {
 "classname" "crate_big"
 "origin" "-640 -1536 600"
 }
-// entity 127
+// entity 122
 {
 "classname" "crate_big"
 "origin" "-640 -1592 600"
 }
-// entity 128
+// entity 123
 {
 "classname" "crate_big"
 "origin" "-640 -1560 656"
 }
-// entity 129
+// entity 124
 {
 "classname" "crate_small"
 "origin" "-392 -1592 600"
 }
-// entity 130
+// entity 125
 {
 "classname" "crate_small"
 "origin" "-432 -1536 600"

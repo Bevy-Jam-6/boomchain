@@ -21,8 +21,9 @@ pub(super) fn plugin(app: &mut App) {
         OnEnter(LoadingScreen::Shaders),
         (
             spawn_or_skip_shader_compilation_loading_screen,
-            spawn_shader_compilation_map,
-            setup_particle_effects,
+            (spawn_shader_compilation_map, setup_particle_effects).run_if(
+                |loaded_pipeline_count: Res<LoadedPipelineCount>| !loaded_pipeline_count.is_done(),
+            ),
         ),
     );
 
