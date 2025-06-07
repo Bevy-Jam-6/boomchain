@@ -6,12 +6,15 @@ use crate::{
         health::OnDamage,
         npc::{Npc, ai_state::AiState},
     },
+    menus::game_over::GameOverMenu,
 };
 
 pub(super) fn plugin(app: &mut App) {
     app.add_systems(
         Update,
-        (despawn_lazy, despawn_lonely).in_set(PostPhysicsAppSystems::TickTimers),
+        (despawn_lazy, despawn_lonely)
+            .in_set(PostPhysicsAppSystems::TickTimers)
+            .run_if(|query: Query<&GameOverMenu>| query.is_empty()),
     );
     app.add_observer(init_last_translation);
 }
