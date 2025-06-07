@@ -78,11 +78,11 @@ impl LoadedPipelineCount {
         {
             #[cfg(feature = "dev")]
             {
-                62
+                61
             }
             #[cfg(not(feature = "dev"))]
             {
-                61
+                60
             }
         }
     };
