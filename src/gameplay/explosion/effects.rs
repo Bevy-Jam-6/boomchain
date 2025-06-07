@@ -26,7 +26,12 @@ use crate::{
     RenderLayer,
     audio::SoundEffect,
     despawn_after::DespawnAfter,
-    gameplay::{explosion::ExplodeOnDeath, health::OnDeath, npc::stats::NpcStats},
+    gameplay::{
+        explosion::ExplodeOnDeath,
+        gore_settings::{Gore, GoreSettings},
+        health::OnDeath,
+        npc::stats::NpcStats,
+    },
     platform_support::is_webgpu_or_native,
 };
 
@@ -105,6 +110,7 @@ fn on_enemy_death(
     trigger: Trigger<OnDeath>,
     query: Query<(&GlobalTransform, Option<&NpcStats>), With<ExplodeOnDeath>>,
     mut explosion_assets: ResMut<ExplosionAssets>,
+    gore_settings: Res<GoreSettings>,
     mut commands: Commands,
 ) {
     let Ok((transform, stats)) = query.get(trigger.target()) else {
@@ -125,6 +131,10 @@ fn on_enemy_death(
         DespawnAfter::new(Duration::from_secs(1)),
         RenderLayers::from(RenderLayer::PARTICLES),
     ));
+
+    if gore_settings.blood_decals == Gore::None {
+        return;
+    }
 
     // Spray some blood splatter decals.
     let blood_decal_texture = explosion_assets

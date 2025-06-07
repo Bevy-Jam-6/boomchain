@@ -164,7 +164,8 @@ pub(crate) fn plus_minus_bar<E, B, M, I1, I2>(
     label_marker: impl Component,
     lower: I1,
     raise: I2,
-    font: Handle<Font>,
+    button_font: Handle<Font>,
+    label_font: Handle<Font>,
 ) -> impl Bundle
 where
     E: Event,
@@ -179,16 +180,119 @@ where
             ..default()
         },
         children![
-            button_small("-", font.clone(), lower),
-            button_small("+", font.clone(), raise),
+            button_small("-", button_font.clone(), lower),
+            button_small("+", button_font.clone(), raise),
             (
                 Node {
                     padding: UiRect::horizontal(Px(10.0)),
                     justify_content: JustifyContent::Center,
                     ..default()
                 },
-                children![(label("", Handle::default()), label_marker)],
+                children![(label("", label_font.clone()), label_marker)],
             ),
         ],
     )
+}
+
+#[derive(Component, Clone, Default)]
+pub(crate) struct SelectInput {
+    pub options: Vec<String>,
+    pub selection: usize,
+}
+
+#[derive(Component, Clone, Default)]
+pub(crate) struct ActiveSelectionLabel;
+
+#[derive(Event)]
+pub(crate) struct OnChangeSelection {
+    pub selection: usize,
+}
+
+impl OnChangeSelection {
+    pub const fn new(selection: usize) -> Self {
+        Self { selection }
+    }
+}
+
+pub(crate) fn cycle_select<E, B, M, I>(
+    options: Vec<String>,
+    selection: usize,
+    font: Handle<Font>,
+    change_selection: I,
+) -> impl Bundle
+where
+    E: Event,
+    B: Bundle,
+    I: IntoObserverSystem<E, B, M> + Sync,
+{
+    let first_option = options[selection].clone();
+    (
+        Node::default(),
+        Children::spawn(SpawnWith(move |parent: &mut ChildSpawner| {
+            parent
+                .spawn((
+                    Name::new("Select Input"),
+                    SelectInput {
+                        options,
+                        selection: 0,
+                    },
+                    Node::default(),
+                    children![
+                        button_small("<", font.clone(), on_change_selection::<-1>),
+                        (
+                            Node {
+                                width: Px(320.0),
+                                padding: UiRect::horizontal(Px(10.0)),
+                                justify_content: JustifyContent::Center,
+                                ..default()
+                            },
+                            children![(label(first_option, font.clone()), ActiveSelectionLabel)],
+                        ),
+                        button_small(">", font.clone(), on_change_selection::<1>),
+                    ],
+                ))
+                .observe(change_selection);
+        })),
+    )
+}
+
+fn on_change_selection<const INCREMENT: i32>(
+    trigger: Trigger<Pointer<Click>>,
+    mut select_query: Query<&mut SelectInput>,
+    child_of_query: Query<&ChildOf>,
+    child_query: Query<&Children>,
+    mut text_query: Query<&mut Text, With<ActiveSelectionLabel>>,
+    mut commands: Commands,
+) {
+    let Ok(Ok(select_entity)) = child_of_query
+        .get(trigger.target())
+        .map(|&ChildOf(parent)| child_of_query.get(parent).map(|c| c.0))
+    else {
+        return;
+    };
+
+    let Ok(mut input) = select_query.get_mut(select_entity) else {
+        return;
+    };
+
+    // Increment or decrement the selected index, wrapping around the options.
+    input.selection =
+        (input.selection as i32 + INCREMENT).rem_euclid(input.options.len() as i32) as usize;
+
+    // Find the text entity within the select input's children and update its text.
+    if let Some(text_entity) = child_query
+        .iter_descendants(select_entity)
+        .find(|&child| text_query.contains(child))
+    {
+        let mut text = text_query.get_mut(text_entity).unwrap();
+        text.0 = input.options[input.selection].clone();
+    }
+
+    // Trigger the `OnChangeSelection` event with the updated selected index.
+    commands.trigger_targets(
+        OnChangeSelection {
+            selection: input.selection,
+        },
+        select_entity,
+    );
 }

@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use avian3d::prelude::*;
 use bevy::{
     audio::{SpatialScale, Volume},
@@ -17,6 +15,7 @@ use crate::{
     despawn_after::{Despawn, DespawnAfter},
     gameplay::{
         explosion::{ExplodeOnDeath, OnExplode},
+        gore_settings::{Gore, GoreSettings},
         health::{OnDamage, OnDeath},
         npc::{ai_state::AiState, assets::NpcAssets, stats::NpcStats},
     },
@@ -39,38 +38,42 @@ fn on_enemy_death(
     trigger: Trigger<OnDeath>,
     enemies: Query<(&Transform, &NpcStats, Has<ExplodeOnDeath>)>,
     npc_assets: Res<NpcAssets>,
+    gore_settings: Res<GoreSettings>,
     mut commands: Commands,
 ) {
     let entity = trigger.target();
     let Ok((transform, stats, explode_on_death)) = enemies.get(entity) else {
         return;
     };
-    let mut rng = rand::thread_rng();
-    let mut gibs = ShuffleBag::try_new(
-        [
-            &npc_assets.gib_head,
-            &npc_assets.gib_torso,
-            &npc_assets.gib_arm_1,
-            &npc_assets.gib_arm_2,
-            &npc_assets.gib_arm_1,
-            &npc_assets.gib_arm_2,
-            &npc_assets.gib_leg,
-            &npc_assets.gib_leg,
-            &npc_assets.gib_foot,
-            &npc_assets.gib_foot,
-            &npc_assets.gib_pelvis,
-        ],
-        &mut rng,
-    )
-    .unwrap();
-    let num_gibs = 5;
-    for _ in 0..num_gibs {
-        let gib = *gibs.pick(&mut rng);
-        let offset_radius = 0.5;
-        let offset = Sphere::new(offset_radius).sample_interior(&mut rng);
-        let position = transform.translation + offset;
-        commands
-            .spawn((
+    if gore_settings.gibs != Gore::None {
+        let mut rng = rand::thread_rng();
+        let mut gibs = ShuffleBag::try_new(
+            [
+                &npc_assets.gib_head,
+                &npc_assets.gib_torso,
+                &npc_assets.gib_arm_1,
+                &npc_assets.gib_arm_2,
+                &npc_assets.gib_arm_1,
+                &npc_assets.gib_arm_2,
+                &npc_assets.gib_leg,
+                &npc_assets.gib_leg,
+                &npc_assets.gib_foot,
+                &npc_assets.gib_foot,
+                &npc_assets.gib_pelvis,
+            ],
+            &mut rng,
+        )
+        .unwrap();
+
+        let num_gibs = 5;
+
+        for _ in 0..num_gibs {
+            let gib = *gibs.pick(&mut rng);
+            let offset_radius = 0.5;
+            let offset = Sphere::new(offset_radius).sample_interior(&mut rng);
+            let position = transform.translation + offset;
+
+            let mut entity_commands = commands.spawn((
                 Gib,
                 SceneRoot(gib.clone()),
                 Transform::from_translation(position).with_scale(Vec3::splat(stats.size)),
@@ -80,10 +83,15 @@ fn on_enemy_death(
                         CollisionLayer::Gib,
                         [CollisionLayer::Default],
                     )),
-                DespawnAfter::new(Duration::from_secs(10)),
                 StateScoped(Screen::Gameplay),
-            ))
-            .observe(remove_shadow_caster);
+            ));
+
+            entity_commands.observe(remove_shadow_caster);
+
+            if let Gore::Despawn(duration) = gore_settings.gibs {
+                entity_commands.insert(DespawnAfter::new(duration));
+            }
+        }
     }
 
     commands.entity(entity).insert(Despawn);

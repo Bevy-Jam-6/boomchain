@@ -2,6 +2,8 @@
 //! We can add all manner of settings and accessibility options here.
 //! For 3D, we'd also place the camera sensitivity and FOV here.
 
+use std::time::Duration;
+
 use bevy::{audio::Volume, input::common_conditions::input_just_pressed, prelude::*, ui::Val::*};
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
@@ -9,10 +11,13 @@ use bevy_simple_subsecond_system::hot;
 use crate::{
     audio::{DEFAULT_VOLUME, max_volume},
     font::FontAssets,
-    gameplay::player::camera::{CameraSensitivity, WorldModelFov},
+    gameplay::{
+        gore_settings::{Gore, GoreSettings},
+        player::camera::{CameraSensitivity, WorldModelFov},
+    },
     menus::Menu,
     screens::Screen,
-    theme::prelude::*,
+    theme::{prelude::*, widget::OnChangeSelection},
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -37,7 +42,11 @@ pub(super) fn plugin(app: &mut App) {
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
-fn spawn_settings_menu(mut commands: Commands, fonts: Res<FontAssets>) {
+fn spawn_settings_menu(
+    mut commands: Commands,
+    fonts: Res<FontAssets>,
+    gore_settings: Res<GoreSettings>,
+) {
     commands.spawn((
         widget::ui_root("Settings Screen"),
         StateScoped(Menu::Settings),
@@ -67,6 +76,7 @@ fn spawn_settings_menu(mut commands: Commands, fonts: Res<FontAssets>) {
                         lower_volume,
                         raise_volume,
                         fonts.default.clone(),
+                        Handle::<Font>::default(),
                     ),
                     // Camera Sensitivity
                     (
@@ -80,6 +90,7 @@ fn spawn_settings_menu(mut commands: Commands, fonts: Res<FontAssets>) {
                         CameraSensitivityLabel,
                         lower_camera_sensitivity,
                         raise_camera_sensitivity,
+                        fonts.default.clone(),
                         fonts.default.clone(),
                     ),
                     // Camera FOV
@@ -95,6 +106,65 @@ fn spawn_settings_menu(mut commands: Commands, fonts: Res<FontAssets>) {
                         lower_camera_fov,
                         raise_camera_fov,
                         fonts.default.clone(),
+                        fonts.default.clone(),
+                    ),
+                    (
+                        widget::label("Blood Splatter", fonts.default.clone()),
+                        Node {
+                            justify_self: JustifySelf::End,
+                            ..default()
+                        }
+                    ),
+                    widget::cycle_select(
+                        vec![
+                            "Enabled (despawn after 10 s)".to_string(),
+                            "Enabled (never despawn)".to_string(),
+                            "Disabled".to_string()
+                        ],
+                        match gore_settings.blood_decals {
+                            Gore::Despawn(_) => 0,
+                            Gore::NeverDespawn => 1,
+                            Gore::None => 2,
+                        },
+                        fonts.default.clone(),
+                        |trigger: Trigger<OnChangeSelection>,
+                         mut gore_settings: ResMut<GoreSettings>| {
+                            let selection = trigger.selection;
+                            gore_settings.blood_decals = match selection {
+                                0 => Gore::Despawn(Duration::from_secs(10)),
+                                1 => Gore::NeverDespawn,
+                                _ => Gore::None,
+                            };
+                        },
+                    ),
+                    (
+                        widget::label("Dismemberment", fonts.default.clone()),
+                        Node {
+                            justify_self: JustifySelf::End,
+                            ..default()
+                        }
+                    ),
+                    widget::cycle_select(
+                        vec![
+                            "Enabled (despawn after 10 s)".to_string(),
+                            "Enabled (never despawn)".to_string(),
+                            "Disabled".to_string()
+                        ],
+                        match gore_settings.blood_decals {
+                            Gore::Despawn(_) => 0,
+                            Gore::NeverDespawn => 1,
+                            Gore::None => 2,
+                        },
+                        fonts.default.clone(),
+                        |trigger: Trigger<OnChangeSelection>,
+                         mut gore_settings: ResMut<GoreSettings>| {
+                            let selection = trigger.selection;
+                            gore_settings.gibs = match selection {
+                                0 => Gore::Despawn(Duration::from_secs(10)),
+                                1 => Gore::NeverDespawn,
+                                _ => Gore::None,
+                            };
+                        },
                     ),
                 ],
             ),
