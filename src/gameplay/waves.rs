@@ -552,7 +552,7 @@ fn advance_waves(
             };
             let filter = SpatialQueryFilter::default().with_mask([CollisionLayer::Default]);
             let spawn_position = if let Some(hit) =
-                spatial_query.cast_ray(spawner_transform, dir, 100.0, true, &filter)
+                spatial_query.cast_ray(spawner_transform, dir, pos3.length(), true, &filter)
             {
                 spawner_transform + dir * (hit.distance - 1.0).max(0.0)
             } else {
