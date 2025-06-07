@@ -107,7 +107,6 @@ fn animate_alpha(
     }
 }
 
-// TODO: This doesn't work well with resizing the window.
 fn scroll_background(
     time: Res<Time>,
     mut query: Query<(&mut Node, &ComputedNode, &TextureScrollSpeed), With<ImageNode>>,
