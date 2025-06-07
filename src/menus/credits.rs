@@ -7,7 +7,7 @@ use bevy::{
 use bevy_simple_subsecond_system::hot;
 
 use crate::{
-    asset_tracking::LoadResource, audio::music, font::FontAssets, menus::Menu, theme::prelude::*,
+    asset_tracking::LoadResource, audio::Music, font::FontAssets, menus::Menu, theme::prelude::*,
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -138,6 +138,8 @@ fn start_credits_music(mut commands: Commands, credits_music: Res<CreditsAssets>
     commands.spawn((
         Name::new("Credits Music"),
         StateScoped(Menu::Credits),
-        music(credits_music.music.clone()),
+        AudioPlayer(credits_music.music.clone()),
+        PlaybackSettings::LOOP.with_speed(0.45),
+        Music,
     ));
 }
