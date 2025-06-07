@@ -89,10 +89,11 @@ fn reset_on_window_resize(
         return;
     }
 
-    if let Some(entity) = query.iter().next() {
+    for entity in &query {
         commands.entity(entity).despawn();
-        commands.run_system_cached(spawn_title_screen_background);
     }
+
+    commands.run_system_cached(spawn_title_screen_background);
 }
 
 fn animate_alpha(
