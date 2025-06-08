@@ -4,7 +4,10 @@ use bevy::prelude::*;
 use bevy_mesh_decal::Decal;
 
 use crate::{
-    despawn_after::DespawnAfter, gameplay::npc::lifecycle::Gib, menus::Menu, screens::Screen,
+    despawn_after::{DespawnAfter, FadeOutAndDespawn},
+    gameplay::{npc::lifecycle::Gib, waves::Waves},
+    menus::Menu,
+    screens::Screen,
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -28,8 +31,8 @@ pub(crate) struct GoreSettings {
 impl Default for GoreSettings {
     fn default() -> Self {
         Self {
-            blood_decals: Gore::Despawn(Duration::from_secs(10)),
-            gibs: Gore::Despawn(Duration::from_secs(10)),
+            blood_decals: Gore::DespawnAfterWave,
+            gibs: Gore::DespawnAfterWave,
         }
     }
 }
@@ -39,14 +42,17 @@ pub enum Gore {
     None,
     NeverDespawn,
     Despawn(Duration),
+    DespawnAfterWave,
 }
 
 fn despawn_decals(
     mut commands: Commands,
     decals: Query<(Entity, Ref<Decal>)>,
     decals_with_despawn_timer: Query<Entity, (With<Decal>, With<DespawnAfter>)>,
+    decals_without_fadeout_timer: Query<Entity, (With<Decal>, Without<FadeOutAndDespawn>)>,
+    waves: Query<&Waves>,
     gore_settings: Res<GoreSettings>,
-) {
+) -> Result {
     match gore_settings.blood_decals {
         Gore::None => {
             for (entity, _) in &decals {
@@ -68,15 +74,31 @@ fn despawn_decals(
                 }
             }
         }
+        Gore::DespawnAfterWave => {
+            let waves = waves.single()?;
+
+            // Start fading out old decals a bit after the wave preparation starts
+            if waves.is_preparing() && waves.prep_timer_elapsed() > Duration::from_secs(5) {
+                let entities = decals_without_fadeout_timer
+                    .iter()
+                    .map(|e| (e, FadeOutAndDespawn::new(Duration::from_secs(5))))
+                    .collect::<Vec<_>>();
+                commands.insert_batch(entities);
+            }
+        }
     }
+
+    Ok(())
 }
 
 fn despawn_gibs(
     mut commands: Commands,
     gibs: Query<(Entity, Ref<Gib>)>,
     gibs_with_despawn_timer: Query<Entity, (With<Gib>, With<DespawnAfter>)>,
+    gibs_without_fadeout_timer: Query<Entity, (With<Gib>, Without<FadeOutAndDespawn>)>,
+    waves: Query<&Waves>,
     gore_settings: Res<GoreSettings>,
-) {
+) -> Result {
     match gore_settings.gibs {
         Gore::None => {
             for (entity, _) in &gibs {
@@ -98,5 +120,19 @@ fn despawn_gibs(
                 }
             }
         }
+        Gore::DespawnAfterWave => {
+            let waves = waves.single()?;
+
+            // Start fading out old gibs a bit after the wave preparation starts
+            if waves.is_preparing() && waves.prep_timer_elapsed() > Duration::from_secs(5) {
+                let entities = gibs_without_fadeout_timer
+                    .iter()
+                    .map(|e| (e, FadeOutAndDespawn::new(Duration::from_secs(5))))
+                    .collect::<Vec<_>>();
+                commands.insert_batch(entities);
+            }
+        }
     }
+
+    Ok(())
 }

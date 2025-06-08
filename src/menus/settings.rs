@@ -117,22 +117,25 @@ fn spawn_settings_menu(
                     ),
                     widget::cycle_select(
                         vec![
+                            "Enabled (despawn after waves)".to_string(),
                             "Enabled (despawn after 10 s)".to_string(),
                             "Enabled (never despawn)".to_string(),
                             "Disabled".to_string()
                         ],
                         match gore_settings.blood_decals {
-                            Gore::Despawn(_) => 0,
-                            Gore::NeverDespawn => 1,
-                            Gore::None => 2,
+                            Gore::DespawnAfterWave => 0,
+                            Gore::Despawn(_) => 1,
+                            Gore::NeverDespawn => 2,
+                            Gore::None => 3,
                         },
                         fonts.default.clone(),
                         |trigger: Trigger<OnChangeSelection>,
                          mut gore_settings: ResMut<GoreSettings>| {
                             let selection = trigger.selection;
                             gore_settings.blood_decals = match selection {
-                                0 => Gore::Despawn(Duration::from_secs(10)),
-                                1 => Gore::NeverDespawn,
+                                0 => Gore::DespawnAfterWave,
+                                1 => Gore::Despawn(Duration::from_secs(10)),
+                                2 => Gore::NeverDespawn,
                                 _ => Gore::None,
                             };
                         },
@@ -146,22 +149,25 @@ fn spawn_settings_menu(
                     ),
                     widget::cycle_select(
                         vec![
+                            "Enabled (despawn after waves)".to_string(),
                             "Enabled (despawn after 10 s)".to_string(),
                             "Enabled (never despawn)".to_string(),
                             "Disabled".to_string()
                         ],
                         match gore_settings.blood_decals {
-                            Gore::Despawn(_) => 0,
-                            Gore::NeverDespawn => 1,
-                            Gore::None => 2,
+                            Gore::DespawnAfterWave => 0,
+                            Gore::Despawn(_) => 1,
+                            Gore::NeverDespawn => 2,
+                            Gore::None => 3,
                         },
                         fonts.default.clone(),
                         |trigger: Trigger<OnChangeSelection>,
                          mut gore_settings: ResMut<GoreSettings>| {
                             let selection = trigger.selection;
                             gore_settings.gibs = match selection {
-                                0 => Gore::Despawn(Duration::from_secs(10)),
-                                1 => Gore::NeverDespawn,
+                                0 => Gore::DespawnAfterWave,
+                                1 => Gore::Despawn(Duration::from_secs(10)),
+                                2 => Gore::NeverDespawn,
                                 _ => Gore::None,
                             };
                         },

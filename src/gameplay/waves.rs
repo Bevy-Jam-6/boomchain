@@ -662,6 +662,10 @@ impl Waves {
         self.prep_timer.remaining()
     }
 
+    pub(crate) fn prep_timer_elapsed(&self) -> Duration {
+        self.prep_timer.elapsed()
+    }
+
     fn try_advance(&mut self, delta: Duration, has_enemies: bool) -> WaveAdvancement {
         let mut advancement = WaveAdvancement::Ongoing;
         if !self.is_finished()
@@ -724,9 +728,10 @@ impl Waves {
         difficulties
     }
 
-    fn is_preparing(&self) -> bool {
+    pub(crate) fn is_preparing(&self) -> bool {
         !self.prep_timer.finished()
     }
+
     fn advance_wave(&mut self) {
         self.current_wave += 1;
         let prep_time = if let Some(current_wave) = self.current_wave() {
