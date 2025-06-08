@@ -103,6 +103,8 @@ fn fade_out_and_despawn(
                     mat.base_color.set_alpha(1.0);
                     if !force_blend {
                         mat.alpha_mode = AlphaMode::Opaque;
+                    } else {
+                        mat.alpha_mode = AlphaMode::Mask(0.5);
                     }
                 }
             }
@@ -112,6 +114,8 @@ fn fade_out_and_despawn(
                         mat.base_color.set_alpha(1.0);
                         if !force_blend {
                             mat.alpha_mode = AlphaMode::Opaque;
+                        } else {
+                            mat.alpha_mode = AlphaMode::Mask(0.5);
                         }
                     }
                 }
