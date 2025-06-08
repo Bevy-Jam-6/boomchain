@@ -43,6 +43,7 @@ pub(crate) enum Upgrade {
     Damage,
     Speed,
     Accuracy,
+    Bullets,
 }
 impl Upgrade {
     fn all_except_health() -> Vec<Upgrade> {
@@ -106,6 +107,11 @@ fn spawn_upgrade_ui(
                 fonts.default.clone(),
                 upgrade_accuracy,
             )),
+            Upgrade::Bullets => menu_commands.with_child(button(
+                "More Bullets per Shot",
+                fonts.default.clone(),
+                upgrade_bullets,
+            )),
         };
     }
 }
@@ -145,6 +151,15 @@ fn upgrade_accuracy(
     mut commands: Commands,
 ) {
     weapon_stats.spread_radius = (weapon_stats.spread_radius - 0.02).max(0.0);
+    commands.trigger(DespawnUpgrades);
+}
+
+fn upgrade_bullets(
+    _: Trigger<Pointer<Click>>,
+    mut weapon_stats: Single<&mut WeaponStats, With<Player>>,
+    mut commands: Commands,
+) {
+    weapon_stats.pellets += 4;
     commands.trigger(DespawnUpgrades);
 }
 
