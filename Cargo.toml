@@ -127,6 +127,7 @@ rustflags = [
     "getrandom_backend=\"wasm_js\"",
     "--cfg",
     "web_sys_unstable_apis",
+    "-Ctarget-feature=+bulk-memory,+sign-ext,+nontrapping-fptoint",
 ]
 
 [package.metadata.bevy_cli.web.dev]
