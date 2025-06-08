@@ -65,9 +65,7 @@ fn on_enemy_death(
         )
         .unwrap();
 
-        let num_gibs = 5;
-
-        for _ in 0..num_gibs {
+        for _ in 0..gore_settings.gib_count {
             let gib = *gibs.pick(&mut rng);
             let offset_radius = 0.5;
             let offset = Sphere::new(offset_radius).sample_interior(&mut rng);

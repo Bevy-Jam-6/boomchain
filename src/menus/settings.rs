@@ -36,6 +36,7 @@ pub(super) fn plugin(app: &mut App) {
             update_volume_label,
             update_camera_sensitivity_label,
             update_camera_fov_label,
+            update_gib_count_label,
         )
             .run_if(in_state(Menu::Settings)),
     );
@@ -105,6 +106,21 @@ fn spawn_settings_menu(
                         CameraFovLabel,
                         lower_camera_fov,
                         raise_camera_fov,
+                        fonts.default.clone(),
+                        fonts.default.clone(),
+                    ),
+                    // Gib count
+                    (
+                        widget::label("Number of body parts", fonts.default.clone()),
+                        Node {
+                            justify_self: JustifySelf::End,
+                            ..default()
+                        }
+                    ),
+                    widget::plus_minus_bar(
+                        GibCountLabel,
+                        lower_gib_count,
+                        raise_gib_count,
                         fonts.default.clone(),
                         fonts.default.clone(),
                     ),
@@ -312,6 +328,28 @@ fn update_camera_fov_label(
     camera_fov: Res<WorldModelFov>,
 ) {
     label.0 = format!("{:.1}", camera_fov.0);
+}
+
+#[derive(Component, Reflect)]
+#[reflect(Component)]
+struct GibCountLabel;
+
+fn lower_gib_count(_trigger: Trigger<Pointer<Click>>, mut gore_settings: ResMut<GoreSettings>) {
+    gore_settings.gib_count = gore_settings.gib_count.saturating_sub(1);
+}
+
+#[cfg_attr(feature = "hot_patch", hot)]
+fn raise_gib_count(_trigger: Trigger<Pointer<Click>>, mut gore_settings: ResMut<GoreSettings>) {
+    gore_settings.gib_count += 1;
+    gore_settings.gib_count = gore_settings.gib_count.min(11);
+}
+
+#[cfg_attr(feature = "hot_patch", hot)]
+fn update_gib_count_label(
+    mut label: Single<&mut Text, With<GibCountLabel>>,
+    gore_settings: Res<GoreSettings>,
+) {
+    label.0 = format!("{}", gore_settings.gib_count);
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
