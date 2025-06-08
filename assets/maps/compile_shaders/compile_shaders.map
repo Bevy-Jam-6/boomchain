@@ -763,70 +763,65 @@
 }
 // entity 8
 {
-"classname" "burning_logs"
-"origin" "-136 24 24"
-}
-// entity 9
-{
 "classname" "bookshelf"
 "origin" "120 -56 24"
 }
-// entity 10
+// entity 9
 {
 "classname" "lamp_sitting"
 "origin" "72 40 24"
 }
-// entity 11
+// entity 10
 {
 "classname" "light_lamp_shaded03"
 "origin" "-104 -184 24"
 }
-// entity 12
+// entity 11
 {
 "classname" "generator2"
 "origin" "-8 -168 24"
 }
-// entity 13
+// entity 12
 {
 "classname" "crate_big"
 "origin" "40 136 24"
 }
-// entity 14
+// entity 13
 {
 "classname" "barrel_large_closed"
 "origin" "-8 56 24"
 }
-// entity 15
+// entity 14
 {
 "classname" "fence_bars_decorative_single"
 "origin" "8 8 24"
 }
-// entity 16
+// entity 15
 {
 "classname" "door_stained_glass"
 "origin" "72 -136 24"
 }
-// entity 17
+// entity 16
 {
 "classname" "ivy_part8"
 "origin" "24 -56 24"
 }
-// entity 18
+// entity 17
 {
 "classname" "package_medium"
 "origin" "56 8 24"
 }
-// entity 19
+// entity 18
 {
 "classname" "package_small"
 "origin" "24 -104 24"
 }
-// entity 20
+// entity 19
 {
 "classname" "small_door_sign1"
 "origin" "-56 136 24"
 }
-// entity 21
+// entity 20
 {
 "classname" "npc"
 "origin" "-216 120 24"

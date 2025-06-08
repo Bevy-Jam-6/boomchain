@@ -9,7 +9,6 @@ use bevy::prelude::*;
 use crate::platform_support::is_webgpu_or_native;
 
 pub(crate) mod avian3d;
-mod avian_pickup;
 mod bevy_enhanced_input;
 mod bevy_firework;
 mod bevy_framepace;
@@ -18,7 +17,6 @@ pub(crate) mod bevy_landmass;
 mod bevy_mesh_decal;
 mod bevy_tnua;
 pub(crate) mod bevy_trenchbroom;
-pub(crate) mod bevy_yarnspinner;
 mod fixes;
 
 pub(super) fn plugin(app: &mut App) {
@@ -31,8 +29,6 @@ pub(super) fn plugin(app: &mut App) {
         bevy_tnua::plugin,
         bevy_landmass::plugin,
         bevy_mesh_decal::plugin,
-        bevy_yarnspinner::plugin,
-        avian_pickup::plugin,
         bevy_framepace::plugin,
     ));
     if is_webgpu_or_native() {

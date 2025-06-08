@@ -5,8 +5,6 @@
 
 use std::{f32::consts::FRAC_PI_2, iter};
 
-use avian_pickup::prelude::*;
-use avian3d::prelude::*;
 use bevy::{
     core_pipeline::{Skybox, bloom::Bloom, tonemapping::Tonemapping},
     pbr::NotShadowCaster,
@@ -32,7 +30,7 @@ use crate::{
         player::camera_shake::{CameraShake, NonTraumaTransform},
     },
     screens::{Screen, loading::LoadingScreen},
-    third_party::{avian3d::CollisionLayer, bevy_trenchbroom::LoadTrenchbroomModel as _},
+    third_party::bevy_trenchbroom::LoadTrenchbroomModel as _,
 };
 
 use super::{PLAYER_FLOAT_HEIGHT, Player, default_input::Rotate};
@@ -100,23 +98,6 @@ fn spawn_view_model(
             NonTraumaTransform(*player_transform),
             StateScoped(Screen::Gameplay),
             StateScoped(LoadingScreen::Shaders),
-            AvianPickupActor {
-                prop_filter: SpatialQueryFilter::from_mask(CollisionLayer::Prop),
-                obstacle_filter: SpatialQueryFilter::from_mask(CollisionLayer::Default),
-                actor_filter: SpatialQueryFilter::from_mask(CollisionLayer::Character),
-                interaction_distance: 2.0,
-                pull: AvianPickupActorPullConfig {
-                    impulse: 20.0,
-                    // We are not limiting ourselves to the mass of props.
-                    max_prop_mass: 10_000.0,
-                },
-                hold: AvianPickupActorHoldConfig {
-                    distance_to_allow_holding: 2.0,
-                    linear_velocity_easing: 0.7,
-                    ..default()
-                },
-                ..default()
-            },
             AnimationPlayerAncestor,
             SpatialListener::new(0.4),
         ))

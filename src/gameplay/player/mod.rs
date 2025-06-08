@@ -24,14 +24,12 @@ pub(crate) mod assets;
 pub(crate) mod camera;
 pub(crate) mod camera_shake;
 pub(crate) mod default_input;
-pub(crate) mod dialogue;
 pub(crate) mod fall_damage;
 pub(crate) mod gunplay;
 pub(crate) mod lifecycle;
 pub(crate) mod movement;
 pub(crate) mod movement_sound;
 pub(crate) mod navmesh_position;
-pub(crate) mod pickup;
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Player>();
@@ -42,11 +40,9 @@ pub(super) fn plugin(app: &mut App) {
         assets::plugin,
         camera::plugin,
         default_input::plugin,
-        dialogue::plugin,
         fall_damage::plugin,
         movement::plugin,
         movement_sound::plugin,
-        pickup::plugin,
         navmesh_position::plugin,
         gunplay::plugin,
         camera_shake::plugin,

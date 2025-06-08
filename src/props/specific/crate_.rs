@@ -1,4 +1,3 @@
-use avian_pickup::prop::PreferredPickupRotation;
 use avian3d::prelude::*;
 use bevy::prelude::*;
 use bevy_landmass::{Character, prelude::*};
@@ -51,10 +50,6 @@ fn setup_crate_small(
             .with_default_density(1_000.0),
         // Not inserting `TnuaNotPlatform`, otherwise the player will not be able to jump on it.
         SceneRoot(model),
-        // The prop should be held upright.
-        PreferredPickupRotation(Quat::IDENTITY),
-        // Holding a big crate right in your face looks bad, so
-        // let's move the pickup distance a bit further away.
         RigidBody::Dynamic,
     ));
 }

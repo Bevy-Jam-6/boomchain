@@ -1,4 +1,3 @@
-use avian_pickup::prop::PreferredPickupRotation;
 use avian3d::prelude::*;
 use bevy::prelude::*;
 #[cfg(feature = "hot_patch")]
@@ -34,7 +33,7 @@ fn setup_lamp_sitting(
     commands
         .entity(trigger.target())
         // The prop should be held upright.
-        .insert((bundle, PreferredPickupRotation(Quat::IDENTITY)))
+        .insert(bundle)
         // The lamp's origin is at the bottom of the lamp, so we need to offset the light a bit.
         .with_child((
             Transform::from_xyz(0.0, 0.2, 0.0),
