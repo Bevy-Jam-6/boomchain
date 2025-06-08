@@ -39,7 +39,7 @@ fn disable_weird_light(
     for (light_transform, mut light) in lights.iter_mut() {
         let dot = light_transform.forward().dot(player.forward().into());
         info!("dot: {}", dot);
-        if dot > 0.85 {
+        if dot > 0.8 {
             light.illuminance = 0.0;
         } else {
             light.illuminance = 5_000.0;
