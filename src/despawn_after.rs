@@ -10,7 +10,7 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<Despawn>();
 
     // This is a weird place for this, but whatever, it's the last day of the jam :P
-    app.register_required_components::<Decal, ForceAlphaModeBlend>();
+    app.register_required_components::<Decal, ForceNoOpaque>();
 
     app.add_systems(
         Update,
@@ -67,14 +67,14 @@ impl FadeOutAndDespawn {
 
 #[derive(Component, Debug, Default, Reflect)]
 #[reflect(Component)]
-pub(crate) struct ForceAlphaModeBlend;
+pub(crate) struct ForceNoOpaque;
 
 fn fade_out_and_despawn(
     mut commands: Commands,
     time: Res<Time>,
     mut to_fade_out: Query<(&mut FadeOutAndDespawn, Entity)>,
     child_query: Query<&Children>,
-    mesh_material_query: Query<(&MeshMaterial3d<StandardMaterial>, Has<ForceAlphaModeBlend>)>,
+    mesh_material_query: Query<(&MeshMaterial3d<StandardMaterial>, Has<ForceNoOpaque>)>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     for (mut fade_out, entity) in to_fade_out.iter_mut() {
@@ -98,10 +98,10 @@ fn fade_out_and_despawn(
 
         if fade_out.0.finished() {
             // Set material alphas back to 1.0 before despawning
-            if let Ok((material, force_blend)) = mesh_material_query.get(entity) {
+            if let Ok((material, no_opaque)) = mesh_material_query.get(entity) {
                 if let Some(mat) = materials.get_mut(material.id()) {
                     mat.base_color.set_alpha(1.0);
-                    if !force_blend {
+                    if !no_opaque {
                         mat.alpha_mode = AlphaMode::Opaque;
                     } else {
                         mat.alpha_mode = AlphaMode::Mask(0.5);
@@ -109,10 +109,10 @@ fn fade_out_and_despawn(
                 }
             }
             for child in child_query.iter_descendants(entity) {
-                if let Ok((material, force_blend)) = mesh_material_query.get(child) {
+                if let Ok((material, no_opaque)) = mesh_material_query.get(child) {
                     if let Some(mat) = materials.get_mut(material.id()) {
                         mat.base_color.set_alpha(1.0);
-                        if !force_blend {
+                        if !no_opaque {
                             mat.alpha_mode = AlphaMode::Opaque;
                         } else {
                             mat.alpha_mode = AlphaMode::Mask(0.5);
