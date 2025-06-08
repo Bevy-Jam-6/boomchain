@@ -335,7 +335,7 @@ fn update_camera_fov_label(
 struct GibCountLabel;
 
 fn lower_gib_count(_trigger: Trigger<Pointer<Click>>, mut gore_settings: ResMut<GoreSettings>) {
-    gore_settings.gib_count.saturating_sub(1);
+    gore_settings.gib_count = gore_settings.gib_count.saturating_sub(1);
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
