@@ -59,7 +59,7 @@ fn spawn_title_screen_background(mut commands: Commands, menu_assets: Res<MenuAs
                         .mix(&RED_600, rng.r#gen::<f32>())
                         .with_alpha(alpha)
                         .into(),
-                    image: menu_assets.background_texture_1.clone(),
+                    image: menu_assets.background_texture.clone(),
                     image_mode: NodeImageMode::Auto,
                     ..default()
                 },
