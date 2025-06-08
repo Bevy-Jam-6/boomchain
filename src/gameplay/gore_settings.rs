@@ -31,7 +31,13 @@ pub(crate) struct GoreSettings {
 impl Default for GoreSettings {
     fn default() -> Self {
         Self {
+            #[cfg(not(feature = "native"))]
+            blood_decals: Gore::Despawn(Duration::from_secs(10)),
+            #[cfg(feature = "native")]
             blood_decals: Gore::DespawnAfterWave,
+            #[cfg(not(feature = "native"))]
+            gibs: Gore::Despawn(Duration::from_secs(10)),
+            #[cfg(feature = "native")]
             gibs: Gore::DespawnAfterWave,
         }
     }

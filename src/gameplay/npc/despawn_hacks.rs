@@ -5,6 +5,7 @@ use crate::{
     gameplay::{
         health::OnDamage,
         npc::{Npc, ai_state::AiState},
+        player::Player,
     },
     menus::game_over::GameOverMenu,
 };
@@ -43,6 +44,7 @@ fn init_last_translation(
 
 fn despawn_lazy(
     mut commands: Commands,
+    player_transform: Single<&Transform, With<Player>>,
     mut enemies: Query<(
         Entity,
         &mut LastEnemyTranslation,
@@ -57,7 +59,10 @@ fn despawn_lazy(
         let translation = transform.translation;
         **last_translation_mut = translation;
         if let Some(mut lazy) = lazy {
-            if lazy.begin.distance_squared(translation) > 1.0 || matches!(ai_state, AiState::Attack)
+            // Don't despawn if the enemy moved wnough, is close to the player, or is in attacking state.
+            if lazy.begin.distance_squared(translation) > 1.0
+                || player_transform.translation.distance_squared(translation) < 100.0
+                || matches!(ai_state, AiState::Attack)
             {
                 commands.entity(entity).remove::<Lazy>();
                 continue;
