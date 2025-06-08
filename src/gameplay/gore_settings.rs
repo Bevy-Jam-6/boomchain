@@ -26,6 +26,7 @@ pub(super) fn plugin(app: &mut App) {
 pub(crate) struct GoreSettings {
     pub blood_decals: Gore,
     pub gibs: Gore,
+    pub gib_count: u8,
 }
 
 impl Default for GoreSettings {
@@ -39,6 +40,7 @@ impl Default for GoreSettings {
             gibs: Gore::Despawn(Duration::from_secs(10)),
             #[cfg(feature = "native")]
             gibs: Gore::DespawnAfterWave,
+            gib_count: 5,
         }
     }
 }
