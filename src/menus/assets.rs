@@ -1,45 +1,24 @@
 use bevy::prelude::*;
 
-use crate::asset_tracking::LoadResource;
-
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<MenuAssets>();
-    app.load_resource::<MenuAssets>();
+
+    let assets = app.world().resource::<AssetServer>();
+    let background_texture = assets.load({
+        #[cfg(feature = "dev")]
+        {
+            "images/blood/BloodFabric04Grayscale.png"
+        }
+        #[cfg(not(feature = "dev"))]
+        {
+            "images/blood/BloodFabric04Grayscale.ktx2"
+        }
+    });
+    app.insert_resource(MenuAssets { background_texture });
 }
 
 #[derive(Resource, Asset, Clone, Reflect)]
 #[reflect(Resource)]
 pub(crate) struct MenuAssets {
-    #[dependency]
-    pub(crate) background_texture_1: Handle<Image>,
-    #[dependency]
-    pub(crate) background_texture_2: Handle<Image>,
-}
-
-impl FromWorld for MenuAssets {
-    fn from_world(world: &mut World) -> Self {
-        let assets = world.resource::<AssetServer>();
-        Self {
-            background_texture_1: assets.load({
-                #[cfg(feature = "dev")]
-                {
-                    "images/blood/BloodFabric04Grayscale.png"
-                }
-                #[cfg(not(feature = "dev"))]
-                {
-                    "images/blood/BloodFabric04Grayscale.ktx2"
-                }
-            }),
-            background_texture_2: assets.load({
-                #[cfg(feature = "dev")]
-                {
-                    "images/blood/BloodFabric07Grayscale.png"
-                }
-                #[cfg(not(feature = "dev"))]
-                {
-                    "images/blood/BloodFabric04Grayscale.ktx2"
-                }
-            }),
-        }
-    }
+    pub(crate) background_texture: Handle<Image>,
 }
