@@ -15,17 +15,6 @@ pub(crate) const CROSSHAIR_DOT_PATH: &str = {
     }
 };
 
-pub(crate) const CROSSHAIR_SQUARE_PATH: &str = {
-    #[cfg(feature = "dev")]
-    {
-        "ui/crosshair_square.png"
-    }
-    #[cfg(not(feature = "dev"))]
-    {
-        "ui/crosshair_square.ktx2"
-    }
-};
-
 pub(super) fn plugin(app: &mut App) {
     app.load_resource::<CursorAssets>();
 }
@@ -35,8 +24,6 @@ pub(super) fn plugin(app: &mut App) {
 pub(crate) struct CursorAssets {
     #[dependency]
     crosshair_dot: Handle<Image>,
-    #[dependency]
-    crosshair_square: Handle<Image>,
 }
 
 impl FromWorld for CursorAssets {
@@ -44,7 +31,6 @@ impl FromWorld for CursorAssets {
         let assets = world.resource::<AssetServer>();
         Self {
             crosshair_dot: assets.load(CROSSHAIR_DOT_PATH),
-            crosshair_square: assets.load(CROSSHAIR_SQUARE_PATH),
         }
     }
 }

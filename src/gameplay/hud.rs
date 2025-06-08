@@ -42,8 +42,6 @@ struct HudAssets {
     #[dependency]
     angry: Handle<Image>,
     #[dependency]
-    dead: Handle<Image>,
-    #[dependency]
     health_bar_texture: Handle<Image>,
 }
 
@@ -59,16 +57,6 @@ impl FromWorld for HudAssets {
                 #[cfg(not(feature = "dev"))]
                 {
                     "ui/angry.ktx2"
-                }
-            }),
-            dead: assets.load({
-                #[cfg(feature = "dev")]
-                {
-                    "ui/dead.png"
-                }
-                #[cfg(not(feature = "dev"))]
-                {
-                    "ui/dead.ktx2"
                 }
             }),
             health_bar_texture: assets.load({

@@ -35,10 +35,6 @@ pub(crate) struct Move;
 pub(crate) struct Jump;
 
 #[derive(Debug, InputAction)]
-#[input_action(output = bool)]
-pub(crate) struct Interact;
-
-#[derive(Debug, InputAction)]
 #[input_action(output = Vec2)]
 pub(crate) struct Rotate;
 

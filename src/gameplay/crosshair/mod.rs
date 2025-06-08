@@ -3,7 +3,7 @@
 //! This is done by registering which systems are interested in the crosshair state.
 
 use crate::{PostPhysicsAppSystems, screens::Screen};
-use assets::{CROSSHAIR_DOT_PATH, CROSSHAIR_SQUARE_PATH};
+use assets::CROSSHAIR_DOT_PATH;
 use bevy::{platform::collections::HashSet, prelude::*, window::CursorGrabMode};
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
@@ -52,16 +52,13 @@ fn spawn_crosshair(mut commands: Commands, assets: Res<AssetServer>) {
 #[derive(Component, Clone, Default, Reflect)]
 #[reflect(Component, Default)]
 pub(crate) struct CrosshairState {
-    pub(crate) wants_square: HashSet<TypeId>,
     pub(crate) wants_invisible: HashSet<TypeId>,
     pub(crate) wants_free_cursor: HashSet<TypeId>,
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
 fn update_crosshair(
-    crosshair: Option<
-        Single<(&mut CrosshairState, &mut ImageNode, &mut Visibility), Changed<CrosshairState>>,
-    >,
+    crosshair: Option<Single<(&mut CrosshairState, &mut ImageNode, &mut Visibility)>>,
     assets: Res<AssetServer>,
     mut window: Single<&mut Window, Changed<Window>>,
 ) {
@@ -70,11 +67,8 @@ fn update_crosshair(
     else {
         return;
     };
-    if crosshair_state.wants_square.is_empty() {
-        image_node.image = assets.load(CROSSHAIR_DOT_PATH);
-    } else {
-        image_node.image = assets.load(CROSSHAIR_SQUARE_PATH);
-    }
+
+    image_node.image = assets.load(CROSSHAIR_DOT_PATH);
 
     if crosshair_state.wants_free_cursor.is_empty() {
         window.cursor_options.grab_mode = CursorGrabMode::Locked;
