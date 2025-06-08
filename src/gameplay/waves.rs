@@ -109,7 +109,7 @@ impl Default for Waves {
                 prep_time: Millis(10000),
                 packet_kinds: [
                     (Millis(0), Difficulty(2)),
-                    (Millis(500), Difficulty(2)),
+                    (Millis(500), Difficulty(1)),
                     (Millis(8000), Difficulty(2)),
                     (Millis(8500), Difficulty(1)),
                     (Millis(9000), Difficulty(0)),
@@ -140,7 +140,7 @@ impl Default for Waves {
                     (Millis(6000), Difficulty(2)),
                     (Millis(9000), Difficulty(2)),
                     (Millis(12000), Difficulty(2)),
-                    (Millis(15000), Difficulty(2)),
+                    (Millis(15000), Difficulty(1)),
                     (Millis(20000), Difficulty(3)),
                 ]
                 .into(),
