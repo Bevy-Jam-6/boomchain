@@ -4,9 +4,9 @@ use crate::{
     gameplay::{
         health::{Health, OnDamage, OnDeath},
         player::Player,
-        waves::{WaveFinishedPreparing, WaveStartedPreparing},
+        waves::{GameWon, WaveFinishedPreparing, WaveStartedPreparing},
     },
-    menus::Menu,
+    menus::{Menu, game_won::GameWonMusic},
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -22,6 +22,7 @@ pub(super) fn plugin(app: &mut App) {
     );
 
     app.add_observer(adjust_music_to_health);
+    app.add_observer(on_game_won);
     app.add_observer(on_death);
 
     app.add_observer(on_wave_started);
@@ -130,6 +131,15 @@ fn on_wave_started(
     for (playback, mut sink) in &mut audio_query {
         sink.set_speed(1.0);
         sink.set_volume(global_volume.volume * playback.volume / Volume::Linear(0.9));
+    }
+}
+
+fn on_game_won(
+    _trigger: Trigger<GameWon>,
+    mut audio_query: Query<&mut AudioSink, (With<Music>, Without<GameWonMusic>)>,
+) {
+    for sink in &mut audio_query {
+        sink.pause();
     }
 }
 
