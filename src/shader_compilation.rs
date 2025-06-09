@@ -4,9 +4,13 @@ use bevy_simple_subsecond_system::hot;
 
 use bevy::render::render_resource::{CachedPipelineState, PipelineCache};
 use bevy::render::{MainWorld, RenderApp};
+use bevy_enhanced_input::prelude::*;
 
 use crate::asset_tracking::LoadResource as _;
 use crate::screens::loading::LoadingScreen;
+use crate::gameplay::npc::ai_state::AiState;
+use crate::gameplay::health::OnDamage;
+use crate::gameplay::player::default_input::{Shoot, DefaultInputContext};
 
 pub(super) fn plugin(app: &mut App) {
     app.load_resource::<CompileShadersAssets>();
@@ -69,22 +73,22 @@ impl LoadedPipelineCount {
         {
             #[cfg(feature = "dev")]
             {
-                88
+                8800
             }
             #[cfg(not(feature = "dev"))]
             {
-                87
+                8700
             }
         }
         #[cfg(not(feature = "native"))]
         {
             #[cfg(feature = "dev")]
             {
-                58
+                5800
             }
             #[cfg(not(feature = "dev"))]
             {
-                57
+                5700
             }
         }
     };
@@ -96,7 +100,7 @@ fn explode_enemy(enemies: Query<Entity, Added<AiState>>, mut commands: Commands)
     }
 }
 
-fn shoot(players: Query<Entity, Added<DefaultInputBinding>>, mut commands: Commands) {
+fn shoot(players: Query<Entity, Added<Actions<DefaultInputContext>>>, mut commands: Commands) {
     for entity in &players {
         commands.entity(entity).trigger(Fired::<Shoot>::default());
     }
@@ -113,6 +117,7 @@ fn update_loaded_pipeline_count(mut main_world: ResMut<MainWorld>, cache: Res<Pi
         if pipelines_ready.0 == count {
             return;
         }
+        info!("loaded {count} pipelines");
 
         pipelines_ready.0 = count;
     }
