@@ -22,7 +22,8 @@ pub(super) fn plugin(app: &mut App) {
         
     app.add_systems(Update, explode_enemy.run_if(in_state(LoadingScreen::Shaders)));
     app.add_systems(PreUpdate, shoot.before(EnhancedInputSystem).run_if(in_state(LoadingScreen::Shaders)));
-    
+    app.add_systems(Update, force_proceed.run_if(in_state(LoadingScreen::Shaders)));
+        
     app.register_type::<LoadedPipelineCount>();
 }
 
@@ -95,6 +96,16 @@ impl LoadedPipelineCount {
     };
 }
 
+fn force_proceed(mut loaded_pipeline_count: ResMut<LoadedPipelineCount>, mut timer: Local<Option<Timer>>, time: Res<Time>) {
+let timer =
+        timer.get_or_insert_with(|| Timer::new(Duration::from_seconds(60), TimerMode::Once));
+    timer.tick(time.delta());
+    if !timer.finished() {
+        return;
+    }
+    loaded_pipeline_count.0 = 9999;
+}
+
 fn explode_enemy(enemies: Query<Entity, Added<AiState>>, mut commands: Commands) {
     for entity in &enemies {
         commands.entity(entity).trigger(OnDamage(1000.0));
@@ -115,7 +126,7 @@ fn update_loaded_pipeline_count(mut main_world: ResMut<MainWorld>, cache: Res<Pi
             .filter(|pipeline| matches!(pipeline.state, CachedPipelineState::Ok(_)))
             .count();
 
-        if pipelines_ready.0 == count {
+        if pipelines_ready.0 >= count {
             return;
         }
         info!("loaded {count} pipelines");
