@@ -40,15 +40,24 @@ pub(crate) struct Upgrades(Vec<Upgrade>);
 #[derive(Reflect, Debug, Clone, Copy)]
 pub(crate) enum Upgrade {
     Health,
-    Damage,
-    Speed,
+    ShotDamage,
+    MovementSpeed,
     Accuracy,
-    Bullets,
+    BulletCount,
+    JumpShotPushback,
+    EnemyExplosionRadius,
 }
 impl Upgrade {
     fn all_except_health() -> Vec<Upgrade> {
         // Add new upgrades here!
-        vec![Upgrade::Damage, Upgrade::Speed, Upgrade::Accuracy]
+        vec![
+            Upgrade::ShotDamage,
+            Upgrade::MovementSpeed,
+            Upgrade::Accuracy,
+            Upgrade::BulletCount,
+            Upgrade::JumpShotPushback,
+            Upgrade::EnemyExplosionRadius,
+        ]
     }
 }
 
@@ -92,25 +101,35 @@ fn spawn_upgrade_ui(
             Upgrade::Health => {
                 menu_commands.with_child(button("Heal", fonts.default.clone(), upgrade_health))
             }
-            Upgrade::Damage => menu_commands.with_child(button(
-                "Increase Weapon Damage",
+            Upgrade::ShotDamage => menu_commands.with_child(button(
+                "Increase Shot Damage",
                 fonts.default.clone(),
                 upgrade_damage,
             )),
-            Upgrade::Speed => menu_commands.with_child(button(
+            Upgrade::MovementSpeed => menu_commands.with_child(button(
                 "Increase Movement Speed",
                 fonts.default.clone(),
                 upgrade_speed,
             )),
             Upgrade::Accuracy => menu_commands.with_child(button(
-                "Increase Weapon Accuracy",
+                "Increase Shot Accuracy",
                 fonts.default.clone(),
                 upgrade_accuracy,
             )),
-            Upgrade::Bullets => menu_commands.with_child(button(
-                "More Bullets per Shot",
+            Upgrade::BulletCount => menu_commands.with_child(button(
+                "Two More Bullets per Shot",
                 fonts.default.clone(),
                 upgrade_bullets,
+            )),
+            Upgrade::JumpShotPushback => menu_commands.with_child(button(
+                "Increase Jump-Shot Pushback",
+                fonts.default.clone(),
+                upgrade_jump_shot_pushback,
+            )),
+            Upgrade::EnemyExplosionRadius => menu_commands.with_child(button(
+                "Larger Enemy Explosion",
+                fonts.default.clone(),
+                upgrade_enemy_explosion_radius,
             )),
         };
     }
@@ -159,7 +178,7 @@ fn upgrade_bullets(
     mut weapon_stats: Single<&mut WeaponStats, With<Player>>,
     mut commands: Commands,
 ) {
-    weapon_stats.pellets += 4;
+    weapon_stats.pellets += 2;
     commands.trigger(DespawnUpgrades);
 }
 
@@ -169,6 +188,24 @@ fn upgrade_damage(
     mut commands: Commands,
 ) {
     weapon_stats.damage += 1.5;
+    commands.trigger(DespawnUpgrades);
+}
+
+fn upgrade_jump_shot_pushback(
+    _: Trigger<Pointer<Click>>,
+    mut weapon_stats: Single<&mut WeaponStats, With<Player>>,
+    mut commands: Commands,
+) {
+    weapon_stats.pushback += 2.0;
+    commands.trigger(DespawnUpgrades);
+}
+
+fn upgrade_enemy_explosion_radius(
+    _: Trigger<Pointer<Click>>,
+    mut weapon_stats: Single<&mut WeaponStats, With<Player>>,
+    mut commands: Commands,
+) {
+    weapon_stats.extra_enemy_explosion_radius += 0.1;
     commands.trigger(DespawnUpgrades);
 }
 

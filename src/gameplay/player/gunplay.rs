@@ -36,6 +36,7 @@ pub(crate) struct WeaponStats {
     pub(crate) pellets: u32,
     pub(crate) spread_radius: f32,
     pub(crate) pushback: f32,
+    pub(crate) extra_enemy_explosion_radius: f32,
 }
 
 pub(super) fn plugin(app: &mut App) {
@@ -61,6 +62,7 @@ fn setup_weapon_stats(trigger: Trigger<OnAdd, Player>, mut commands: Commands) {
         pellets: 16,
         spread_radius: 0.15,
         pushback: 12.0,
+        extra_enemy_explosion_radius: 0.0,
     });
 }
 
