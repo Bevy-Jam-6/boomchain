@@ -96,6 +96,10 @@ fn assets(font: Handle<Font>) -> impl Bundle {
                         "Impacts 01, Pixabay Content License by freesound_community, modified by Joona Aalto",
                     ],
                     [
+                        "Game Won Jingle",
+                        "Guitar jingle - Hard rock style, Pixabay Content License by ShidenBeatsMusic",
+                    ],
+                    [
                         "Shotgun Model",
                         "PSX Shotgun Asset-Pack, CC-BY by Doctor_sci3nce",
                     ],

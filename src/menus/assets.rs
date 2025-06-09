@@ -14,11 +14,16 @@ pub(super) fn plugin(app: &mut App) {
             "images/blood/BloodFabric04Grayscale.ktx2"
         }
     });
-    app.insert_resource(MenuAssets { background_texture });
+    let gamee_won_sound = assets.load("audio/sound_effects/guitar-jingle-hard-rock-style.ogg");
+    app.insert_resource(MenuAssets {
+        background_texture,
+        gamee_won_sound,
+    });
 }
 
 #[derive(Resource, Asset, Clone, Reflect)]
 #[reflect(Resource)]
 pub(crate) struct MenuAssets {
     pub(crate) background_texture: Handle<Image>,
+    pub(crate) gamee_won_sound: Handle<AudioSource>,
 }

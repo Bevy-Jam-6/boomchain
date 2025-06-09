@@ -8,6 +8,7 @@ use crate::{
         crosshair::CrosshairState,
         health::OnDeath,
         player::{Player, default_input::BlocksInput},
+        time::GameplayTime,
     },
     screens::Screen,
     theme::widget,
@@ -27,17 +28,26 @@ fn on_player_death(
     mut crosshair: Single<&mut CrosshairState>,
     mut block_input: ResMut<BlocksInput>,
     fonts: Res<FontAssets>,
+    gameplay_time: Res<GameplayTime>,
     mut commands: Commands,
 ) {
     if !player.contains(trigger.target()) {
         return;
     }
+    let elapsed_secs = gameplay_time.elapsed_secs();
+    let minutes = (elapsed_secs / 60.0) as u32;
+    let seconds = (elapsed_secs % 60.0) as u32;
+    let milliseconds = (elapsed_secs * 1000.0) as u32 % 1000;
     commands.spawn((
         widget::ui_root("Game Over Menu"),
         StateScoped(Screen::Gameplay),
         GameOverMenu,
         children![
             widget::header("Game Over", fonts.default.clone()),
+            widget::label(
+                format!("Time: {minutes:02}:{seconds:02}.{milliseconds:03}"),
+                fonts.default.clone()
+            ),
             widget::button("Try Again", fonts.default.clone(), try_again),
             widget::button("Quit to Title", fonts.default.clone(), quit_to_title),
         ],

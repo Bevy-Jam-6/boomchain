@@ -14,6 +14,7 @@ pub(crate) mod hud;
 pub(crate) mod level;
 pub(crate) mod npc;
 pub(crate) mod player;
+pub(crate) mod time;
 pub(crate) mod upgrades;
 pub(crate) mod waves;
 
@@ -28,6 +29,7 @@ pub(super) fn plugin(app: &mut App) {
         health::plugin,
         hud::plugin,
         waves::plugin,
+        time::plugin,
         upgrades::plugin,
         // This plugin preloads the level,
         // so make sure to add it last.
