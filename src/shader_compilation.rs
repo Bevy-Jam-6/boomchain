@@ -10,7 +10,7 @@ use crate::asset_tracking::LoadResource as _;
 use crate::screens::loading::LoadingScreen;
 use crate::gameplay::npc::ai_state::AiState;
 use crate::gameplay::health::OnDamage;
-use crate::gameplay::player::default_input::{Shoot, DefaultInputContext};
+use crate::gameplay::player::default_input::DefaultInputContext;
 
 pub(super) fn plugin(app: &mut App) {
     app.load_resource::<CompileShadersAssets>();
@@ -102,7 +102,7 @@ fn explode_enemy(enemies: Query<Entity, Added<AiState>>, mut commands: Commands)
 }
 
 fn shoot(players: Query<Entity, Added<Actions<DefaultInputContext>>>, mut inputs: ResMut<ButtonInput<MouseButton>>) {
-    for entity in &players {
+    for _entity in &players {
         inputs.press(MouseButton::Left);
     }
 }
