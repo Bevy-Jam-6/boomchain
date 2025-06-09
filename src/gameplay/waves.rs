@@ -20,12 +20,22 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<SpawnPackets>();
     app.register_type::<Spawner>();
     app.init_resource::<SpawnPackets>();
+    app.init_state::<GameMode>();
     app.add_systems(
         RunFixedMainLoop,
         advance_waves
             .in_set(PrePhysicsAppSystems::SpawnWave)
             .run_if(any_with_component::<WaveIconParent>),
     );
+}
+
+#[derive(States, Debug, Hash, PartialEq, Eq, Clone, Default)]
+#[states(scoped_entities)]
+pub enum GameMode {
+    #[default]
+    Indeterminate,
+    Normal,
+    Endless,
 }
 
 impl Default for Waves {
@@ -481,7 +491,18 @@ fn advance_waves(
     spawners: Query<(&Transform, &Spawner)>,
     spatial_query: SpatialQuery,
     mut commands: Commands,
+    game_mode: Res<State<GameMode>>,
 ) {
+    if **game_mode == GameMode::Endless {
+        // Add a new wave selected randomly from the last 5 waves.
+        let new_wave = Waves::default().waves[4..]
+            .choose(&mut rand::thread_rng())
+            .cloned()
+            .unwrap();
+        waves.waves.push(new_wave);
+        info_once!("New wave added");
+    }
+
     let is_preparing_before = waves.is_preparing();
     let advancement = waves.try_advance(time.delta(), !enemies.is_empty());
     let is_preparing_after = waves.is_preparing();
@@ -556,20 +577,25 @@ fn advance_waves(
                 Visibility::Inherited,
                 Transform::from_translation(spawn_position),
             ));
+            let buff_i = waves.current_wave_index().saturating_sub(5) / 5;
+            let scale_stat = move |base_stat: f32, factor: f32| -> f32 {
+                base_stat * (1.0 + factor * buff_i as f32)
+            };
             match spawn {
                 SpawnVariant::BasicEnemy => {
                     spawn_commands.insert((
                         Name::new("Basic Enemy"),
                         Npc,
                         NpcStats {
-                            health: 100.0,
-                            desired_speed: 7.0,
-                            max_speed: 8.0,
-                            attack_damage: 10.0,
-                            attack_speed_range: 1.5..2.3,
+                            health: scale_stat(100.0, 0.1),
+                            desired_speed: scale_stat(7.0, 0.1),
+                            max_speed: scale_stat(8.0, 0.1),
+                            attack_damage: scale_stat(10.0, 0.05),
+                            attack_speed_range: scale_stat(1.5, 0.1)..scale_stat(2.3, 0.1),
                             size: 1.0,
                             stagger_chance: 0.3,
-                            stagger_duration: 0.2..0.4,
+                            stagger_duration: (0.2 * (1.0 - (buff_i as f32 * 0.05).min(0.5)))
+                                ..(0.4 * (1.0 - (buff_i as f32 * 0.05).min(0.5))),
                         },
                     ));
                 }
@@ -578,14 +604,15 @@ fn advance_waves(
                         Name::new("Big Enemy"),
                         Npc,
                         NpcStats {
-                            health: 400.0,
-                            desired_speed: 5.0,
-                            max_speed: 5.0,
-                            attack_damage: 40.0,
-                            attack_speed_range: 1.1..1.7,
+                            health: scale_stat(400.0, 0.1),
+                            desired_speed: scale_stat(5.0, 0.1),
+                            max_speed: scale_stat(5.0, 0.1),
+                            attack_damage: scale_stat(40.0, 0.05),
+                            attack_speed_range: scale_stat(1.1, 0.1)..scale_stat(1.7, 0.1),
                             size: 2.0,
                             stagger_chance: 0.2,
-                            stagger_duration: 0.1..0.3,
+                            stagger_duration: (0.1 * (1.0 - (buff_i as f32 * 0.05).min(0.5)))
+                                ..(0.3 * (1.0 - (buff_i as f32 * 0.05).min(0.5))),
                         },
                     ));
                 }
@@ -594,14 +621,15 @@ fn advance_waves(
                         Name::new("Small Enemy"),
                         Npc,
                         NpcStats {
-                            health: 30.0,
-                            desired_speed: 11.0,
-                            max_speed: 11.0,
-                            attack_damage: 10.0,
-                            attack_speed_range: 2.1..2.8,
+                            health: scale_stat(30.0, 0.1),
+                            desired_speed: scale_stat(11.0, 0.1),
+                            max_speed: scale_stat(11.0, 0.1),
+                            attack_damage: scale_stat(10.0, 0.05),
+                            attack_speed_range: scale_stat(2.1, 0.1)..scale_stat(2.8, 0.1),
                             size: 0.7,
                             stagger_chance: 0.5,
-                            stagger_duration: 0.2..0.3,
+                            stagger_duration: (0.2 * (1.0 - (buff_i as f32 * 0.05).min(0.5)))
+                                ..(0.3 * (1.0 - (buff_i as f32 * 0.05).min(0.5))),
                         },
                     ));
                 }
@@ -756,7 +784,7 @@ impl Default for Spawner {
     }
 }
 
-#[derive(Reflect, Debug)]
+#[derive(Reflect, Clone, Debug)]
 struct Wave {
     prep_time: Millis,
     packet_kinds: Vec<(Millis, Difficulty)>,
