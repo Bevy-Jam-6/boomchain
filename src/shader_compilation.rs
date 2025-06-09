@@ -20,8 +20,9 @@ pub(super) fn plugin(app: &mut App) {
     app.sub_app_mut(RenderApp)
         .add_systems(ExtractSchedule, update_loaded_pipeline_count);
         
-    app.add_systems(Update, (explode_enemy, shoot).run_if(in_state(LoadingScreen::Shaders)));
-
+    app.add_systems(Update, explode_enemy.run_if(in_state(LoadingScreen::Shaders)));
+    app.add_systems(PreUpdate, shoot.before(EnhancedInputSystem).run_if(in_state(LoadingScreen::Shaders)));
+    
     app.register_type::<LoadedPipelineCount>();
 }
 
@@ -100,9 +101,9 @@ fn explode_enemy(enemies: Query<Entity, Added<AiState>>, mut commands: Commands)
     }
 }
 
-fn shoot(players: Query<Entity, Added<Actions<DefaultInputContext>>>, mut commands: Commands) {
+fn shoot(players: Query<Entity, Added<Actions<DefaultInputContext>>>, mut inputs: ResMut<ButtonInput<MouseButton>>) {
     for entity in &players {
-        commands.entity(entity).trigger(Fired::<Shoot>::default());
+        inputs.press(MouseButton::Left);
     }
 }
 
