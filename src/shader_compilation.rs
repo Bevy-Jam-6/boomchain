@@ -1,12 +1,15 @@
+use crate::asset_tracking::LoadResource as _;
+use crate::gameplay::health::OnDamage;
+use crate::gameplay::npc::ai_state::AiState;
+use crate::gameplay::player::default_input::DefaultInputContext;
+use crate::screens::loading::LoadingScreen;
 use bevy::prelude::*;
-#[cfg(feature = "hot_patch")]
-use bevy_simple_subsecond_system::hot;
-
 use bevy::render::render_resource::{CachedPipelineState, PipelineCache};
 use bevy::render::{MainWorld, RenderApp};
-
-use crate::asset_tracking::LoadResource as _;
-use crate::screens::loading::LoadingScreen;
+use bevy_enhanced_input::prelude::*;
+#[cfg(feature = "hot_patch")]
+use bevy_simple_subsecond_system::hot;
+use std::time::Duration;
 
 pub(super) fn plugin(app: &mut App) {
     app.load_resource::<CompileShadersAssets>();
@@ -15,6 +18,21 @@ pub(super) fn plugin(app: &mut App) {
 
     app.sub_app_mut(RenderApp)
         .add_systems(ExtractSchedule, update_loaded_pipeline_count);
+
+    app.add_systems(
+        Update,
+        explode_enemy.run_if(in_state(LoadingScreen::Shaders)),
+    );
+    app.add_systems(
+        PreUpdate,
+        shoot
+            .before(EnhancedInputSystem)
+            .run_if(in_state(LoadingScreen::Shaders)),
+    );
+    app.add_systems(
+        Update,
+        force_proceed.run_if(in_state(LoadingScreen::Shaders)),
+    );
 
     app.register_type::<LoadedPipelineCount>();
 }
@@ -67,25 +85,54 @@ impl LoadedPipelineCount {
         {
             #[cfg(feature = "dev")]
             {
-                88
+                85
             }
             #[cfg(not(feature = "dev"))]
             {
-                87
+                84
             }
         }
         #[cfg(not(feature = "native"))]
         {
             #[cfg(feature = "dev")]
             {
-                58
+                57
             }
             #[cfg(not(feature = "dev"))]
             {
-                57
+                56
             }
         }
     };
+}
+
+fn force_proceed(
+    mut loaded_pipeline_count: ResMut<LoadedPipelineCount>,
+    mut timer: Local<Option<Timer>>,
+    time: Res<Time>,
+) {
+    let timer = timer.get_or_insert_with(|| Timer::new(Duration::from_secs(60), TimerMode::Once));
+    timer.tick(time.delta());
+    if !timer.finished() {
+        return;
+    }
+    loaded_pipeline_count.0 = 9999;
+}
+
+fn explode_enemy(enemies: Query<Entity, Added<AiState>>, mut commands: Commands) {
+    for entity in &enemies {
+        commands.entity(entity).trigger(OnDamage(1000.0));
+    }
+}
+
+fn shoot(
+    players: Query<Entity, Added<Actions<DefaultInputContext>>>,
+    mut inputs: ResMut<ButtonInput<MouseButton>>,
+) {
+    for _entity in &players {
+        inputs.press(MouseButton::Left);
+        inputs.release(MouseButton::Left);
+    }
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
@@ -96,9 +143,10 @@ fn update_loaded_pipeline_count(mut main_world: ResMut<MainWorld>, cache: Res<Pi
             .filter(|pipeline| matches!(pipeline.state, CachedPipelineState::Ok(_)))
             .count();
 
-        if pipelines_ready.0 == count {
+        if pipelines_ready.0 >= count {
             return;
         }
+        info!("loaded {count} pipelines");
 
         pipelines_ready.0 = count;
     }

@@ -160,7 +160,12 @@ fn stagger_on_hit(
     mut enemies: Query<(&mut AiState, &NpcStats, &Transform)>,
     mut commands: Commands,
     mut npc_assets: ResMut<NpcAssets>,
+    state: Res<State<Screen>>,
 ) {
+    if *state != Screen::Gameplay {
+        return;
+    }
+
     let entity = trigger.target();
     let Ok((mut ai_state, stats, transform)) = enemies.get_mut(entity) else {
         return;
