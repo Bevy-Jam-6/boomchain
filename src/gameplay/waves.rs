@@ -495,20 +495,12 @@ fn advance_waves(
 ) {
     if **game_mode == GameMode::Endless {
         // Add a new wave selected randomly from the last 5 waves.
-        let last_waves = waves.waves.len().saturating_sub(5);
-        let new_wave = if last_waves > 0 {
-            waves.waves[last_waves..]
-                .choose(&mut rand::thread_rng())
-                .cloned()
-        } else {
-            None
-        };
-        if let Some(wave) = new_wave {
-            waves.waves.push(wave);
-            info_once!("New wave added");
-        } else {
-            info_once!("No new wave added, not enough previous waves");
-        }
+        let new_wave = Waves::default().waves[4..]
+            .choose(&mut rand::thread_rng())
+            .cloned()
+            .unwrap();
+        waves.waves.push(new_wave);
+        info_once!("New wave added");
     }
 
     let is_preparing_before = waves.is_preparing();
@@ -585,20 +577,25 @@ fn advance_waves(
                 Visibility::Inherited,
                 Transform::from_translation(spawn_position),
             ));
+            let buff_i = (waves.current_wave_index() + 1).saturating_sub(5) % 5;
+            let scale_stat = move |base_stat: f32, factor: f32| -> f32 {
+                base_stat * (1.0 + factor * buff_i as f32)
+            };
             match spawn {
                 SpawnVariant::BasicEnemy => {
                     spawn_commands.insert((
                         Name::new("Basic Enemy"),
                         Npc,
                         NpcStats {
-                            health: 100.0,
-                            desired_speed: 7.0,
-                            max_speed: 8.0,
-                            attack_damage: 10.0,
-                            attack_speed_range: 1.5..2.3,
+                            health: scale_stat(100.0, 0.1),
+                            desired_speed: scale_stat(7.0, 0.1),
+                            max_speed: scale_stat(8.0, 0.1),
+                            attack_damage: scale_stat(10.0, 0.05),
+                            attack_speed_range: scale_stat(1.5, 0.1)..scale_stat(2.3, 0.1),
                             size: 1.0,
                             stagger_chance: 0.3,
-                            stagger_duration: 0.2..0.4,
+                            stagger_duration: (0.2 * (1.0 - (buff_i as f32 * 0.05).min(0.5)))
+                                ..(0.4 * (1.0 - (buff_i as f32 * 0.05).min(0.5))),
                         },
                     ));
                 }
@@ -607,14 +604,15 @@ fn advance_waves(
                         Name::new("Big Enemy"),
                         Npc,
                         NpcStats {
-                            health: 400.0,
-                            desired_speed: 5.0,
-                            max_speed: 5.0,
-                            attack_damage: 40.0,
-                            attack_speed_range: 1.1..1.7,
+                            health: scale_stat(400.0, 0.1),
+                            desired_speed: scale_stat(5.0, 0.1),
+                            max_speed: scale_stat(5.0, 0.1),
+                            attack_damage: scale_stat(40.0, 0.05),
+                            attack_speed_range: scale_stat(1.1, 0.1)..scale_stat(1.7, 0.1),
                             size: 2.0,
                             stagger_chance: 0.2,
-                            stagger_duration: 0.1..0.3,
+                            stagger_duration: (0.1 * (1.0 - (buff_i as f32 * 0.05).min(0.5)))
+                                ..(0.3 * (1.0 - (buff_i as f32 * 0.05).min(0.5))),
                         },
                     ));
                 }
@@ -623,14 +621,15 @@ fn advance_waves(
                         Name::new("Small Enemy"),
                         Npc,
                         NpcStats {
-                            health: 30.0,
-                            desired_speed: 11.0,
-                            max_speed: 11.0,
-                            attack_damage: 10.0,
-                            attack_speed_range: 2.1..2.8,
+                            health: scale_stat(30.0, 0.1),
+                            desired_speed: scale_stat(11.0, 0.1),
+                            max_speed: scale_stat(11.0, 0.1),
+                            attack_damage: scale_stat(10.0, 0.05),
+                            attack_speed_range: scale_stat(2.1, 0.1)..scale_stat(2.8, 0.1),
                             size: 0.7,
                             stagger_chance: 0.5,
-                            stagger_duration: 0.2..0.3,
+                            stagger_duration: (0.2 * (1.0 - (buff_i as f32 * 0.05).min(0.5)))
+                                ..(0.3 * (1.0 - (buff_i as f32 * 0.05).min(0.5))),
                         },
                     ));
                 }
@@ -667,7 +666,7 @@ impl Waves {
             waves,
             current_packets: Vec::new(),
             wave_stopwatch: Stopwatch::default(),
-            current_wave: 0,
+            current_wave: 8,
             total_waves: len,
             prep_timer: Timer::from_seconds(0.0, TimerMode::Once),
         }
