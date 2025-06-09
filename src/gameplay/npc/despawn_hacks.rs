@@ -60,8 +60,8 @@ fn despawn_lazy(
         **last_translation_mut = translation;
         if let Some(mut lazy) = lazy {
             // Don't despawn if the enemy moved wnough, is close to the player, or is in attacking state.
-            if lazy.begin.distance_squared(translation) > 1.0
-                || player_transform.translation.distance_squared(translation) < 100.0
+            if lazy.begin.distance_squared(translation) > 0.1
+                || player_transform.translation.distance_squared(translation) < 900.0
                 || matches!(ai_state, AiState::Attack)
             {
                 commands.entity(entity).remove::<Lazy>();
@@ -73,12 +73,12 @@ fn despawn_lazy(
             }
             continue;
         }
-        if translation.distance_squared(last_translation) < 1.0
+        if translation.distance_squared(last_translation) < 0.1
             && !matches!(ai_state, AiState::Attack)
         {
             commands.entity(entity).insert(Lazy {
                 begin: translation,
-                timer: Timer::from_seconds(5.0, TimerMode::Once),
+                timer: Timer::from_seconds(10.0, TimerMode::Once),
             });
         }
     }

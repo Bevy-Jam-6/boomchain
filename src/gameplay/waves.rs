@@ -20,12 +20,22 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<SpawnPackets>();
     app.register_type::<Spawner>();
     app.init_resource::<SpawnPackets>();
+    app.init_state::<GameMode>();
     app.add_systems(
         RunFixedMainLoop,
         advance_waves
             .in_set(PrePhysicsAppSystems::SpawnWave)
             .run_if(any_with_component::<WaveIconParent>),
     );
+}
+
+#[derive(States, Debug, Hash, PartialEq, Eq, Clone, Default)]
+#[states(scoped_entities)]
+pub enum GameMode {
+    #[default]
+    Indeterminate,
+    Normal,
+    Endless,
 }
 
 impl Default for Waves {
@@ -481,7 +491,26 @@ fn advance_waves(
     spawners: Query<(&Transform, &Spawner)>,
     spatial_query: SpatialQuery,
     mut commands: Commands,
+    game_mode: Res<State<GameMode>>,
 ) {
+    if **game_mode == GameMode::Endless {
+        // Add a new wave selected randomly from the last 5 waves.
+        let last_waves = waves.waves.len().saturating_sub(5);
+        let new_wave = if last_waves > 0 {
+            waves.waves[last_waves..]
+                .choose(&mut rand::thread_rng())
+                .cloned()
+        } else {
+            None
+        };
+        if let Some(wave) = new_wave {
+            waves.waves.push(wave);
+            info_once!("New wave added");
+        } else {
+            info_once!("No new wave added, not enough previous waves");
+        }
+    }
+
     let is_preparing_before = waves.is_preparing();
     let advancement = waves.try_advance(time.delta(), !enemies.is_empty());
     let is_preparing_after = waves.is_preparing();
@@ -756,7 +785,7 @@ impl Default for Spawner {
     }
 }
 
-#[derive(Reflect, Debug)]
+#[derive(Reflect, Clone, Debug)]
 struct Wave {
     prep_time: Millis,
     packet_kinds: Vec<(Millis, Difficulty)>,

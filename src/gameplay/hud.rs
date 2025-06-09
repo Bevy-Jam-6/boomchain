@@ -9,7 +9,9 @@ use crate::gameplay::health::{Health, OnDeath};
 use crate::gameplay::npc::Npc;
 use crate::gameplay::player::Player;
 use crate::gameplay::upgrades::Upgrades;
-use crate::gameplay::waves::{WaveAdvanced, WaveFinishedPreparing, WaveStartedPreparing, Waves};
+use crate::gameplay::waves::{
+    GameMode, WaveAdvanced, WaveFinishedPreparing, WaveStartedPreparing, Waves,
+};
 use crate::screens::Screen;
 use crate::theme::palette;
 
@@ -105,7 +107,7 @@ pub(crate) struct PrepTimeText;
 #[reflect(Component)]
 pub(crate) struct UpgradeMenuText(Timer);
 
-fn spawn_wave_hud(mut commands: Commands, fonts: Res<FontAssets>) {
+fn spawn_wave_hud(mut commands: Commands, fonts: Res<FontAssets>, game_mode: Res<State<GameMode>>) {
     commands.spawn((
         Name::new("Spawn Wave HUD"),
         Node {
@@ -120,7 +122,11 @@ fn spawn_wave_hud(mut commands: Commands, fonts: Res<FontAssets>) {
         Pickable::IGNORE,
         children![
             (
-                Text::new("Wave 1/10:"),
+                Text::new(if **game_mode == GameMode::Normal {
+                    "Wave 1/10:"
+                } else {
+                    "Wave 1"
+                }),
                 TextFont::from_font_size(26.0).with_font(fonts.default.clone()),
                 WaveText
             ),
@@ -212,12 +218,20 @@ fn flush_on_wave_advanced(
     commands.entity(*container).despawn_related::<Children>();
 }
 
-fn update_wave_text(waves: Single<&Waves>, mut wave_text: Single<&mut Text, With<WaveText>>) {
-    ***wave_text = format!(
-        "Wave {}/{}",
-        waves.current_wave_index() + 1,
-        waves.total_waves()
-    );
+fn update_wave_text(
+    waves: Single<&Waves>,
+    mut wave_text: Single<&mut Text, With<WaveText>>,
+    game_mode: Res<State<GameMode>>,
+) {
+    if **game_mode == GameMode::Normal {
+        ***wave_text = format!(
+            "Wave {}/{}:",
+            waves.current_wave_index() + 1,
+            waves.total_waves()
+        );
+    } else {
+        ***wave_text = format!("Wave {}:", waves.current_wave_index() + 1);
+    }
 }
 
 fn spawn_prep_icon(
