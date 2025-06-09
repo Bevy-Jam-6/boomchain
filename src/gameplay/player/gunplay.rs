@@ -11,6 +11,7 @@ use crate::{
         npc::Npc,
         player::{GroundCast, camera::CustomRenderLayer, camera_shake::OnTrauma},
     },
+    screens::Screen,
     third_party::avian3d::CollisionLayer,
 };
 use avian3d::prelude::*;
@@ -124,7 +125,12 @@ fn shooting_sounds(
     _trigger: Trigger<OnAdd, Shooting>,
     mut commands: Commands,
     mut player_assets: ResMut<PlayerAssets>,
+    state: Res<State<Screen>>,
 ) {
+    if *state != Screen::Gameplay {
+        return;
+    }
+
     let rng = &mut rand::thread_rng();
     let shooting_sound = player_assets.shooting_sounds.pick(rng).clone();
 
@@ -135,7 +141,12 @@ fn shooting_sounds_reload(
     _trigger: Trigger<OnAdd, Reloading>,
     mut commands: Commands,
     player_assets: ResMut<PlayerAssets>,
+    state: Res<State<Screen>>,
 ) {
+    if *state != Screen::Gameplay {
+        return;
+    }
+
     commands.spawn(sound_effect(player_assets.reload_sound.clone()));
 }
 

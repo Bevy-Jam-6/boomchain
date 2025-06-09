@@ -1,15 +1,15 @@
+use crate::asset_tracking::LoadResource as _;
+use crate::gameplay::health::OnDamage;
+use crate::gameplay::npc::ai_state::AiState;
+use crate::gameplay::player::default_input::DefaultInputContext;
+use crate::screens::loading::LoadingScreen;
 use bevy::prelude::*;
-#[cfg(feature = "hot_patch")]
-use bevy_simple_subsecond_system::hot;
-use std::time::Duration;
 use bevy::render::render_resource::{CachedPipelineState, PipelineCache};
 use bevy::render::{MainWorld, RenderApp};
 use bevy_enhanced_input::prelude::*;
-use crate::asset_tracking::LoadResource as _;
-use crate::screens::loading::LoadingScreen;
-use crate::gameplay::npc::ai_state::AiState;
-use crate::gameplay::health::OnDamage;
-use crate::gameplay::player::default_input::DefaultInputContext;
+#[cfg(feature = "hot_patch")]
+use bevy_simple_subsecond_system::hot;
+use std::time::Duration;
 
 pub(super) fn plugin(app: &mut App) {
     app.load_resource::<CompileShadersAssets>();
@@ -18,11 +18,22 @@ pub(super) fn plugin(app: &mut App) {
 
     app.sub_app_mut(RenderApp)
         .add_systems(ExtractSchedule, update_loaded_pipeline_count);
-        
-    app.add_systems(Update, explode_enemy.run_if(in_state(LoadingScreen::Shaders)));
-    app.add_systems(PreUpdate, shoot.before(EnhancedInputSystem).run_if(in_state(LoadingScreen::Shaders)));
-    app.add_systems(Update, force_proceed.run_if(in_state(LoadingScreen::Shaders)));
-        
+
+    app.add_systems(
+        Update,
+        explode_enemy.run_if(in_state(LoadingScreen::Shaders)),
+    );
+    app.add_systems(
+        PreUpdate,
+        shoot
+            .before(EnhancedInputSystem)
+            .run_if(in_state(LoadingScreen::Shaders)),
+    );
+    app.add_systems(
+        Update,
+        force_proceed.run_if(in_state(LoadingScreen::Shaders)),
+    );
+
     app.register_type::<LoadedPipelineCount>();
 }
 
@@ -74,30 +85,33 @@ impl LoadedPipelineCount {
         {
             #[cfg(feature = "dev")]
             {
-                8800
+                85
             }
             #[cfg(not(feature = "dev"))]
             {
-                8700
+                84
             }
         }
         #[cfg(not(feature = "native"))]
         {
             #[cfg(feature = "dev")]
             {
-                5800
+                57
             }
             #[cfg(not(feature = "dev"))]
             {
-                5700
+                56
             }
         }
     };
 }
 
-fn force_proceed(mut loaded_pipeline_count: ResMut<LoadedPipelineCount>, mut timer: Local<Option<Timer>>, time: Res<Time>) {
-let timer =
-        timer.get_or_insert_with(|| Timer::new(Duration::from_seconds(60), TimerMode::Once));
+fn force_proceed(
+    mut loaded_pipeline_count: ResMut<LoadedPipelineCount>,
+    mut timer: Local<Option<Timer>>,
+    time: Res<Time>,
+) {
+    let timer = timer.get_or_insert_with(|| Timer::new(Duration::from_secs(60), TimerMode::Once));
     timer.tick(time.delta());
     if !timer.finished() {
         return;
@@ -111,9 +125,13 @@ fn explode_enemy(enemies: Query<Entity, Added<AiState>>, mut commands: Commands)
     }
 }
 
-fn shoot(players: Query<Entity, Added<Actions<DefaultInputContext>>>, mut inputs: ResMut<ButtonInput<MouseButton>>) {
+fn shoot(
+    players: Query<Entity, Added<Actions<DefaultInputContext>>>,
+    mut inputs: ResMut<ButtonInput<MouseButton>>,
+) {
     for _entity in &players {
         inputs.press(MouseButton::Left);
+        inputs.release(MouseButton::Left);
     }
 }
 

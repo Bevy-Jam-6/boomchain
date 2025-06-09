@@ -74,7 +74,12 @@ fn on_death(
     npc: Query<&GlobalTransform, With<Npc>>,
     mut npc_assets: ResMut<NpcAssets>,
     mut commands: Commands,
+    state: Res<State<Screen>>,
 ) {
+    if *state != Screen::Gameplay {
+        return;
+    }
+
     let entity = trigger.target();
 
     let Ok(transform) = npc.get(entity) else {

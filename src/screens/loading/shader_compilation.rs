@@ -55,10 +55,13 @@ fn spawn_or_skip_shader_compilation_loading_screen(
         widget::ui_root("Loading Screen"),
         BackgroundColor(SCREEN_BACKGROUND),
         StateScoped(LoadingScreen::Shaders),
-        children![(
-            widget::label("Compiling shaders...", fonts.default.clone()),
-            LoadingShadersLabel
-        )],
+        children![
+            (
+                widget::label("Compiling shaders", fonts.default.clone()),
+                LoadingShadersLabel
+            ),
+            widget::label("This can take up to a minute", fonts.default.clone()),
+        ],
     ));
 }
 

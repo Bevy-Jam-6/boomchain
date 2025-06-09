@@ -33,6 +33,7 @@ use crate::{
         npc::stats::NpcStats,
     },
     platform_support::is_webgpu_or_native,
+    screens::Screen,
 };
 
 const EXPLOSION_LIGHT_INTENSITY: f32 = 50_000.0;
@@ -54,24 +55,28 @@ fn on_explode_prop(
     query: Query<&GlobalTransform, With<PropExplosionVfx>>,
     mut explosion_assets: ResMut<ExplosionAssets>,
     mut commands: Commands,
+    state: Res<State<Screen>>,
 ) {
     let Ok(transform) = query.get(trigger.target()) else {
         return;
     };
 
     let rng = &mut rand::thread_rng();
-    let sound_effect = explosion_assets.prop_explosion_sfx.pick(rng).clone();
 
-    commands.spawn((
-        transform.compute_transform(),
-        AudioPlayer(sound_effect),
-        PlaybackSettings::DESPAWN
-            .with_spatial(true)
-            .with_speed(0.9)
-            .with_volume(Volume::Linear(3.5))
-            .with_spatial_scale(SpatialScale::new(1.0 / 10.0)),
-        SoundEffect,
-    ));
+    if *state == Screen::Gameplay {
+        let sound_effect = explosion_assets.prop_explosion_sfx.pick(rng).clone();
+
+        commands.spawn((
+            transform.compute_transform(),
+            AudioPlayer(sound_effect),
+            PlaybackSettings::DESPAWN
+                .with_spatial(true)
+                .with_speed(0.9)
+                .with_volume(Volume::Linear(3.5))
+                .with_spatial_scale(SpatialScale::new(1.0 / 10.0)),
+            SoundEffect,
+        ));
+    }
 
     // Use Hanabi if supported, otherwise use `bevy_firework` as a fallback.
     if is_webgpu_or_native() {
