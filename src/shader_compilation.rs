@@ -16,7 +16,7 @@ pub(super) fn plugin(app: &mut App) {
     app.sub_app_mut(RenderApp)
         .add_systems(ExtractSchedule, update_loaded_pipeline_count);
         
-    app.add_systems(Update, (explode_enemy, shoot).run_if(in_state(LoadingScreen::Shaders));
+    app.add_systems(Update, (explode_enemy, shoot).run_if(in_state(LoadingScreen::Shaders)));
 
     app.register_type::<LoadedPipelineCount>();
 }
