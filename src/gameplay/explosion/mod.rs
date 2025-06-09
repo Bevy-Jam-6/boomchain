@@ -11,7 +11,7 @@ use crate::{
     despawn_after::Despawn,
     gameplay::{
         health::{Health, OnDamage, OnDeath},
-        player::Player,
+        player::{Player, gunplay::WeaponStats},
     },
     third_party::avian3d::CollisionLayer,
 };
@@ -171,6 +171,7 @@ fn on_enemy_death(
     trigger: Trigger<OnDeath>,
     mut commands: Commands,
     explosive_query: Query<(&GlobalTransform, &Explosive), With<ExplodeOnDeath>>,
+    weapon_stats: Single<&WeaponStats, With<Player>>,
 ) {
     let entity = trigger.target();
 
@@ -180,13 +181,15 @@ fn on_enemy_death(
         // to delay the explosion until the dismembered body parts of enemies
         // are ready for physics.
         // Hacky, but this is a game jam :D could be cleaned up though
+        let mut explosive = *explosive;
+        explosive.radius += weapon_stats.extra_enemy_explosion_radius;
         commands
             .spawn((
                 RigidBody::Static,
                 AutoTimer(Timer::from_seconds(0.1, TimerMode::Once)),
                 // Just copy the transform and explosive properties to the temporary entity.
                 transform.compute_transform(),
-                *explosive,
+                explosive,
             ))
             .observe(
                 |trigger: Trigger<OnAutoTimerFinish>, mut commands: Commands| {

@@ -31,6 +31,7 @@ use crate::{
         gore_settings::{Gore, GoreSettings},
         health::OnDeath,
         npc::stats::NpcStats,
+        player::{Player, gunplay::WeaponStats},
     },
     platform_support::is_webgpu_or_native,
     screens::Screen,
@@ -114,6 +115,7 @@ fn on_explode_prop(
 fn on_enemy_death(
     trigger: Trigger<OnDeath>,
     query: Query<(&GlobalTransform, Option<&NpcStats>), With<ExplodeOnDeath>>,
+    weapon_stats: Single<&WeaponStats, With<Player>>,
     mut explosion_assets: ResMut<ExplosionAssets>,
     gore_settings: Res<GoreSettings>,
     mut commands: Commands,
@@ -127,7 +129,9 @@ fn on_enemy_death(
     // Spawn the explosion particle effect.
     let properties = EffectProperties::default().with_properties([(
         "scale".to_string(),
-        Value::Scalar(ScalarValue::Float(scale)),
+        Value::Scalar(ScalarValue::Float(
+            scale + weapon_stats.extra_enemy_explosion_radius / scale,
+        )),
     )]);
     commands.spawn((
         ParticleEffect::new(explosion_assets.enemy_explosion_vfx.clone()),
@@ -155,7 +159,7 @@ fn on_enemy_death(
     let scale_x = rng.gen_range(0.8..1.2);
     let scale_y = rng.gen_range(0.8..1.2);
     let scale_z = rng.gen_range(0.8..1.2);
-    let base_scale = scale * 2.5;
+    let base_scale = scale * (2.5 + weapon_stats.extra_enemy_explosion_radius);
 
     let spray_transform = transform
         .with_translation(transform.translation - Vec3::Y * 0.3)
