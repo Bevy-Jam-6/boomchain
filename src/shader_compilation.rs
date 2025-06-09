@@ -98,7 +98,7 @@ fn explode_enemy(enemies: Query<Entity, Added<AiState>>, mut commands: Commands)
 
 fn shoot(players: Query<Entity, Added<DefaultInputBinding>>, mut commands: Commands) {
     for entity in &players {
-        commands.entity(entity).trigger(Fired<Shoot>);
+        commands.entity(entity).trigger(Fired::<Shoot>::default());
     }
 }
 
