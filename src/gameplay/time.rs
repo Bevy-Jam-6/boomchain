@@ -29,6 +29,5 @@ fn reset_gameplay_time(mut gameplay_time: ResMut<GameplayTime>) {
 }
 
 fn update_gameplay_time(mut gameplay_time: ResMut<GameplayTime>, time: Res<Time>) {
-    println!("Gameplay time: {:.2} seconds", gameplay_time.elapsed_secs());
     gameplay_time.tick(time.delta());
 }
