@@ -148,9 +148,10 @@ fn grunt_passively(
         }
 
         let handle = npc_assets.idle_sound.pick(&mut rand::thread_rng()).clone();
-        commands
-            .spawn(enemy_sound_effect(handle, *transform, stats))
-            .insert(VocalOf(entity));
+        commands.spawn((
+            enemy_sound_effect(handle, *transform, stats),
+            VocalOf(entity),
+        ));
     }
 }
 
@@ -188,9 +189,10 @@ fn stagger_on_hit(
             bevy::ecs::error::ignore,
         );
 
-        commands
-            .spawn(enemy_sound_effect(handle, *transform, stats))
-            .insert(VocalOf(entity));
+        commands.spawn((
+            enemy_sound_effect(handle, *transform, stats),
+            VocalOf(entity),
+        ));
     }
 }
 
