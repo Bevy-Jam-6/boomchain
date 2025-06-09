@@ -38,7 +38,11 @@ fn spawn_main_menu(mut commands: Commands, fonts: Res<FontAssets>) {
                 TextFont::from_font_size(52.0).with_font(fonts.default.clone())
             ),
             widget::button("Play", fonts.default.clone(), enter_loading_screen),
-            widget::button("Endless Mode", fonts.default.clone(), enter_loading_screen),
+            widget::button(
+                "Endless Mode",
+                fonts.default.clone(),
+                enter_loading_screen_endless
+            ),
             widget::button("Settings", fonts.default.clone(), open_settings_menu),
             widget::button("Credits", fonts.default.clone(), open_credits_menu),
         ],
