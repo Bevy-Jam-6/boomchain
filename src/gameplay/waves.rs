@@ -666,7 +666,7 @@ impl Waves {
             waves,
             current_packets: Vec::new(),
             wave_stopwatch: Stopwatch::default(),
-            current_wave: 8,
+            current_wave: 0,
             total_waves: len,
             prep_timer: Timer::from_seconds(0.0, TimerMode::Once),
         }
