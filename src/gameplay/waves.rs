@@ -577,7 +577,7 @@ fn advance_waves(
                 Visibility::Inherited,
                 Transform::from_translation(spawn_position),
             ));
-            let buff_i = (waves.current_wave_index() + 1).saturating_sub(5) % 5;
+            let buff_i = waves.current_wave_index().saturating_sub(5) / 5;
             let scale_stat = move |base_stat: f32, factor: f32| -> f32 {
                 base_stat * (1.0 + factor * buff_i as f32)
             };
