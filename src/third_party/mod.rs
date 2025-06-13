@@ -12,7 +12,6 @@ pub(crate) mod avian3d;
 mod bevy_enhanced_input;
 mod bevy_firework;
 mod bevy_framepace;
-mod bevy_hanabi;
 pub(crate) mod bevy_landmass;
 mod bevy_mesh_decal;
 mod bevy_tnua;
@@ -31,7 +30,4 @@ pub(super) fn plugin(app: &mut App) {
         bevy_mesh_decal::plugin,
         bevy_framepace::plugin,
     ));
-    if is_webgpu_or_native() {
-        app.add_plugins(bevy_hanabi::plugin);
-    }
 }

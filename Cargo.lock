@@ -1068,28 +1068,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy_hanabi"
-version = "0.16.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "98bb4b6d8b60909e495d2cd93222d2907d12502234b54c3294c013c1bced2b05"
-dependencies = [
- "anyhow",
- "bevy",
- "bitflags 2.9.1",
- "bytemuck",
- "copyless",
- "fixedbitset",
- "naga",
- "naga_oil",
- "rand 0.8.5",
- "rand_pcg",
- "ron",
- "serde",
- "thiserror 2.0.12",
- "wgpu",
-]
-
-[[package]]
 name = "bevy_heavy"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2200,7 +2178,6 @@ dependencies = [
  "bevy_firework",
  "bevy_fix_cursor_unlock_web",
  "bevy_framepace",
- "bevy_hanabi",
  "bevy_landmass",
  "bevy_mesh_decal",
  "bevy_mod_skinned_aabb",
@@ -2337,12 +2314,6 @@ checksum = "e1aaf9b65849a68662ac6c0810c8893a765c960b907dd7cfab9c4a50bf764fbc"
 dependencies = [
  "const_soft_float",
 ]
-
-[[package]]
-name = "copyless"
-version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2df960f5d869b2dd8532793fde43eb5427cceb126c929747a26823ab0eeb536"
 
 [[package]]
 name = "core-foundation"
@@ -5416,15 +5387,6 @@ checksum = "32cb0b9bc82b0a0876c2dd994a7e7a2683d3e7390ca40e6886785ef0c7e3ee31"
 dependencies = [
  "num-traits",
  "rand 0.8.5",
-]
-
-[[package]]
-name = "rand_pcg"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "59cad018caf63deb318e5a4586d99a24424a364f40f1e5778c29aca23f4fc73e"
-dependencies = [
- "rand_core 0.6.4",
 ]
 
 [[package]]
