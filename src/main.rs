@@ -26,13 +26,24 @@ use audio::DEFAULT_VOLUME;
 use bevy_landmass::LandmassSystemSet;
 use bitflags::bitflags;
 
-use bevy::{asset::AssetMetaCheck, audio::AudioPlugin, prelude::*, render::view::RenderLayers};
+use bevy::{
+    asset::AssetMetaCheck,
+    audio::AudioPlugin,
+    ecs::error::{GLOBAL_ERROR_HANDLER, error},
+    prelude::*,
+    render::view::RenderLayers,
+};
 
 #[cfg(feature = "native")]
 use bevy::core_pipeline::experimental::taa::TemporalAntiAliasPlugin;
 use oxidized_navigation::OxidizedNavigation;
 
 fn main() -> AppExit {
+    // Don't panic on errors, just log them.
+    GLOBAL_ERROR_HANDLER
+        .set(error)
+        .expect("Error handler already set");
+
     let mut app = App::new();
 
     // Add Bevy plugins.

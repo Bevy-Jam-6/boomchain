@@ -19,7 +19,7 @@ use crate::{
         health::{OnDamage, OnDeath},
         npc::{ai_state::AiState, assets::NpcAssets, stats::NpcStats},
     },
-    screens::Screen,
+    screens::{Screen, loading::LoadingScreen},
     third_party::avian3d::CollisionLayer,
 };
 
@@ -82,6 +82,7 @@ fn on_enemy_death(
                         [CollisionLayer::Default],
                     )),
                 StateScoped(Screen::Gameplay),
+                StateScoped(LoadingScreen::Shaders),
             ));
 
             entity_commands.observe(remove_shadow_caster);

@@ -165,6 +165,7 @@ fn explode_enemy(
     mut commands: Commands,
     mut timer: Local<Option<Timer>>,
     time: Res<Time>,
+    mut already_exploded: Local<bool>,
 ) {
     let timer =
         timer.get_or_insert_with(|| Timer::new(Duration::from_millis(500), TimerMode::Once));
@@ -172,6 +173,10 @@ fn explode_enemy(
     if !timer.finished() {
         return;
     }
+    if *already_exploded {
+        return;
+    }
+    *already_exploded = true;
     for entity in &enemies {
         commands.entity(entity).trigger(OnDamage(1000.0));
     }
@@ -182,6 +187,7 @@ fn explode_barrel(
     mut commands: Commands,
     mut timer: Local<Option<Timer>>,
     time: Res<Time>,
+    mut already_exploded: Local<bool>,
 ) {
     let timer =
         timer.get_or_insert_with(|| Timer::new(Duration::from_millis(500), TimerMode::Once));
@@ -189,6 +195,10 @@ fn explode_barrel(
     if !timer.finished() {
         return;
     }
+    if *already_exploded {
+        return;
+    }
+    *already_exploded = true;
     for entity in &barrels {
         commands.entity(entity).trigger(OnDamage(1000.0));
     }
@@ -204,6 +214,7 @@ fn shoot(
         timer.get_or_insert_with(|| Timer::new(Duration::from_millis(1000), TimerMode::Once));
     timer.tick(time.delta());
     if timer.finished() {
+        // Only shoot for the first second so that the particles despawn in time
         return;
     }
     for player in &players {
