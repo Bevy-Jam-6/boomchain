@@ -3,6 +3,7 @@ use crate::gameplay::health::OnDamage;
 use crate::gameplay::npc::ai_state::AiState;
 use crate::gameplay::player::default_input::DefaultInputContext;
 use crate::screens::loading::LoadingScreen;
+use bevy::pbr::CascadeShadowConfigBuilder;
 use bevy::prelude::*;
 use bevy::render::render_resource::{CachedPipelineState, PipelineCache};
 use bevy::render::{MainWorld, RenderApp};
@@ -47,6 +48,23 @@ pub(crate) fn spawn_shader_compilation_map(
         SceneRoot(compile_shaders_assets.level.clone()),
         StateScoped(LoadingScreen::Shaders),
     ));
+
+    commands.spawn((
+        StateScoped(LoadingScreen::Shaders),
+        DirectionalLight {
+            illuminance: 5_000.0,
+            color: Color::srgb_u8(200, 190, 255),
+            shadows_enabled: true,
+            ..default()
+        },
+        CascadeShadowConfigBuilder {
+            maximum_distance: 400.0,
+            first_cascade_far_bound: 40.0,
+            ..default()
+        }
+        .build(),
+        Transform::default().looking_to(Vec3::new(-1.75, -1.0, 0.5), Vec3::Y),
+    ));
 }
 
 /// A [`Resource`] that contains all the assets needed to spawn the level.
@@ -85,22 +103,22 @@ impl LoadedPipelineCount {
         {
             #[cfg(feature = "dev")]
             {
-                85
+                77
             }
             #[cfg(not(feature = "dev"))]
             {
-                84
+                77
             }
         }
         #[cfg(not(feature = "native"))]
         {
             #[cfg(feature = "dev")]
             {
-                57
+                51
             }
             #[cfg(not(feature = "dev"))]
             {
-                56
+                50
             }
         }
     };

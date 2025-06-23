@@ -38,11 +38,8 @@ fn setup_lamp_wall_electric(
             PointLight {
                 color: Color::srgb_u8(232, 199, 176),
                 intensity: 40_000.0,
-                radius: 0.05,
-                range: 20.0,
-                shadows_enabled: true,
-                #[cfg(feature = "native")]
-                soft_shadows_enabled: true,
+                range: 8.0,
+                shadows_enabled: false,
                 ..default()
             },
         ))

@@ -40,7 +40,7 @@ fn setup_lamp_sitting(
             PointLight {
                 color: Color::srgb(1.0, 0.7, 0.4),
                 intensity: 30_000.0,
-                radius: 0.05,
+                range: 8.0,
                 shadows_enabled: false,
                 ..default()
             },

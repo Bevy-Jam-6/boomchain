@@ -16,7 +16,9 @@ use bevy::{
 #[cfg(feature = "native")]
 use bevy::{
     core_pipeline::{experimental::taa::TemporalAntiAliasing, prepass::NormalPrepass},
-    pbr::{ScreenSpaceAmbientOcclusion, ShadowFilteringMethod},
+    pbr::{
+        ScreenSpaceAmbientOcclusion, ScreenSpaceAmbientOcclusionQualityLevel, ShadowFilteringMethod,
+    },
 };
 use bevy_enhanced_input::prelude::*;
 #[cfg(feature = "hot_patch")]
@@ -132,7 +134,10 @@ fn spawn_view_model(
                 #[cfg(feature = "native")]
                 (
                     Msaa::Off,
-                    ScreenSpaceAmbientOcclusion::default(),
+                    ScreenSpaceAmbientOcclusion {
+                        quality_level: ScreenSpaceAmbientOcclusionQualityLevel::Medium,
+                        ..default()
+                    },
                     TemporalAntiAliasing::default(),
                     NormalPrepass,
                     ShadowFilteringMethod::Temporal,

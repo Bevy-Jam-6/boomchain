@@ -88,7 +88,7 @@ fn on_explode_prop(
             RenderLayers::from(RenderLayer::PARTICLES),
             children![PointLight {
                 intensity: EXPLOSION_LIGHT_INTENSITY,
-                range: 10.0,
+                range: 5.0,
                 radius: 0.25,
                 shadows_enabled: false,
                 color: ORANGE.into(),

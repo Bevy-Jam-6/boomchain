@@ -51,8 +51,7 @@ fn setup_lamp_wall_electric(
             PointLight {
                 color: lamp.color,
                 intensity: lamp.intensity,
-                radius: 0.1,
-                range: 80.0,
+                range: 8.0,
                 shadows_enabled: false,
                 ..default()
             },
