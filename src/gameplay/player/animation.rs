@@ -10,7 +10,6 @@ use bevy_tnua::{TnuaAnimatingState, TnuaAnimatingStateDirective, prelude::*};
 use crate::{
     PostPhysicsAppSystems,
     gameplay::{animation::AnimationPlayers, crosshair::CrosshairState, player::gunplay::Shooting},
-    screens::Screen,
 };
 
 use super::assets::PlayerAssets;

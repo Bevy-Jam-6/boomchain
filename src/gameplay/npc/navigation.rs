@@ -17,7 +17,6 @@ use bevy_tnua::prelude::*;
 use crate::{
     PrePhysicsAppSystems,
     gameplay::{npc::stats::NpcStats, player::navmesh_position::LastValidPlayerNavmeshPosition},
-    screens::Screen,
 };
 
 use super::{ai_state::AiState, attack::Attacking};

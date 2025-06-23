@@ -1,6 +1,6 @@
 //! The main menu (seen on the title screen).
 
-use bevy::{prelude::*, window::CursorGrabMode};
+use bevy::prelude::*;
 
 use crate::{
     font::FontAssets, gameplay::waves::GameMode, menus::Menu, screens::Screen, theme::widget,
@@ -53,7 +53,6 @@ fn enter_loading_screen(
     _trigger: Trigger<Pointer<Click>>,
     mut next_screen: ResMut<NextState<Screen>>,
     mut next_game_mode: ResMut<NextState<GameMode>>,
-    mut window: Single<&mut Window>,
 ) {
     next_screen.set(Screen::Loading);
     next_game_mode.set(GameMode::Normal);
@@ -63,7 +62,6 @@ fn enter_loading_screen_endless(
     _trigger: Trigger<Pointer<Click>>,
     mut next_screen: ResMut<NextState<Screen>>,
     mut next_game_mode: ResMut<NextState<GameMode>>,
-    mut window: Single<&mut Window>,
 ) {
     next_screen.set(Screen::Loading);
     next_game_mode.set(GameMode::Endless);

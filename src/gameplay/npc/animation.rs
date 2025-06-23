@@ -8,7 +8,7 @@ use bevy_simple_subsecond_system::hot;
 use bevy_tnua::{TnuaAnimatingState, TnuaAnimatingStateDirective, prelude::*};
 use rand::Rng;
 
-use crate::{PostPhysicsAppSystems, gameplay::animation::AnimationPlayers, screens::Screen};
+use crate::{PostPhysicsAppSystems, gameplay::animation::AnimationPlayers};
 
 use super::{assets::NpcAssets, attack::Attacking};
 
