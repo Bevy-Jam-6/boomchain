@@ -57,7 +57,6 @@ fn enter_loading_screen(
 ) {
     next_screen.set(Screen::Loading);
     next_game_mode.set(GameMode::Normal);
-    window.cursor_options.grab_mode = CursorGrabMode::Locked;
 }
 
 fn enter_loading_screen_endless(
@@ -68,7 +67,6 @@ fn enter_loading_screen_endless(
 ) {
     next_screen.set(Screen::Loading);
     next_game_mode.set(GameMode::Endless);
-    window.cursor_options.grab_mode = CursorGrabMode::Locked;
 }
 
 fn open_settings_menu(_: Trigger<Pointer<Click>>, mut next_menu: ResMut<NextState<Menu>>) {

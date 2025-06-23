@@ -35,7 +35,8 @@ pub(super) fn plugin(app: &mut App) {
         PreUpdate,
         shoot
             .before(EnhancedInputSystem)
-            .run_if(in_state(LoadingScreen::Shaders)),
+            .run_if(in_state(LoadingScreen::Shaders))
+            .run_if(any_with_component::<Camera3d>),
     );
     app.add_systems(
         PostUpdate,
@@ -129,11 +130,11 @@ impl LoadedPipelineCount {
         {
             #[cfg(feature = "dev")]
             {
-                45
+                44
             }
             #[cfg(not(feature = "dev"))]
             {
-                44
+                43
             }
         }
     };
@@ -193,7 +194,18 @@ fn explode_barrel(
     }
 }
 
-fn shoot(players: Query<Entity, With<Player>>, mut commands: Commands) {
+fn shoot(
+    players: Query<Entity, With<Player>>,
+    mut commands: Commands,
+    mut timer: Local<Option<Timer>>,
+    time: Res<Time>,
+) {
+    let timer =
+        timer.get_or_insert_with(|| Timer::new(Duration::from_millis(1000), TimerMode::Once));
+    timer.tick(time.delta());
+    if timer.finished() {
+        return;
+    }
     for player in &players {
         commands.entity(player).insert(Shooting);
     }
@@ -231,7 +243,7 @@ pub(crate) fn all_pipelines_loaded(
         return false;
     }
     let timer =
-        timer.get_or_insert_with(|| Timer::new(Duration::from_millis(5000), TimerMode::Once));
+        timer.get_or_insert_with(|| Timer::new(Duration::from_millis(3000), TimerMode::Once));
     timer.tick(time.delta());
     if !timer.finished() {
         return false;
