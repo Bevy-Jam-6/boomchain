@@ -228,6 +228,7 @@ where
     let first_option = options[selection].clone();
     (
         Node::default(),
+        Pickable::IGNORE,
         Children::spawn(SpawnWith(move |parent: &mut ChildSpawner| {
             parent
                 .spawn((
@@ -237,6 +238,7 @@ where
                         selection: 0,
                     },
                     Node::default(),
+                    Pickable::IGNORE,
                     children![
                         button_small("<", font.clone(), on_change_selection::<-1>),
                         (

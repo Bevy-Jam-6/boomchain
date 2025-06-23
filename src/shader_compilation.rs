@@ -242,8 +242,9 @@ pub(crate) fn all_pipelines_loaded(
     if !is_done_but_still_playing_particles {
         return false;
     }
+    // Need some time to let the particles finish playing
     let timer =
-        timer.get_or_insert_with(|| Timer::new(Duration::from_millis(3000), TimerMode::Once));
+        timer.get_or_insert_with(|| Timer::new(Duration::from_millis(1500), TimerMode::Once));
     timer.tick(time.delta());
     if !timer.finished() {
         return false;

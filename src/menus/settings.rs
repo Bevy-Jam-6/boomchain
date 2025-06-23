@@ -16,7 +16,7 @@ use crate::{
     font::FontAssets,
     gameplay::{
         gore_settings::{Gore, GoreSettings},
-        player::camera::{CameraSensitivity, WorldModelFov},
+        player::camera::{CameraSensitivity, MouseInversion, WorldModelFov},
     },
     menus::Menu,
     screens::Screen,
@@ -50,10 +50,12 @@ fn spawn_settings_menu(
     mut commands: Commands,
     fonts: Res<FontAssets>,
     gore_settings: Res<GoreSettings>,
+    mouse_inversion: Res<MouseInversion>,
 ) {
     let fonts_outer = fonts.clone();
     let fonts = fonts.clone();
     let gore_settings = gore_settings.clone();
+    let mouse_inversion = mouse_inversion.clone();
     commands.spawn((
         widget::ui_root("Settings Screen"),
         StateScoped(Menu::Settings),
@@ -101,6 +103,24 @@ fn spawn_settings_menu(
                         raise_camera_sensitivity,
                         fonts.default.clone(),
                         fonts.default.clone(),
+                    ));
+                    // Invert mouse Y
+                    parent.spawn((
+                        widget::label("Invert Mouse Y", fonts.default.clone()),
+                        Node {
+                            justify_self: JustifySelf::End,
+                            ..default()
+                        },
+                    ));
+                    parent.spawn(widget::cycle_select(
+                        vec!["No".to_string(), "Yes".to_string()],
+                        if mouse_inversion.invert_mouse_y { 1 } else { 0 },
+                        fonts.default.clone(),
+                        |trigger: Trigger<OnChangeSelection>,
+                         mut mouse_inversion: ResMut<MouseInversion>| {
+                            let selection = trigger.selection;
+                            mouse_inversion.invert_mouse_y = selection == 1;
+                        },
                     ));
                     // Camera FOV
                     parent.spawn((
