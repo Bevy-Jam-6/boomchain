@@ -15,7 +15,7 @@ use crate::{
     third_party::avian3d::CollisionLayer,
 };
 use avian3d::prelude::*;
-use bevy::{prelude::*, render::view::RenderLayers};
+use bevy::{prelude::*, render::view::RenderLayers, window::CursorGrabMode};
 use bevy_enhanced_input::prelude::*;
 use bevy_hanabi::prelude::*;
 #[cfg(feature = "hot_patch")]
@@ -49,10 +49,19 @@ pub(super) fn plugin(app: &mut App) {
     app.add_observer(shooting_sounds_reload);
     app.add_observer(spawn_muzzle_flash);
     app.add_observer(shot_pushback);
+    app.add_observer(lock_on_shoot);
 
     // Only until the animations work again.
     app.add_systems(Update, remove_shooting);
     app.add_systems(Update, trigger_reload_sound);
+    app.add_systems(
+        Update,
+        (
+            lock_cursor.run_if(resource_exists::<LockCursorThisFrame>),
+            prepare_lock_cache.run_if(resource_exists::<LockCursorNextFrame>),
+        )
+            .chain(),
+    );
     app.init_resource::<BulletImpact>();
 }
 
@@ -284,6 +293,29 @@ fn handle_hits(
             .trigger(OnDamage(weapon_stats.damage));
     }
 }
+
+fn lock_on_shoot(_trigger: Trigger<OnAdd, Shooting>, mut commands: Commands) {
+    // Initiate ugly cache clearing hack
+    commands.insert_resource(LockCursorNextFrame);
+}
+
+fn prepare_lock_cache(mut window: Single<&mut Window>, mut commands: Commands) {
+    window.cursor_options.grab_mode = CursorGrabMode::Confined;
+    window.cursor_options.visible = false;
+    commands.remove_resource::<LockCursorNextFrame>();
+    commands.insert_resource(LockCursorThisFrame);
+}
+
+fn lock_cursor(mut window: Single<&mut Window>, mut commands: Commands) {
+    window.cursor_options.grab_mode = CursorGrabMode::Locked;
+    commands.remove_resource::<LockCursorThisFrame>();
+}
+
+#[derive(Resource, Debug, Clone)]
+struct LockCursorNextFrame;
+
+#[derive(Resource, Debug, Clone)]
+struct LockCursorThisFrame;
 
 #[derive(Resource)]
 struct BulletImpact(Handle<EffectAsset>);

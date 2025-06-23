@@ -30,10 +30,12 @@ fn on_player_death(
     fonts: Res<FontAssets>,
     gameplay_time: Res<GameplayTime>,
     mut commands: Commands,
+    mut window: Single<&mut Window>,
 ) {
     if !player.contains(trigger.target()) {
         return;
     }
+    window.cursor_options.visible = true;
     let elapsed_secs = gameplay_time.elapsed_secs();
     let minutes = (elapsed_secs / 60.0) as u32;
     let seconds = (elapsed_secs % 60.0) as u32;

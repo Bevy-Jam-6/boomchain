@@ -38,10 +38,12 @@ fn on_game_won(
     mut commands: Commands,
     game_won_marker: Query<(), With<GameWonMarker>>,
     gameplay_time: Res<GameplayTime>,
+    mut window: Single<&mut Window>,
 ) {
     if !game_won_marker.is_empty() {
         return;
     }
+    window.cursor_options.visible = true;
     let elapsed_secs = gameplay_time.elapsed_secs();
     let minutes = (elapsed_secs / 60.0) as u32;
     let seconds = (elapsed_secs % 60.0) as u32;

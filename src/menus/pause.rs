@@ -23,6 +23,7 @@ fn spawn_pause_menu(
     mut crosshair: Single<&mut CrosshairState>,
     mut time: ResMut<Time<Virtual>>,
     fonts: Res<FontAssets>,
+    mut window: Single<&mut Window>,
 ) {
     commands.spawn((
         widget::ui_root("Pause Menu"),
@@ -38,6 +39,7 @@ fn spawn_pause_menu(
     crosshair
         .wants_free_cursor
         .insert(spawn_pause_menu.type_id());
+    window.cursor_options.visible = true;
     time.pause();
 }
 
@@ -52,12 +54,14 @@ fn close_menu(
     mut next_menu: ResMut<NextState<Menu>>,
     mut crosshair: Single<&mut CrosshairState>,
     mut time: ResMut<Time<Virtual>>,
+    mut window: Single<&mut Window>,
 ) {
     next_menu.set(Menu::None);
     crosshair
         .wants_free_cursor
         .remove(&spawn_pause_menu.type_id());
     time.unpause();
+    window.cursor_options.visible = false;
 }
 
 #[cfg_attr(feature = "hot_patch", hot)]
