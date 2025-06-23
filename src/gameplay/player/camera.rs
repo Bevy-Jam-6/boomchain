@@ -356,13 +356,7 @@ impl Default for CameraSensitivity {
 
 #[derive(Resource, Reflect, Debug, Clone)]
 #[reflect(Resource)]
+#[derive(Default)]
 pub(crate) struct MouseInversion {
     pub(crate) invert_mouse_y: bool,
-}
-impl Default for MouseInversion {
-    fn default() -> Self {
-        Self {
-            invert_mouse_y: false,
-        }
-    }
 }
