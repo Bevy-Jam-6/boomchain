@@ -83,10 +83,12 @@ fn spawn_upgrade_ui(
     mut block_input: ResMut<BlocksInput>,
     mut crosshair_state: Single<&mut CrosshairState>,
     fonts: Res<FontAssets>,
+    mut window: Single<&mut Window>,
 ) {
     if !upgrade_menus.is_empty() {
         return;
     }
+    window.cursor_options.visible = true;
     block_input.insert(spawn_upgrade_ui.type_id());
     crosshair_state
         .wants_free_cursor
@@ -221,6 +223,7 @@ fn despawn_upgrades(
     mut block_input: ResMut<BlocksInput>,
     mut crosshair_state: Single<&mut CrosshairState>,
     mut time: ResMut<Time<Virtual>>,
+    mut window: Single<&mut Window>,
 ) {
     for upgrade in upgrades.iter() {
         commands.entity(upgrade).despawn();
@@ -233,6 +236,7 @@ fn despawn_upgrades(
         .wants_free_cursor
         .remove(&spawn_upgrade_ui.type_id());
     time.unpause();
+    window.cursor_options.visible = false;
 }
 
 fn pause_in_menu(mut time: ResMut<Time<Virtual>>) {

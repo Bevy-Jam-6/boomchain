@@ -85,6 +85,8 @@ web-sys = { version = "0.3", features = ["Gpu", "Navigator", "Window"] }
 default = [
     # Default to a native dev build.
     "dev_native",
+    # Hack: this shakes up ordering enough to fix an issue with multicam setups. Somehow.
+    "bevy/bevy_ui_debug",
 ]
 native = ["bevy/experimental_pbr_pcss"]
 dev = [
