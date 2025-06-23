@@ -13,6 +13,7 @@ use crate::gameplay::waves::{
     GameMode, WaveAdvanced, WaveFinishedPreparing, WaveStartedPreparing, Waves,
 };
 use crate::screens::Screen;
+use crate::screens::loading::LoadingScreen;
 use crate::theme::palette;
 
 pub(super) fn plugin(app: &mut App) {

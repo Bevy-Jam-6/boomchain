@@ -33,8 +33,7 @@ pub(super) fn plugin(app: &mut App) {
         (sync_agent_velocity, set_controller_velocity)
             .chain()
             .in_set(RunFixedMainLoopSystem::BeforeFixedMainLoop)
-            .before(LandmassSystemSet::SyncExistence)
-            .run_if(in_state(Screen::Gameplay)),
+            .before(LandmassSystemSet::SyncExistence),
     );
     app.add_systems(
         RunFixedMainLoop,

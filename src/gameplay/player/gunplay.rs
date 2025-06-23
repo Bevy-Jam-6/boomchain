@@ -213,6 +213,7 @@ fn handle_hits(
     mut commands: Commands,
     npcs: Query<(), With<Npc>>,
     mut player_assets: ResMut<PlayerAssets>,
+    state: Res<State<Screen>>,
 ) {
     let mut rng = &mut rand::thread_rng();
 
@@ -262,11 +263,15 @@ fn handle_hits(
             // play jump sound sped up, sound like flesh impact
             let rng = &mut rand::thread_rng();
             let sound = player_assets.jump_start_sounds.pick(rng).clone();
-            commands.spawn(sped_up_sound_effect(sound.clone()));
+            if *state == Screen::Gameplay {
+                commands.spawn(sped_up_sound_effect(sound.clone()));
+            }
         } else {
             // play throw sound sped up, sounds like wall impact
             let sound = player_assets.throw_sound.clone();
-            commands.spawn(sped_up_sound_effect(sound.clone()));
+            if *state == Screen::Gameplay {
+                commands.spawn(sped_up_sound_effect(sound.clone()));
+            }
         }
 
         let Ok(ColliderOf { body }) = collider_of.get(first_hit.entity) else {

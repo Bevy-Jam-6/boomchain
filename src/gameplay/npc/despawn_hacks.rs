@@ -8,6 +8,7 @@ use crate::{
         player::Player,
     },
     menus::game_over::GameOverMenu,
+    screens::Screen,
 };
 
 pub(super) fn plugin(app: &mut App) {
@@ -15,7 +16,8 @@ pub(super) fn plugin(app: &mut App) {
         Update,
         (despawn_lazy, despawn_lonely)
             .in_set(PostPhysicsAppSystems::TickTimers)
-            .run_if(|query: Query<&GameOverMenu>| query.is_empty()),
+            .run_if(|query: Query<&GameOverMenu>| query.is_empty())
+            .run_if(in_state(Screen::Gameplay)),
     );
     app.add_observer(init_last_translation);
 }

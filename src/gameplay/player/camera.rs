@@ -48,9 +48,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_observer(rotate_camera_yaw_and_pitch);
     app.add_systems(
         Update,
-        sync_camera_translation_with_player
-            .run_if(in_state(Screen::Gameplay))
-            .in_set(PostPhysicsAppSystems::Update),
+        sync_camera_translation_with_player.in_set(PostPhysicsAppSystems::Update),
     );
     app.add_systems(
         Update,

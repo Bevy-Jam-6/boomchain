@@ -16,9 +16,7 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<NpcAnimations>();
     app.add_systems(
         Update,
-        play_animations
-            .run_if(in_state(Screen::Gameplay))
-            .in_set(PostPhysicsAppSystems::PlayAnimations),
+        play_animations.in_set(PostPhysicsAppSystems::PlayAnimations),
     );
 }
 
