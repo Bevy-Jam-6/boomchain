@@ -6,12 +6,6 @@ use bevy::{
     prelude::*,
     render::view::RenderLayers,
 };
-use bevy_firework::{
-    bevy_utilitarian::prelude::RandF32,
-    core::{BlendMode, ParticleSpawner, SpawnTransformMode},
-    curve::FireworkGradient,
-    emission_shape::EmissionShape,
-};
 use bevy_hanabi::{
     AccelModifier, Attribute, ColorBlendMask, ColorBlendMode, ColorOverLifetimeModifier,
     EffectAsset, EffectProperties, ExprWriter, Gradient, LinearDragModifier, ParticleEffect,
@@ -33,7 +27,6 @@ use crate::{
         npc::stats::NpcStats,
         player::{Player, gunplay::WeaponStats},
     },
-    platform_support::is_webgpu_or_native,
     screens::Screen,
 };
 
@@ -79,37 +72,20 @@ fn on_explode_prop(
         ));
     }
 
-    // Use Hanabi if supported, otherwise use `bevy_firework` as a fallback.
-    if is_webgpu_or_native() {
-        commands.spawn((
-            Transform::from_translation(transform.translation()),
-            DespawnAfter::new(Duration::from_secs(1)),
-            ParticleEffect::new(explosion_assets.prop_explosion_vfx.clone()),
-            RenderLayers::from(RenderLayer::PARTICLES),
-            children![PointLight {
-                intensity: EXPLOSION_LIGHT_INTENSITY,
-                range: 10.0,
-                radius: 0.25,
-                shadows_enabled: false,
-                color: ORANGE.into(),
-                ..default()
-            }],
-        ));
-    } else {
-        commands.spawn((
-            bevy_firework_prop_explosion(),
-            Transform::from_translation(transform.translation()),
-            DespawnAfter::new(Duration::from_secs(1)),
-            PointLight {
-                intensity: EXPLOSION_LIGHT_INTENSITY,
-                range: 10.0,
-                radius: 0.25,
-                shadows_enabled: false,
-                color: ORANGE.into(),
-                ..default()
-            },
-        ));
-    }
+    commands.spawn((
+        Transform::from_translation(transform.translation()),
+        DespawnAfter::new(Duration::from_secs(1)),
+        ParticleEffect::new(explosion_assets.prop_explosion_vfx.clone()),
+        RenderLayers::from(RenderLayer::PARTICLES),
+        children![PointLight {
+            intensity: EXPLOSION_LIGHT_INTENSITY,
+            range: 5.0,
+            radius: 0.25,
+            shadows_enabled: false,
+            color: ORANGE.into(),
+            ..default()
+        }],
+    ));
 }
 
 fn on_enemy_death(
@@ -170,39 +146,6 @@ fn on_enemy_death(
         ))
         .with_rotation(rotation);
     spray_decal(&mut commands, blood_decal_texture, spray_transform);
-}
-
-fn bevy_firework_prop_explosion() -> ParticleSpawner {
-    let gradient = FireworkGradient::uneven_samples(vec![
-        (0.0, LinearRgba::new(1.0, 1.0, 0.8, 1.0)),
-        (0.2, LinearRgba::new(1.0, 0.8, 0.3, 1.0)),
-        (0.6, LinearRgba::new(1.0, 0.3, 0.1, 0.8)),
-        (1.0, LinearRgba::new(1.0, 0.2, 0.1, 0.0)),
-    ]);
-
-    ParticleSpawner {
-        one_shot: true,
-        rate: 600.0,
-        emission_shape: EmissionShape::Sphere(2.0),
-        lifetime: RandF32 { min: 0.2, max: 1.0 },
-        inherit_parent_velocity: true,
-        initial_velocity_radial: RandF32 {
-            min: 0.0,
-            max: 10.0,
-        },
-        initial_scale: RandF32 {
-            min: 0.01,
-            max: 0.1,
-        },
-        color: gradient.clone(),
-        blend_mode: BlendMode::Blend,
-        linear_drag: 7.0,
-        fade_edge: 0.4,
-        pbr: false,
-        acceleration: Vec3::new(0., -8.0, 0.),
-        spawn_transform_mode: SpawnTransformMode::Local,
-        ..default()
-    }
 }
 
 pub(super) fn hanabi_prop_explosion(world: &mut World) -> EffectAsset {

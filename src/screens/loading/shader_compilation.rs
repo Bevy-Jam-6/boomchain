@@ -9,8 +9,9 @@ use bevy_simple_subsecond_system::hot;
 use crate::{
     font::FontAssets,
     gameplay::explosion::assets::ExplosionAssets,
-    platform_support::is_webgpu_or_native,
-    shader_compilation::{LoadedPipelineCount, all_pipelines_loaded, spawn_shader_compilation_map},
+    shader_compilation::{
+        LoadedPipelineCount, PipelinesReady, all_pipelines_loaded, spawn_shader_compilation_map,
+    },
     theme::{palette::SCREEN_BACKGROUND, prelude::*},
 };
 
@@ -44,10 +45,11 @@ pub(super) fn plugin(app: &mut App) {
 fn spawn_or_skip_shader_compilation_loading_screen(
     mut commands: Commands,
     loaded_pipeline_count: Res<LoadedPipelineCount>,
+    pipelines_ready: Res<PipelinesReady>,
     mut next_screen: ResMut<NextState<LoadingScreen>>,
     fonts: Res<FontAssets>,
 ) {
-    if loaded_pipeline_count.is_done() {
+    if loaded_pipeline_count.is_done() && pipelines_ready.0 {
         next_screen.set(LoadingScreen::Level);
         return;
     }
@@ -66,11 +68,6 @@ fn spawn_or_skip_shader_compilation_loading_screen(
 }
 
 fn setup_particle_effects(mut commands: Commands, explosion_assets: Res<ExplosionAssets>) {
-    if !is_webgpu_or_native() {
-        // Skip particle effects setup if Hanabi is not supported.
-        return;
-    }
-
     // Spawn the particle effects for shader compilation.
     commands.spawn((
         StateScoped(LoadingScreen::Shaders),

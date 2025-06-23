@@ -1,6 +1,8 @@
 //! The screen state for the main gameplay.
 
-use bevy::{input::common_conditions::input_just_pressed, prelude::*, ui::Val::*};
+use bevy::{
+    input::common_conditions::input_just_pressed, prelude::*, ui::Val::*, window::CursorGrabMode,
+};
 
 use crate::{
     Pause,
@@ -27,6 +29,7 @@ pub(super) fn plugin(app: &mut App) {
             ),
         ),
     );
+    app.add_systems(OnEnter(Screen::Gameplay), lock_cursor);
     app.add_systems(OnExit(Screen::Gameplay), (close_menu, unpause));
     app.add_systems(
         OnEnter(Menu::None),
@@ -62,4 +65,8 @@ fn open_pause_menu(mut next_menu: ResMut<NextState<Menu>>) {
 
 fn close_menu(mut next_menu: ResMut<NextState<Menu>>) {
     next_menu.set(Menu::None);
+}
+
+fn lock_cursor(mut window: Single<&mut Window>) {
+    window.cursor_options.grab_mode = CursorGrabMode::Locked;
 }

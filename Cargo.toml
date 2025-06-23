@@ -35,7 +35,6 @@ bevy-tnua = "0.24"
 bevy-tnua-avian3d = "0.5"
 
 # VFX and decals
-bevy_firework = { version = "0.7" }
 bevy_hanabi = { version = "0.16.0", default-features = false, features = [
     "3d",
 ] }

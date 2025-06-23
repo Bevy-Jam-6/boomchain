@@ -1,12 +1,14 @@
 use bevy::prelude::*;
 
-use crate::PostPhysicsAppSystems;
+use crate::{PostPhysicsAppSystems, screens::Screen};
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<Health>();
     app.add_systems(
         Update,
-        kill_out_of_bounds.in_set(PostPhysicsAppSystems::TriggerDeath),
+        kill_out_of_bounds
+            .in_set(PostPhysicsAppSystems::TriggerDeath)
+            .run_if(in_state(Screen::Gameplay)),
     );
     app.add_observer(on_damage);
 }

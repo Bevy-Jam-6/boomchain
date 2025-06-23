@@ -21,7 +21,7 @@ pub(super) fn plugin(app: &mut App) {
     );
 }
 
-#[derive(Resource, Reflect)]
+#[derive(Resource, Reflect, Clone)]
 #[reflect(Resource)]
 pub(crate) struct GoreSettings {
     pub blood_decals: Gore,

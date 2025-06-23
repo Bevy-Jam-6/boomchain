@@ -8,7 +8,7 @@ use bevy_simple_subsecond_system::hot;
 use bevy_tnua::{TnuaAnimatingState, TnuaAnimatingStateDirective, prelude::*};
 use rand::Rng;
 
-use crate::{PostPhysicsAppSystems, gameplay::animation::AnimationPlayers, screens::Screen};
+use crate::{PostPhysicsAppSystems, gameplay::animation::AnimationPlayers};
 
 use super::{assets::NpcAssets, attack::Attacking};
 
@@ -16,9 +16,7 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<NpcAnimations>();
     app.add_systems(
         Update,
-        play_animations
-            .run_if(in_state(Screen::Gameplay))
-            .in_set(PostPhysicsAppSystems::PlayAnimations),
+        play_animations.in_set(PostPhysicsAppSystems::PlayAnimations),
     );
 }
 

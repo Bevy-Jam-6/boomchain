@@ -16,7 +16,9 @@ use bevy::{
 #[cfg(feature = "native")]
 use bevy::{
     core_pipeline::{experimental::taa::TemporalAntiAliasing, prepass::NormalPrepass},
-    pbr::{ScreenSpaceAmbientOcclusion, ShadowFilteringMethod},
+    pbr::{
+        ScreenSpaceAmbientOcclusion, ScreenSpaceAmbientOcclusionQualityLevel, ShadowFilteringMethod,
+    },
 };
 use bevy_enhanced_input::prelude::*;
 #[cfg(feature = "hot_patch")]
@@ -38,6 +40,7 @@ use super::{PLAYER_FLOAT_HEIGHT, Player, default_input::Rotate};
 pub(super) fn plugin(app: &mut App) {
     app.init_resource::<CameraSensitivity>();
     app.init_resource::<WorldModelFov>();
+    app.init_resource::<MouseInversion>();
 
     app.add_observer(spawn_view_model);
     app.add_observer(add_render_layers_to_point_light);
@@ -46,9 +49,7 @@ pub(super) fn plugin(app: &mut App) {
     app.add_observer(rotate_camera_yaw_and_pitch);
     app.add_systems(
         Update,
-        sync_camera_translation_with_player
-            .run_if(in_state(Screen::Gameplay))
-            .in_set(PostPhysicsAppSystems::Update),
+        sync_camera_translation_with_player.in_set(PostPhysicsAppSystems::Update),
     );
     app.add_systems(
         Update,
@@ -60,6 +61,7 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<WorldModelCamera>();
     app.register_type::<CameraSensitivity>();
     app.register_type::<WorldModelFov>();
+    app.register_type::<MouseInversion>();
 }
 
 /// The parent entity of the player's cameras.
@@ -132,7 +134,10 @@ fn spawn_view_model(
                 #[cfg(feature = "native")]
                 (
                     Msaa::Off,
-                    ScreenSpaceAmbientOcclusion::default(),
+                    ScreenSpaceAmbientOcclusion {
+                        quality_level: ScreenSpaceAmbientOcclusionQualityLevel::Medium,
+                        ..default()
+                    },
                     TemporalAntiAliasing::default(),
                     NormalPrepass,
                     ShadowFilteringMethod::Temporal,
@@ -219,6 +224,7 @@ fn rotate_camera_yaw_and_pitch(
     mut transform: Single<&mut NonTraumaTransform, With<PlayerCamera>>,
     sensitivity: Res<CameraSensitivity>,
     window: Single<&Window>,
+    mouse_inversion: Res<MouseInversion>,
 ) {
     if window.cursor_options.grab_mode == CursorGrabMode::None {
         return;
@@ -236,8 +242,13 @@ fn rotate_camera_yaw_and_pitch(
     // This situation is reversed when reading e.g. analog input from a gamepad however, where the same rules
     // as for keyboard input apply. Such an input should be multiplied by delta_time to get the intended rotation
     // independent of the framerate.
+    let pitch_sign = if mouse_inversion.invert_mouse_y {
+        -1.0
+    } else {
+        1.0
+    };
     let delta_yaw = delta.x * sensitivity.x;
-    let delta_pitch = delta.y * sensitivity.y;
+    let delta_pitch = delta.y * sensitivity.y * pitch_sign;
 
     let (yaw, pitch, roll) = transform.rotation.to_euler(EulerRot::YXZ);
     let yaw = yaw + delta_yaw;
@@ -341,4 +352,11 @@ impl Default for CameraSensitivity {
     fn default() -> Self {
         Self(Vec2::splat(1.0))
     }
+}
+
+#[derive(Resource, Reflect, Debug, Clone)]
+#[reflect(Resource)]
+#[derive(Default)]
+pub(crate) struct MouseInversion {
+    pub(crate) invert_mouse_y: bool,
 }

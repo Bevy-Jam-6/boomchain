@@ -14,7 +14,6 @@ mod font;
 mod gameplay;
 mod hdr;
 mod menus;
-pub(crate) mod platform_support;
 mod props;
 mod screens;
 mod shader_compilation;

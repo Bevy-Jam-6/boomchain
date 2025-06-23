@@ -17,7 +17,6 @@ use bevy_tnua::prelude::*;
 use crate::{
     PrePhysicsAppSystems,
     gameplay::{npc::stats::NpcStats, player::navmesh_position::LastValidPlayerNavmeshPosition},
-    screens::Screen,
 };
 
 use super::{ai_state::AiState, attack::Attacking};
@@ -33,8 +32,7 @@ pub(super) fn plugin(app: &mut App) {
         (sync_agent_velocity, set_controller_velocity)
             .chain()
             .in_set(RunFixedMainLoopSystem::BeforeFixedMainLoop)
-            .before(LandmassSystemSet::SyncExistence)
-            .run_if(in_state(Screen::Gameplay)),
+            .before(LandmassSystemSet::SyncExistence),
     );
     app.add_systems(
         RunFixedMainLoop,

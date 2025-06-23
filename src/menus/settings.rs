@@ -4,7 +4,10 @@
 
 use std::time::Duration;
 
-use bevy::{audio::Volume, input::common_conditions::input_just_pressed, prelude::*, ui::Val::*};
+use bevy::{
+    audio::Volume, ecs::spawn::SpawnWith, input::common_conditions::input_just_pressed, prelude::*,
+    ui::Val::*,
+};
 #[cfg(feature = "hot_patch")]
 use bevy_simple_subsecond_system::hot;
 
@@ -13,7 +16,7 @@ use crate::{
     font::FontAssets,
     gameplay::{
         gore_settings::{Gore, GoreSettings},
-        player::camera::{CameraSensitivity, WorldModelFov},
+        player::camera::{CameraSensitivity, MouseInversion, WorldModelFov},
     },
     menus::Menu,
     screens::Screen,
@@ -47,7 +50,12 @@ fn spawn_settings_menu(
     mut commands: Commands,
     fonts: Res<FontAssets>,
     gore_settings: Res<GoreSettings>,
+    mouse_inversion: Res<MouseInversion>,
 ) {
+    let fonts_outer = fonts.clone();
+    let fonts = fonts.clone();
+    let gore_settings = gore_settings.clone();
+    let mouse_inversion = mouse_inversion.clone();
     commands.spawn((
         widget::ui_root("Settings Screen"),
         StateScoped(Menu::Settings),
@@ -63,81 +71,101 @@ fn spawn_settings_menu(
                     grid_template_columns: RepeatedGridTrack::px(2, 400.0),
                     ..default()
                 },
-                children![
-                    // Audio
-                    (
-                        widget::label("Audio Volume", fonts.default.clone()),
-                        Node {
-                            justify_self: JustifySelf::End,
-                            ..default()
-                        }
-                    ),
-                    widget::plus_minus_bar(
+                Children::spawn(SpawnWith(move |parent: &mut ChildSpawner| {
+                    parent.spawn(
+                        // Audio
+                        (
+                            widget::label("Audio Volume", fonts.default.clone()),
+                            Node {
+                                justify_self: JustifySelf::End,
+                                ..default()
+                            },
+                        ),
+                    );
+                    parent.spawn(widget::plus_minus_bar(
                         GlobalVolumeLabel,
                         lower_volume,
                         raise_volume,
                         fonts.default.clone(),
                         Handle::<Font>::default(),
-                    ),
+                    ));
                     // Camera Sensitivity
-                    (
+                    parent.spawn((
                         widget::label("Camera Sensitivity", fonts.default.clone()),
                         Node {
                             justify_self: JustifySelf::End,
                             ..default()
-                        }
-                    ),
-                    widget::plus_minus_bar(
+                        },
+                    ));
+                    parent.spawn(widget::plus_minus_bar(
                         CameraSensitivityLabel,
                         lower_camera_sensitivity,
                         raise_camera_sensitivity,
                         fonts.default.clone(),
                         fonts.default.clone(),
-                    ),
+                    ));
+                    // Invert mouse Y
+                    parent.spawn((
+                        widget::label("Invert Mouse Y", fonts.default.clone()),
+                        Node {
+                            justify_self: JustifySelf::End,
+                            ..default()
+                        },
+                    ));
+                    parent.spawn(widget::cycle_select(
+                        vec!["No".to_string(), "Yes".to_string()],
+                        if mouse_inversion.invert_mouse_y { 1 } else { 0 },
+                        fonts.default.clone(),
+                        |trigger: Trigger<OnChangeSelection>,
+                         mut mouse_inversion: ResMut<MouseInversion>| {
+                            let selection = trigger.selection;
+                            mouse_inversion.invert_mouse_y = selection == 1;
+                        },
+                    ));
                     // Camera FOV
-                    (
+                    parent.spawn((
                         widget::label("Camera FOV", fonts.default.clone()),
                         Node {
                             justify_self: JustifySelf::End,
                             ..default()
-                        }
-                    ),
-                    widget::plus_minus_bar(
+                        },
+                    ));
+                    parent.spawn(widget::plus_minus_bar(
                         CameraFovLabel,
                         lower_camera_fov,
                         raise_camera_fov,
                         fonts.default.clone(),
                         fonts.default.clone(),
-                    ),
+                    ));
                     // Gib count
-                    (
+                    parent.spawn((
                         widget::label("Number of body parts", fonts.default.clone()),
                         Node {
                             justify_self: JustifySelf::End,
                             ..default()
-                        }
-                    ),
-                    widget::plus_minus_bar(
+                        },
+                    ));
+                    parent.spawn(widget::plus_minus_bar(
                         GibCountLabel,
                         lower_gib_count,
                         raise_gib_count,
                         fonts.default.clone(),
                         fonts.default.clone(),
-                    ),
+                    ));
                     // Gore settings for dismemberment
-                    (
+                    parent.spawn((
                         widget::label("Dismemberment", fonts.default.clone()),
                         Node {
                             justify_self: JustifySelf::End,
                             ..default()
-                        }
-                    ),
-                    widget::cycle_select(
+                        },
+                    ));
+                    parent.spawn(widget::cycle_select(
                         vec![
                             "Enabled (despawn after waves)".to_string(),
                             "Enabled (despawn after 10 s)".to_string(),
                             "Enabled (never despawn)".to_string(),
-                            "Disabled".to_string()
+                            "Disabled".to_string(),
                         ],
                         match gore_settings.blood_decals {
                             Gore::DespawnAfterWave => 0,
@@ -156,21 +184,21 @@ fn spawn_settings_menu(
                                 _ => Gore::None,
                             };
                         },
-                    ),
+                    ));
                     // Gore settings for blood decals
-                    (
+                    parent.spawn((
                         widget::label("Blood Splatter", fonts.default.clone()),
                         Node {
                             justify_self: JustifySelf::End,
                             ..default()
-                        }
-                    ),
-                    widget::cycle_select(
+                        },
+                    ));
+                    parent.spawn(widget::cycle_select(
                         vec![
                             "Enabled (despawn after waves)".to_string(),
                             "Enabled (despawn after 10 s)".to_string(),
                             "Enabled (never despawn)".to_string(),
-                            "Disabled".to_string()
+                            "Disabled".to_string(),
                         ],
                         match gore_settings.blood_decals {
                             Gore::DespawnAfterWave => 0,
@@ -189,10 +217,10 @@ fn spawn_settings_menu(
                                 _ => Gore::None,
                             };
                         },
-                    ),
-                ],
+                    ));
+                })),
             ),
-            widget::button("Back", fonts.default.clone(), go_back_on_click),
+            widget::button("Back", fonts_outer.default.clone(), go_back_on_click),
         ],
     ));
 }
