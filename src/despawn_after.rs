@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use bevy::prelude::*;
 use bevy_mesh_decal::Decal;
+use rand::Rng as _;
 
 use crate::PostPhysicsAppSystems;
 
@@ -57,11 +58,20 @@ fn despawn(mut commands: Commands, to_despawn: Query<Entity, With<Despawn>>) {
 /// the same material handle.
 #[derive(Component, Reflect)]
 #[reflect(Component)]
-pub(crate) struct FadeOutAndDespawn(pub Timer);
+pub(crate) struct FadeOutAndDespawn {
+    pub(crate) start_fade_out_timer: Timer,
+    pub(crate) despawn_timer: Timer,
+}
 
 impl FadeOutAndDespawn {
     pub(crate) fn new(duration: Duration) -> Self {
-        Self(Timer::new(duration, TimerMode::Once))
+        // Changing the blend mode is expensive, so let's not do it all at once!
+        let delay = rand::thread_rng().gen_range(0.0..=2.0);
+        let delay = Duration::from_secs_f64(delay);
+        Self {
+            start_fade_out_timer: Timer::new(delay, TimerMode::Once),
+            despawn_timer: Timer::new(duration.saturating_sub(delay), TimerMode::Once),
+        }
     }
 }
 
@@ -78,25 +88,31 @@ fn fade_out_and_despawn(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     for (mut fade_out, entity) in to_fade_out.iter_mut() {
-        fade_out.0.tick(time.delta());
+        fade_out.start_fade_out_timer.tick(time.delta());
+        if !fade_out.start_fade_out_timer.finished() {
+            continue;
+        }
+        fade_out.despawn_timer.tick(time.delta());
 
         // Fade out the material
+        let alpha = 1.0 - fade_out.despawn_timer.fraction();
+        let alpha = alpha * alpha;
         if let Ok((material, _)) = mesh_material_query.get(entity) {
             if let Some(mat) = materials.get_mut(material.id()) {
-                mat.base_color.set_alpha(1.0 - fade_out.0.fraction());
+                mat.base_color.set_alpha(alpha);
                 mat.alpha_mode = AlphaMode::Blend;
             }
         }
         for child in child_query.iter_descendants(entity) {
             if let Ok((material, _)) = mesh_material_query.get(child) {
                 if let Some(mat) = materials.get_mut(material.id()) {
-                    mat.base_color.set_alpha(1.0 - fade_out.0.fraction());
+                    mat.base_color.set_alpha(alpha);
                     mat.alpha_mode = AlphaMode::Blend;
                 }
             }
         }
 
-        if fade_out.0.finished() {
+        if fade_out.despawn_timer.finished() {
             // Set material alphas back to 1.0 before despawning
             if let Ok((material, no_opaque)) = mesh_material_query.get(entity) {
                 if let Some(mat) = materials.get_mut(material.id()) {
