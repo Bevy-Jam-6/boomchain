@@ -197,7 +197,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      toolchain: nightly-2025-04-03
+      toolchain: nightly-2025-05-14
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -212,7 +212,7 @@ jobs:
           shared-key: cli
 
       - name: Install Bevy linter
-        uses: TheBevyFlock/bevy_cli/bevy_lint@lint-v0.3.0
+        uses: TheBevyFlock/bevy_cli/bevy_lint@lint-v0.4.0-dev
 
       - name: Add cranelift to rustc
         run: rustup component add rustc-codegen-cranelift-preview --toolchain ${{ env.toolchain }}
