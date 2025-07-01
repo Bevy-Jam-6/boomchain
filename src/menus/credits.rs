@@ -142,12 +142,12 @@ fn grid(
                 (
                     widget::label_small(text, font.clone()),
                     Node {
-                        justify_self: if i % 2 == 0 {
+                        justify_self: if i.is_multiple_of(2) {
                             JustifySelf::End
                         } else {
                             JustifySelf::Start
                         },
-                        max_width: if i % 2 == 0 { Auto } else { Px(300.0) },
+                        max_width: if i.is_multiple_of(2) { Auto } else { Px(300.0) },
                         ..default()
                     },
                 )

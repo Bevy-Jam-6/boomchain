@@ -97,42 +97,42 @@ fn fade_out_and_despawn(
         // Fade out the material
         let alpha = 1.0 - fade_out.despawn_timer.fraction();
         let alpha = alpha * alpha;
-        if let Ok((material, _)) = mesh_material_query.get(entity) {
-            if let Some(mat) = materials.get_mut(material.id()) {
-                mat.base_color.set_alpha(alpha);
-                mat.alpha_mode = AlphaMode::Blend;
-            }
+        if let Ok((material, _)) = mesh_material_query.get(entity)
+            && let Some(mat) = materials.get_mut(material.id())
+        {
+            mat.base_color.set_alpha(alpha);
+            mat.alpha_mode = AlphaMode::Blend;
         }
         for child in child_query.iter_descendants(entity) {
-            if let Ok((material, _)) = mesh_material_query.get(child) {
-                if let Some(mat) = materials.get_mut(material.id()) {
-                    mat.base_color.set_alpha(alpha);
-                    mat.alpha_mode = AlphaMode::Blend;
-                }
+            if let Ok((material, _)) = mesh_material_query.get(child)
+                && let Some(mat) = materials.get_mut(material.id())
+            {
+                mat.base_color.set_alpha(alpha);
+                mat.alpha_mode = AlphaMode::Blend;
             }
         }
 
         if fade_out.despawn_timer.finished() {
             // Set material alphas back to 1.0 before despawning
-            if let Ok((material, no_opaque)) = mesh_material_query.get(entity) {
-                if let Some(mat) = materials.get_mut(material.id()) {
+            if let Ok((material, no_opaque)) = mesh_material_query.get(entity)
+                && let Some(mat) = materials.get_mut(material.id())
+            {
+                mat.base_color.set_alpha(1.0);
+                if !no_opaque {
+                    mat.alpha_mode = AlphaMode::Opaque;
+                } else {
+                    mat.alpha_mode = AlphaMode::Mask(0.5);
+                }
+            }
+            for child in child_query.iter_descendants(entity) {
+                if let Ok((material, no_opaque)) = mesh_material_query.get(child)
+                    && let Some(mat) = materials.get_mut(material.id())
+                {
                     mat.base_color.set_alpha(1.0);
                     if !no_opaque {
                         mat.alpha_mode = AlphaMode::Opaque;
                     } else {
                         mat.alpha_mode = AlphaMode::Mask(0.5);
-                    }
-                }
-            }
-            for child in child_query.iter_descendants(entity) {
-                if let Ok((material, no_opaque)) = mesh_material_query.get(child) {
-                    if let Some(mat) = materials.get_mut(material.id()) {
-                        mat.base_color.set_alpha(1.0);
-                        if !no_opaque {
-                            mat.alpha_mode = AlphaMode::Opaque;
-                        } else {
-                            mat.alpha_mode = AlphaMode::Mask(0.5);
-                        }
                     }
                 }
             }
