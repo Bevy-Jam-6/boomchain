@@ -196,6 +196,8 @@ jobs:
     name: Bevy linter
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      toolchain: nightly-2025-04-03
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -207,7 +209,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           save-if: ${{ github.ref == 'refs/heads/main' }}
-          shared-key: lints
+          shared-key: cli
 
       - name: Install Bevy linter
         uses: TheBevyFlock/bevy_cli/bevy_lint@lint-v0.3.0
