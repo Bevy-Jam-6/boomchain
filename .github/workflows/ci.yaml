@@ -12,7 +12,7 @@ concurrency:
 
 env:
   # Use the same Rust toolchain across jobs so they can share a cache.
-  toolchain: nightly-2025-07-01
+  toolchain: nightly-2025-05-14
 
 jobs:
   # Run tests.
@@ -196,8 +196,6 @@ jobs:
     name: Bevy linter
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    env:
-      toolchain: nightly-2025-05-14
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -209,7 +207,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           save-if: ${{ github.ref == 'refs/heads/main' }}
-          shared-key: cli
+          shared-key: lints
 
       - name: Install Bevy linter
       - uses: cargo install --git https://github.com/TheBevyFlock/bevy_cli --branch main --locked bevy_lint
