@@ -119,10 +119,10 @@ fn play_animations(
                     if let NpcAnimationState::Walking(speed) = state
                         && let Some((_index, playing_animation)) =
                             anim_player.playing_animations_mut().next()
-                        {
-                            let anim_speed = (speed / 5.0).max(0.2);
-                            playing_animation.set_speed(anim_speed);
-                        }
+                    {
+                        let anim_speed = (speed / 5.0).max(0.2);
+                        playing_animation.set_speed(anim_speed);
+                    }
                 }
                 TnuaAnimatingStateDirective::Alter {
                     // We don't need the old state here, but it's available for transition
