@@ -203,7 +203,7 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@master
         with:
-          components: rustc-codegen-cranelift-preview
+          components: rustc-codegen-cranelift-preview, rustc-dev, llvm-tools-preview
           toolchain: ${{ env.toolchain }}
 
       - name: Install dependencies
