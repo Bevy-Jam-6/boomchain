@@ -93,14 +93,6 @@ pub(crate) struct AngryIcon(Entity);
 
 #[derive(Component, Reflect)]
 #[reflect(Component)]
-pub(crate) struct WaveInProgressIcon;
-
-#[derive(Component, Reflect)]
-#[reflect(Component)]
-pub(crate) struct DeadIcon;
-
-#[derive(Component, Reflect)]
-#[reflect(Component)]
 pub(crate) struct PrepTimeText;
 
 #[derive(Component, Reflect, Deref, DerefMut)]
